@@ -1,0 +1,16 @@
+.deps/turand.Po
+Makefile.in
+aclocal.m4
+autom4te.cache
+compile
+config.h
+config.h.in
+config.h.in~
+config.log
+config.status
+configure
+configure.ac~
+depcomp
+install-sh
+missing
+stamp-h1

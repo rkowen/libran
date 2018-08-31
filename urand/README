@@ -1,0 +1,8 @@
+This urand directory is specialized to creating a sequential congruential
+uniform pseudo-random number generator based on Fortran77 code originally
+given by D.E. Knuth (1969) and then published by G.E. Forsysth,
+M.A. Malcolm, and C.B. Moler (1977); and converted to C with f2c.
+
+The configure script will run several tests and set certain options based
+on optimizing certain base operations.
+
