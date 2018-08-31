@@ -56,4 +56,11 @@ int	LR_igetseed(void);
 int	LR_igetrand(void);
 float	LR_fgetrand(void);
 
+long	LR_lrand(void);
+double	LR_drand(void);
+void	LR_lsetseed(long lty);
+long	LR_lgetseed(void);
+long	LR_lgetrand(void);
+double	LR_dgetrand(void);
+
 #endif	/* _URAND_H_ */

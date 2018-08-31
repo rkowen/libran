@@ -11,25 +11,23 @@ static const char RCSID[]="$Id: urand.c 106 2002-02-10 08:02:39Z rk $";
  *  with many features added.
  */
 /*
- *  irand()	- returns INTEGER   in range [0,IRAND_MAX]
- *  urand()	- returns PRECISION in range [0,1.0)
- *  setseed(INTEGER X)	- sets the seed to X
- *  getseed()	- gets the current seed
- *  getirand()	- returns last value returned from irand()
- *  geturand()	- returns last value returned from urand()
- *
- *  extern INTEGER IRAND_MAX	- the maximum value returned by irand
- *				  it's only defined after a call to
- *				  urand(), irand(), or setseed().
- * #define NOINTOVF	- if no integer overflow on addition
- * #define NOADDMULT	- if wordlength for addtion is same as multiplication
- * #define NOOPADD	- if using ^m is faster than -=m2, -=m2
- * #define NOOPSUB	- if using ^m is faster than +=m2, +=m2
+ *  LR_irand()		- returns int       in range [0,LR_IRAND_IMAX]
+ *  LR_lrand()		- returns long      in range [0,LR_IRAND_LMAX]
+ *  LR_frand()		- returns float     in range [0,1.0)
+ *  LR_drand()		- returns double    in range [0,1.0)
+ *  LR_isetseed(int X)	- sets the seed to X
+ *  LR_lsetseed(long X)	- sets the seed to X
+ *  LR_igetseed()	- gets the current seed
+ *  LR_lgetseed()	- gets the current seed
+ *  LR_igetrand()	- returns last value returned from irand()
+ *  LR_lgetrand()	- returns last value returned from lrand()
+ *  LR_fgetrand()	- returns last value returned from frand()
+ *  LR_dgetrand()	- returns last value returned from drand()
  */
 /*
  *********************************************************************
  *
- *     This software is copyrighted by R.K.Owen,Ph.D. 1996
+ *     This software is copyrighted by R.K.Owen,Ph.D. 1996,2018
  *
  * The author, R.K.Owen, of this software is not liable for any
  * problems WHATSOEVER which may result from use  or  abuse  of
@@ -43,301 +41,247 @@ static const char RCSID[]="$Id: urand.c 106 2002-02-10 08:02:39Z rk $";
  *
  *********************************************************************
  */
-/*
- * define TEST to create a stand-alone test program
- */
-
-#if 0
-#  define TEST
-#endif
-
-#include "urand.h"
+#include "config.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* global variables */
-INTEGER iy, iy0;
-INTEGER m = 1, m2 = 0;
-PRECISION s;
-PRECISION halfm;
-INTEGER ia, ic, mic;
-INTEGER IRAND_MAX = 0;
+int	lr_iy = 0, lr_iy0 = 0;
+long	lr_ly = 0, lr_ly0 = 0;
+float	lr_fscale, lr_fhalfm;
+double	lr_dscale, lr_dhalfm;
+int	lr_ia = 0, lr_ic = 0, lr_imc = 0;
+long	lr_la = 0, lr_lc = 0, lr_lmc = 0;
 
 #define SQRT3 1.7320508075688772935
 #define PI 3.141592653589793238462643
 
 void _set_rand(void) {
-	extern INTEGER m;
-	extern INTEGER m2;
-	extern PRECISION s;
-	extern PRECISION halfm;
-	extern INTEGER ia, ic, mic;
-	extern INTEGER IRAND_MAX;
+	extern float lr_fscale, lr_fhalfm;
+	extern double lr_dscale, lr_dhalfm;
+	extern int lr_ia, lr_ic, lr_imc;
+	extern long lr_la, lr_lc, lr_lmc;
 
-/*  COMPUTE MACHINE INTEGER WORD LENGTH */
-	do {
-		m2 = m;
-		m = 2 * m2;
-	} while (m > m2);
-
-	halfm = (PRECISION) m2;
-	IRAND_MAX = (m2 - 1) + m2;
+	lr_fhalfm = (float) LR_IRAND_IMAX2;
+	lr_dhalfm = (double) LR_IRAND_LMAX2;
 
 /*  COMPUTE MULTIPLIER AND INCREMENT FOR LINEAR CONGRUENTIAL METHOD */
-	ia = ((INTEGER) (halfm * PI / 32.) << 3) + 5;
-	ic = ((INTEGER) (halfm * (.5 - SQRT3 / 6.)) << 1) + 1;
-	mic = (m2 - ic) + m2;
+	lr_ia = ((int) (lr_fhalfm * PI / 32.) << 3) + 5;
+	lr_ic = ((int) (lr_fhalfm * (.5 - SQRT3 / 6.)) << 1) + 1;
+	lr_imc = (LR_IRAND_IMAX2 - lr_ic) + LR_IRAND_IMAX2;
+	lr_la = ((long) (lr_dhalfm * PI / 32.) << 3) + 5;
+	lr_lc = ((long) (lr_dhalfm * (.5 - SQRT3 / 6.)) << 1) + 1;
+	lr_lmc = (LR_IRAND_LMAX2 - lr_lc) + LR_IRAND_LMAX2;
 
-/*  S IS THE SCALE FACTOR FOR CONVERTING TO FLOATING POINT */
-	s = .5 / halfm;
+/*  SCALE FACTOR FOR CONVERTING TO FLOATING POINT */
+	lr_fscale = .5 / lr_fhalfm;
+	lr_dscale = .5 / lr_dhalfm;
 }
 
-INTEGER irand(void) {
-	extern INTEGER iy;
-	extern INTEGER m;
-	extern INTEGER m2;
-	extern PRECISION s;
-	extern PRECISION halfm;
-	extern INTEGER ia, ic, mic;
+/* lower precision int/float */
+int LR_irand(void) {
+	extern int lr_iy, lr_iy0;
+	extern float lr_fscale, lr_fhalfm;
+	extern int lr_ia, lr_ic, lr_imc;
 
 /*  IF FIRST ENTRY, COMPUTE URAND CONSTANTS */
-	if (m2 == 0) _set_rand();
+	if (lr_ia == 0) _set_rand();
 
 /*  COMPUTE NEXT RANDOM NUMBER */
-
-	iy *= ia;
-
+	lr_iy *= lr_ia;
 /*  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHICH DO NOT ALLOW */
 /*  INTEGER OVERFLOW ON ADDITION */
-
-#ifndef NOINTOVF
-	if (iy > mic) {
-#  ifndef NOOPSUB
-		iy -= m2;
-		iy -= m2;
-#  else
-		iy ^= m;
-#  endif
+#ifndef LR_NOINTOVF
+	if (lr_iy > lr_imc) {
+#ifdef LR_ISUB
+		lr_iy -= LR_IRAND_IMAX2;
+		lr_iy -= LR_IRAND_IMAX2;
+#elif defined LR_NOISUB
+		lr_iy ^= LR_IRAND_INOT;
+#else
+#  error "Need either LR_ISUB or LR_NOISUB to be defined"
+#endif
 	}
 #endif
-	iy += ic;
+	lr_iy += lr_ic;
 
 /*  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHERE THE */
 /*  WORD LENGTH FOR ADDITION IS GREATER THAN FOR MULTIPLICATION */
-
 #ifndef NOADDMULT
 	if (
-#ifndef NODIV
-		(iy >> 1)
+#ifdef LR_IDIV
+		(lr_iy/2)
+#elif defined LR_NOIDIV
+		(lr_iy >> 1)
 #else
-		(iy/2)
+#  error "Need either LR_IDIV or LR_NOIDIV to be defined"
 #endif
-	> m2) {
-#  ifndef NOOPSUB
-		iy -= m2;
-		iy -= m2;
-#  else
-		iy ^= m;
-#  endif
+	> LR_IRAND_IMAX2) {
+#ifdef LR_ISUB
+		lr_iy -= LR_IRAND_IMAX2;
+		lr_iy -= LR_IRAND_IMAX2;
+#elif defined LR_NOISUB
+		lr_iy ^= LR_IRAND_INOT;
+#else
+#  error "Need either LR_ISUB or LR_NOISUB to be defined"
+#endif
 	}
 #endif
 
 /*  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHERE INTEGER */
 /*  OVERFLOW AFFECTS THE SIGN BIT */
-
-	if (iy < 0) {
-#ifndef NOOPADD
-		iy += m2;
-		iy += m2;
+	if (lr_iy < 0) {
+#ifdef LR_IADD
+		lr_iy += LR_IRAND_IMAX2;
+		lr_iy += LR_IRAND_IMAX2;
+#elif defined LR_NOIADD
+		lr_iy ^= LR_IRAND_INOT;
 #else
-		iy ^= m;
+#  error "Need either LR_IADD or LR_NOIADD to be defined"
 #endif
 	}
-
-	return iy;
+	return lr_iy;
 }
 
-PRECISION urand(void) {
-#ifndef HACK_INLINE
-	extern INTEGER iy;
-	extern INTEGER m2;
-	extern PRECISION s;
-
-
-/*  IF FIRST ENTRY, COMPUTE URAND CONSTANTS */
-	if (m2 == 0) _set_rand();
+float LR_frand(void) {
+	extern int lr_iy;
+	extern float lr_fscale;
 
 /*  COMPUTE NEXT RANDOM NUMBER */
+	LR_irand();
 
-	irand();
-#else
-#  include "urand.in"
-#endif
-
-	return (PRECISION) (iy) * s;
+	return (float) (lr_iy) * lr_fscale;
 }
 
-void setseed(INTEGER ity) {
-	extern INTEGER iy, iy0;
-	extern INTEGER m2;
+void LR_isetseed(int ity) {
+	extern int lr_iy, lr_iy0;
+	extern int lr_ia;
 
 /*  IF FIRST ENTRY, COMPUTE URAND CONSTANTS */
-	if (m2 == 0) _set_rand();
+	if (lr_ia == 0) _set_rand();
 
-	iy = iy0 = ity;
+	lr_iy = lr_iy0 = ity;
 }
 
-INTEGER getseed(void) {
-	extern INTEGER iy0;
-	return iy0;
+int LR_igetseed(void) {
+	extern int lr_iy0;
+	return lr_iy0;
 }
 
-INTEGER getirand(void) {
-	extern INTEGER iy;
-	return iy;
+int LR_igetrand(void) {
+	extern int lr_iy;
+	return lr_iy;
 }
 
-PRECISION geturand(void) {
-	extern INTEGER iy;
-	extern PRECISION s;
-	return (PRECISION) (iy) * s;
+float LR_fgetrand(void) {
+	extern int lr_iy;
+	extern float lr_fscale;
+	return (float) (lr_iy) * lr_fscale;
+}
+
+/* higher precision long/double */
+long LR_lrand(void) {
+	extern long lr_ly, lr_ly0;
+	extern double lr_dscale, lr_dhalfm;
+	extern long lr_la, lr_lc, lr_lmc;
+
+/*  IF FIRST ENTRY, COMPUTE URAND CONSTANTS */
+	if (lr_la == 0) _set_rand();
+
+/*  COMPUTE NEXT RANDOM NUMBER */
+	lr_ly *= lr_la;
+/*  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHICH DO NOT ALLOW */
+/*  INTEGER OVERFLOW ON ADDITION */
+#ifndef LR_NOINTOVF
+	if (lr_ly > lr_lmc) {
+#ifdef LR_ISUB
+		lr_ly -= LR_IRAND_LMAX2;
+		lr_ly -= LR_IRAND_LMAX2;
+#elif defined LR_NOISUB
+		lr_ly ^= LR_IRAND_LNOT;
+#else
+#  error "Need either LR_ISUB or LR_NOISUB to be defined"
+#endif
+	}
+#endif
+	lr_ly += lr_lc;
+
+/*  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHERE THE */
+/*  WORD LENGTH FOR ADDITION IS GREATER THAN FOR MULTIPLICATION */
+#ifndef NOADDMULT
+	if (
+#ifdef LR_IDIV
+		(lr_ly/2)
+#elif defined LR_NOIDIV
+		(lr_ly >> 1)
+#else
+#  error "Need either LR_IDIV or LR_NOIDIV to be defined"
+#endif
+	> LR_IRAND_LMAX2) {
+#ifdef LR_ISUB
+		lr_ly -= LR_IRAND_LMAX2;
+		lr_ly -= LR_IRAND_LMAX2;
+#elif defined LR_NOISUB
+		lr_ly ^= LR_IRAND_LNOT;
+#else
+#  error "Need either LR_ISUB or LR_NOISUB to be defined"
+#endif
+	}
+#endif
+
+/*  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHERE INTEGER */
+/*  OVERFLOW AFFECTS THE SIGN BIT */
+	if (lr_ly < 0) {
+#ifdef LR_LADD
+		lr_ly += LR_IRAND_LMAX2;
+		lr_ly += LR_IRAND_LMAX2;
+#elif defined LR_NOLADD
+		lr_ly ^= LR_IRAND_LNOT;
+#else
+#  error "Need either LR_LADD or LR_NOIADD to be defined"
+#endif
+	}
+	return lr_ly;
+}
+
+double LR_drand(void) {
+	extern long lr_ly;
+	extern double lr_dscale;
+
+/*  COMPUTE NEXT RANDOM NUMBER */
+	LR_lrand();
+
+	return (double) (lr_ly) * lr_dscale;
+}
+
+void LR_lsetseed(long lty) {
+	extern long lr_ly, lr_ly0;
+	extern long lr_la;
+
+/*  IF FIRST ENTRY, COMPUTE URAND CONSTANTS */
+	if (lr_la == 0) _set_rand();
+
+	lr_ly = lr_ly0 = lty;
+}
+
+long LR_lgetseed(void) {
+	extern long lr_ly0;
+	return lr_ly0;
+}
+
+long LR_lgetrand(void) {
+	extern long lr_ly;
+	return lr_ly;
+}
+
+double LR_dgetrand(void) {
+	extern long lr_ly;
+	extern double lr_dscale;
+	return (double) (lr_ly) * lr_dscale;
 }
 
 #ifdef __cplusplus
 }
 #endif
-
-#ifdef TEST
-
-#  define PTEST(a,b)	\
-	if ((a) == (b)) printf("OK  "); \
-	else printf("FAIL"); \
-	printf(" : " #a "\n");
-
-#  define NTEST(a,b)	\
-	if ((a) != (b)) printf("OK  "); \
-	else printf("FAIL"); \
-	printf(" : " #a "\n");
-
-#  define ABS(a)	((a) < 0 ? -(a) : (a))
-
-#  include <time.h>
-#  include <stdio.h>
-#  include <stdlib.h>
-
-#  include "urand_.c"	/* includes common definitions & code too */
-
-#  ifndef MAXSMP
-#    define MAXSMP 1000000
-#  endif
-
-int main() {
-	extern INTEGER m, m2;
-	extern INTEGER IRAND_MAX;
-	int i, j;
-	int arrdim = 10;
-	int iarr1[10];
-	int uarr1[10];
-	int sample = 10000;
-	INTEGER myseed = sizeof(INTEGER);
-	INTEGER imax = 0;
-	double iten;
-	INTEGER itst;
-	PRECISION utst;
-	clocker_t t0;
-	double t1[MAXTRY],t2[MAXTRY], t1m, t2m, t1a, t2a;
-
-/* initialize arrays */
-	for (i=0; i<arrdim; ++i) {
-		iarr1[i] = 0;
-		uarr1[i] = 0;
-	}
-/* initialize seed */
-	setseed(myseed);
-	iten = 10./((double) IRAND_MAX);
-	utst = urand();
-	itst = irand();
-	PTEST(getirand(), itst );
-	NTEST(geturand(), utst );
-	itst = irand();
-	utst = urand();
-	PTEST(geturand(), utst );
-	NTEST(getirand(), itst );
-	PTEST(getseed(), myseed );
-
-/* sample from irand */
-	setseed(myseed);
-	for (i = 0; i < sample; ++i) {
-		++iarr1[(int) (((double) irand()) * iten)];
-		imax = (imax > getirand() ? imax : getirand());
-	}
-/* display results */
-	printf("seed      = %ld %ld\n",(long) myseed, (long) getseed());
-	printf("m2        = %ld\n",(long) m2);
-	printf("m         = %ld\t\t%lx\n",(long) m,(long) m);
-	printf("m2        = %ld\t\t%lx\n",(long) m2,(long) m2);
-	printf("IRAND_MAX = %ld\n",(long) IRAND_MAX);
-	printf("imax      = %ld\n", (long) imax);
-	printf("sampling from irand()\n");
-	for (i=0; i<arrdim; ++i) {
-		printf(" %5d",iarr1[i]);
-	}
-	printf("\n");
-/* sample from urand */
-	printf("sampling from urand()\n");
-	setseed(myseed);
-	for (i = 0; i < sample; ++i) {
-		++uarr1[((int) (10.*urand()))];
-	}
-	for (i=0; i<arrdim; ++i) {
-		printf(" %5d",uarr1[i]);
-	}
-	printf("\n");
-/* the two arrays should be roughly equivalent */
-	iten = sample/1000;
-	itst = 0;
-	for (i=0; i<arrdim; ++i) {
-		if (ABS(iarr1[i] - uarr1[i]) > iten) itst++;
-	}
-	if (itst) printf("FAIL");
-	else printf("OK  ");
-	printf(" : comparison between irand() and urand() distribution\n");
-
-/* timing results */
-
-	for (j = 0; j < MAXTRY; ++j) {
-/* clock irand */
-		(void) clocker(&t0, _SET);
-		for (i=0; i<MAXSMP; ++i) {
-			itst = irand();
-		}
-/* clock urand */
-		t1[j] = clocker(&t0, _RESET);
-		for (i=0; i<MAXSMP; ++i) {
-			utst = urand();
-		}
-		t2[j] = clocker(&t0, _RESET);
-/* display time */
-		printf("irand clocks: %7.3f\t\t", t1[j]);
-		printf("urand clocks: %7.3f\n", t2[j]);
-	}
-/* find median value */
-	qsort(t1, MAXTRY, sizeof(double), tcmp);
-	qsort(t2, MAXTRY, sizeof(double), tcmp);
-	t1m = t1[MAXTRY/2];
-	t2m = t2[MAXTRY/2];
-	t1a = tave(t1, MAXTRY);
-	t2a = tave(t2, MAXTRY);
-
-        printf("Median value --\n");
-	printf("irand clocks: %7.3f\t\t", t1m);
-	printf("urand clocks: %7.3f\n", t2m);
-        printf("Average value --\n");
-	printf("irand clocks: %7.3f\t\t", t1a);
-	printf("urand clocks: %7.3f\n", t2a);
-	return 0;
-}
-
-#endif /* TEST */

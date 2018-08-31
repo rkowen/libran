@@ -90,6 +90,26 @@ AC_TYPE_SIZE_T
 AC_LANG(C)
 
 # test certain run-time features
+AC_MSG_CHECKING([Check for wrapping integer overflow])
+AC_RUN_IFELSE([AC_LANG_PROGRAM(
+[
+],[
+int i = 7, ilast, j;
+int isize = (int) 8 * sizeof(int);
+for (j = 0; j < 2*isize; ++j) {
+	ilast = i;
+	i += i;
+	if (!(j%3)) ++i;
+	if ((ilast > i) || (i < 0)) return 0;
+}
+return 1;
+])],[
+AC_MSG_RESULT(does wrap-around integer overflow)
+],[AC_MSG_RESULT(does not allow integer overflow wrap-around)
+AC_DEFINE([LR_NOINTOVF],1,[Does not allow integer overflow wrap-around])
+],
+[AC_MSG_FAILURE(Can not cross compile to determine integer overflow behavior)]
+)
 AC_MSG_CHECKING([IRAND half max value])
 AC_RUN_IFELSE([AC_LANG_PROGRAM(
 [
@@ -121,8 +141,7 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM(
 "#define LR_IRAND_INOT	0x%x\n",
 		mm2, (mm2 - 1) + mm2, mm,
 		imm2, (imm2 - 1) + imm2, imm);
-]
-)],[
+])],[
 AC_MSG_RESULT(found values)
 ],[AC_MSG_FAILURE(Failed to determine LR_IRAND constants)],
 [AC_MSG_FAILURE(Can not cross compile LR_IRAND)]
