@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([LibRan],[0.1],[rk@owen.sj.ca.us])
-AM_INIT_AUTOMAKE(-Wportability)
+AM_INIT_AUTOMAKE(foreign -Wportability)
 AC_CONFIG_SRCDIR([urand.c])
 AC_CONFIG_HEADERS([config.h])
 AC_AIX
