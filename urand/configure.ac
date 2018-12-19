@@ -21,7 +21,7 @@ AH_TOP([
 	republished by G.E. Forsysth, M.A. Malcolm, and C.B. Moler (1977);
 	and converted from Fortran 77 to C with f2c.
 
- Copyright 2018 by R.K. Owen
+ Copyright 2018 by R.K. Owen, Ph.D.
  See LICENSE.LGPL, which must be provided, for details.
 
  ******************************************************************************

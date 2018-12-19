@@ -3,3 +3,14 @@ Do Not Edit!  This is a generated file.
 
 LibRan/Urand
 
+2018-08-30  R.K. Owen <rk@owen.sj.ca.us>
+
+  * urand/.gitignore, urand/configure.ac: Not using the GNU standard for files.
+
+  * urand/.gitignore, urand/INSTALL, urand/configure.ac, urand/urand.c,
+  urand/urand.h: Now with working and optimised version of urand "package."
+
+  * urand/.gitignore, urand/AUTHORS, urand/ChangeLog, urand/INSTALL,
+  urand/LICENSE.LGPL, urand/Makefile.am, urand/README, urand/turand.c,
+  urand/urand.c, urand/urand.h: Now have a working and optimised urand
+  "package."
