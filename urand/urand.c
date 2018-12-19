@@ -1,15 +1,19 @@
 static const char AUTHOR[]="@(#)urand 06/02/94 1.3 R.K.Owen,PhD";
 static const char RCSID[]="$Id: urand.c 106 2002-02-10 08:02:39Z rk $";
-/*      URAND IS A UNIFORM RANDOM NUMBER GENERATOR BASED  ON  THEORY  AND
- *  SUGGESTIONS  GIVEN  IN  D.E. KNUTH (1969),  VOL  2.   THE INTEGER  IY
- *  SHOULD BE INITIALIZED TO AN ARBITRARY INTEGER PRIOR TO THE FIRST CALL
- *  TO URAND.  THE CALLING PROGRAM SHOULD  NOT  ALTER  THE  VALUE  OF  IY
- *  BETWEEN  SUBSEQUENT CALLS TO URAND.  VALUES OF URAND WILL BE RETURNED
- *  IN THE INTERVAL (0,1).
- *
- *  C version ran through f2c and cleaned up by R.K.Owen,Ph.D. 02/12/93
- *  with many features added.
- */
+/*****
+ ******************************************************************************
+ LibRan/Urand - 
+	Urand is a specialized sequential congruential uniform
+	pseudo-random number generator based on theory and
+	suggestions given in D.E. Knuth (1969), vol 2.  and then
+	republished by G.E. Forsysth, M.A. Malcolm, and C.B. Moler (1977);
+	and converted from Fortran 77 to C with f2c.
+
+ Copyright 2018 by R.K. Owen, Ph.D.
+ See LICENSE.LGPL, which must be provided, for details.
+
+ ******************************************************************************
+ *****/
 /*
  *  LR_irand()		- returns int       in range [0,LR_IRAND_IMAX]
  *  LR_lrand()		- returns long      in range [0,LR_IRAND_LMAX]
@@ -24,23 +28,7 @@ static const char RCSID[]="$Id: urand.c 106 2002-02-10 08:02:39Z rk $";
  *  LR_fgetrand()	- returns last value returned from frand()
  *  LR_dgetrand()	- returns last value returned from drand()
  */
-/*
- *********************************************************************
- *
- *     This software is copyrighted by R.K.Owen,Ph.D. 1996,2018
- *
- * The author, R.K.Owen, of this software is not liable for any
- * problems WHATSOEVER which may result from use  or  abuse  of
- * this software. The author, R.K.Owen, grants unlimited rights
- * to anyone who uses and modifies this  software  for  private
- * non-commercial  use  as  long  as  this copyright and rights
- * notice remains in this software and is made available to all
- * recipients of this software.
- *
- * last known email: rk@owen.sj.ca.us
- *
- *********************************************************************
- */
+
 #include "config.h"
 
 #ifdef __cplusplus
@@ -111,22 +99,22 @@ int LR_irand(void) {
 /*  WORD LENGTH FOR ADDITION IS GREATER THAN FOR MULTIPLICATION */
 #ifndef NOADDMULT
 	if (
-#ifdef LR_IDIV
+#  ifdef LR_IDIV
 		(lr_iy/2)
-#elif defined LR_NOIDIV
+#  elif defined LR_NOIDIV
 		(lr_iy >> 1)
-#else
-#  error "Need either LR_IDIV or LR_NOIDIV to be defined"
-#endif
+#  else
+#    error "Need either LR_IDIV or LR_NOIDIV to be defined"
+#  endif
 	> LR_IRAND_IMAX2) {
-#ifdef LR_ISUB
+#  ifdef LR_ISUB
 		lr_iy -= LR_IRAND_IMAX2;
 		lr_iy -= LR_IRAND_IMAX2;
-#elif defined LR_NOISUB
+#  elif defined LR_NOISUB
 		lr_iy ^= LR_IRAND_INOT;
-#else
-#  error "Need either LR_ISUB or LR_NOISUB to be defined"
-#endif
+#  else
+#    error "Need either LR_ISUB or LR_NOISUB to be defined"
+#  endif
 	}
 #endif
 
