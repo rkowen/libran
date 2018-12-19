@@ -3,14 +3,60 @@ Do Not Edit!  This is a generated file.
 
 LibRan/Urand
 
-2018-08-30  R.K. Owen <rk@owen.sj.ca.us>
+76e6c034f1702eda080edb94d608009cf1e96c56
+  R.K. Owen
+  2018-12-19 15:31:57 -0700
+  Updated license info.
+M	urand/ChangeLog
+M	urand/configure.ac
+M	urand/urand.h
 
-  * urand/.gitignore, urand/configure.ac: Not using the GNU standard for files.
+145caace826d8eb56ce76405607bf8c8328e7e50
+  R.K. Owen
+  2018-12-19 15:30:37 -0700
+  Expanded the list of files to ignore.
+M	urand/.gitignore
 
-  * urand/.gitignore, urand/INSTALL, urand/configure.ac, urand/urand.c,
-  urand/urand.h: Now with working and optimised version of urand "package."
+4d05bb5683fd12689313829d35040107741a4f1d
+  R.K. Owen
+  2018-12-19 15:29:26 -0700
+  Indented the conditional statements, and updated licensing statement.
+M	urand/urand.c
 
-  * urand/.gitignore, urand/AUTHORS, urand/ChangeLog, urand/INSTALL,
-  urand/LICENSE.LGPL, urand/Makefile.am, urand/README, urand/turand.c,
-  urand/urand.c, urand/urand.h: Now have a working and optimised urand
-  "package."
+b4fecf47928807e4613661c49b47b510abe05185
+  R.K. Owen
+  2018-08-30 20:44:55 -0500
+  Not using the GNU standard for files.
+M	urand/.gitignore
+M	urand/configure.ac
+
+153301156a15aa443542bdc79f76b7b187472561
+  R.K. Owen
+  2018-08-30 20:31:30 -0500
+  Now with working and optimised version of urand "package."
+M	urand/.gitignore
+M	urand/INSTALL
+M	urand/configure.ac
+M	urand/urand.c
+M	urand/urand.h
+
+9e83a7992ad61c4abfb32ff869015e712328e671
+  R.K. Owen
+  2018-08-30 20:28:46 -0500
+  Now have a working and optimised urand "package."
+A	urand/.gitignore
+A	urand/AUTHORS
+A	urand/ChangeLog
+A	urand/INSTALL
+A	urand/LICENSE.LGPL
+A	urand/Makefile.am
+A	urand/README
+A	urand/turand.c
+A	urand/urand.c
+A	urand/urand.h
+
+3310bd1c8469db80acc5fb55ea46e86abdee92f8
+  R.K. Owen
+  2018-08-24 16:12:13 -0500
+  Working configure.ac - determines several IRAND constants and times the add/sub/div operations.
+A	urand/configure.ac
