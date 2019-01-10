@@ -16,7 +16,7 @@ AUTOMAKE_OPTIONS=foreign subdir-objects no-installinfo
 
 #ACLOCAL_AMFLAGS=-I config
 
-SUBDIRS = . urand
+SUBDIRS = . urand tests
 #AM_CPPFLAGS = -I$(srcdir)/include -I$(srcdir)
 
 LR_srcs	=								\
@@ -43,6 +43,7 @@ EXTRA_DIST=				\
 		$(man3_MANS)		\
 		include			\
 		urand			\
+		tests			\
 		config			\
 		docs
 

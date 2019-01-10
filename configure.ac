@@ -9,6 +9,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
 	Makefile
 	urand/Makefile
+	tests/Makefile
 ])
 
 # Checks for programs.
@@ -41,5 +42,5 @@ AC_CHECK_HEADERS([stdlib.h string.h])
 # Checks for library functions.
 AC_FUNC_MALLOC
 
-AC_CONFIG_SUBDIRS([urand])
+AC_CONFIG_SUBDIRS([urand tests])
 AC_OUTPUT
