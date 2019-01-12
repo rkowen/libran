@@ -5,6 +5,7 @@
 int LR_vset(LR_obj *o, char *x, va_list ap) {
 	LR_val t;
 	char x1;
+	int ret = 0;
 
 	while (x1 = *x++) {
 		switch (o->d) {
@@ -22,7 +23,8 @@ int LR_vset(LR_obj *o, char *x, va_list ap) {
 			t.d = va_arg(ap, double);
 			break;
 		default:
-			return 1;
+			/* should not get here unless a new type was added */
+			return -1;
 		}
 
 		switch (x1) {
@@ -43,10 +45,11 @@ int LR_vset(LR_obj *o, char *x, va_list ap) {
 			break;
 		default:
 			/* it is an error to include non-object attributes */
-			return 1;
+			/* but continue on and process remaining */
+			ret++;
 		}
 	}
-	return 0;
+	return ret;
 }
 
 int LR_set(LR_obj *o, char x, ...) {
