@@ -27,9 +27,12 @@ static const char RCSID[]="$Id: urand.c 106 2002-02-10 08:02:39Z rk $";
  *  LR_lgetrand()	- returns last value returned from lrand()
  *  LR_fgetrand()	- returns last value returned from frand()
  *  LR_dgetrand()	- returns last value returned from drand()
+ *  LR_igetval()	- returns URAND int  configuration values
+ *  LR_lgetval()	- returns URAND long configuration values
  */
 
 #include "config.h"
+#include <string.h>	/* strcmp */
 
 #ifdef __cplusplus
 extern "C" {
@@ -268,6 +271,26 @@ double LR_dgetrand(void) {
 	extern long lr_ly;
 	extern double lr_dscale;
 	return (double) (lr_ly) * lr_dscale;
+}
+
+int LR_igetval(char *val) {
+	if (!strcmp(val, "LR_IRAND_IMAX2"))
+		return	LR_IRAND_IMAX2;
+	else if (!strcmp(val, "LR_IRAND_IMAX"))
+		return	LR_IRAND_IMAX;
+	else if (!strcmp(val, "LR_IRAND_INOT"))
+		return	LR_IRAND_INOT;
+	return 0;
+}
+
+long LR_lgetval(char *val) {
+	if (!strcmp(val, "LR_IRAND_LMAX2"))
+		return	LR_IRAND_LMAX2;
+	else if (!strcmp(val, "LR_IRAND_LMAX"))
+		return	LR_IRAND_LMAX;
+	else if (!strcmp(val, "LR_IRAND_LNOT"))
+		return	LR_IRAND_LNOT;
+	return 0;
 }
 
 #ifdef __cplusplus

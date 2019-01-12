@@ -58,8 +58,11 @@ int main() {
 		imax = (imax > LR_igetrand() ? imax : LR_igetrand());
 	}
 /* display results */
-	printf("seed      = %ld %ld\n",(long) imyseed, (long) LR_igetseed());
-	printf("IRAND MAX = %ld\n",(long) LR_IRAND_IMAX);
+	printf("seed          = %ld %ld\n",(long) imyseed,(long) LR_igetseed());
+	printf("IRAND MAX     = %ld\n",(long) LR_IRAND_IMAX);
+	printf("LR_IRAND_IMAX = %ld\n",(long) LR_igetval("LR_IRAND_IMAX"));
+	printf("LR_IRAND_IMAX2= %ld\n",(long) LR_igetval("LR_IRAND_IMAX2"));
+	printf("LR_IRAND_INOT = %ld\n",(long) LR_igetval("LR_IRAND_INOT"));
 	printf("imax      = %ld\n", (long) imax);
 	printf("sampling from LR_irand()\n");
 	for (i=0; i<arrdim; ++i) {
@@ -114,6 +117,9 @@ int main() {
 /* display results */
 	printf("seed      = %ld %ld\n",(long) lmyseed, (long) LR_lgetseed());
 	printf("IRAND MAX = %ld\n",(long) LR_IRAND_LMAX);
+	printf("LR_IRAND_LMAX = %ld\n",(long) LR_lgetval("LR_IRAND_LMAX"));
+	printf("LR_IRAND_LMAX2= %ld\n",(long) LR_lgetval("LR_IRAND_LMAX2"));
+	printf("LR_IRAND_LNOT = %ld\n",(long) LR_lgetval("LR_IRAND_LNOT"));
 	printf("lmax      = %ld\n", (long) lmax);
 	printf("sampling from LR_lrand()\n");
 	for (i=0; i<arrdim; ++i) {

@@ -28,6 +28,8 @@ static const char RCSID[]="$Id: urand.c 106 2002-02-10 08:02:39Z rk $";
  *  LR_lgetrand()	- returns last value returned from lrand()
  *  LR_fgetrand()	- returns last value returned from frand()
  *  LR_dgetrand()	- returns last value returned from drand()
+ *  LR_igetval()	- returns URAND int  configuration values
+ *  LR_lgetval()	- returns URAND long configuration values
  *
  *  extern INTEGER IRAND_MAX	- the maximum value returned by irand
  *				  it's only defined after a call to
@@ -51,4 +53,6 @@ long	LR_lgetseed(void);
 long	LR_lgetrand(void);
 double	LR_dgetrand(void);
 
+int	LR_igetval(char *str);
+long	LR_lgetval(char *str);
 #endif	/* _URAND_H_ */
