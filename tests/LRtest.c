@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "libran.h"
+#include "urand/urand.h"
 #include <CUnit/CUnit.h>
 #include <CUnit/Basic.h>
 
@@ -9,7 +10,11 @@ int clean_suite(void) { return 0; }
 #define testLRnew(tt)			void test_new_##tt(void) {	\
 	LR_obj *o = LR_new(gaus, LR_##tt);				\
 	CU_ASSERT_PTR_NOT_NULL(o);					\
-	CU_ASSERT_EQUAL(o->d, LR_##tt);				\
+	CU_ASSERT_EQUAL(o->d, LR_##tt);					\
+	CU_ASSERT_PTR_EQUAL(o->ui, LR_irand);				\
+	CU_ASSERT_PTR_EQUAL(o->ul, LR_lrand);				\
+	CU_ASSERT_PTR_EQUAL(o->uf, LR_frand);				\
+	CU_ASSERT_PTR_EQUAL(o->ud, LR_drand);				\
 	CU_ASSERT_EQUAL(sizeof (*o), sizeof (LR_obj));			\
 	LR_rm(&o);							\
 	CU_ASSERT_PTR_NULL(o);						\

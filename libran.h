@@ -41,6 +41,11 @@ typedef struct {
 	LR_val		b;	/* upper bound */
 	LR_val		m;	/* middle value of distribution */
 	LR_val		s;	/* measure of distribution width */
+	/* uniform random number generators */
+	int	(*ui)(void);
+	long	(*ul)(void);
+	float	(*uf)(void);
+	double	(*ud)(void);
 }	LR_obj;
 
 /* LibRan function declarations */

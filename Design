@@ -21,7 +21,7 @@ conversion of values to the user.
 A libran object defined for one type of distribution can not be used by
 a different distribution and will raise an exception.
 
-t = s or d for single or double precision
+t = f or d for single (float) or double precision
   = i or l for an int or long integer precision
 
 xxx	- generic template
