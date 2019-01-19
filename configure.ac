@@ -4,11 +4,39 @@
 AC_PREREQ([2.69])
 AC_INIT([LibRan], [0.1], [rk@owen.sj.ca.us])
 AM_INIT_AUTOMAKE(foreign -Wportability)
+#
+# Doxygen
+AC_CHECK_PROGS([DOXYGEN], [doxygen])
+AC_CHECK_PROGS([DOT], [dot])
+AM_CONDITIONAL([DOXYGEN],[test -z "$DOXYGEN"])
+AM_CONDITIONAL([DOT],[test -z "$DOT"])
+if test -z "$DOXYGEN"; then
+	AC_MSG_WARN([Doxygen not found - continuing without Doxygen support])
+else
+	DX_INIT_DOXYGEN([LibRan],[.],[docs])
+	DX_HTML_FEATURE(ON)
+	DX_CHM_FEATURE(OFF)
+	DX_CHI_FEATURE(OFF)
+	DX_MAN_FEATURE(ON)
+	DX_RTF_FEATURE(OFF)
+	DX_XML_FEATURE(OFF)
+	DX_PDF_FEATURE(ON)
+	DX_PS_FEATURE(OFF)
+fi
+if test -n "$DOXYGEN"; then
+if test -n "$DOT"; then
+	:
+	DX_DOT_FEATURE(ON)
+else
+	AC_MSG_WARN([Dot not found - continuing without Doxygen dot graphics support])
+	DX_DOT_FEATURE(OFF)
+fi
+fi
+
 AC_CONFIG_SRCDIR([LRnew.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
 	Makefile
-	urand/Makefile
 	tests/Makefile
 ])
 
@@ -42,5 +70,5 @@ AC_CHECK_HEADERS([stdlib.h string.h])
 # Checks for library functions.
 AC_FUNC_MALLOC
 
-AC_CONFIG_SUBDIRS([urand tests])
+AC_CONFIG_SUBDIRS([urand])
 AC_OUTPUT

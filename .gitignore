@@ -16,5 +16,8 @@ depcomp
 install-sh
 missing
 stamp-h1
+html
+latex
+man
 *.o
 *.a

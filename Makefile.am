@@ -34,7 +34,12 @@ libran_a_SOURCES	=	\
 	$(LR_srcs) 		\
 	$(URAND_srcs)
 
-#man3_MANS =  \
+
+if DOXYGEN
+@DX_RULES@
+man3_MANS: doxygen-doc
+endif
+
 #	docs/urand.man 
 
 EXTRA_DIST=				\
