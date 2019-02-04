@@ -45,6 +45,8 @@ AC_PROG_CC
 AC_PROG_RANLIB
 
 # Checks for libraries.
+AC_CHECK_LIB([cunit],[CU_add_test])
+AM_CONDITIONAL([CUNIT],[test "x$ac_cv_lib_cunit_CU_add_test" = xyes])
 
 # Checks for header files.
 dnl ---------------------------------------------------------------------------

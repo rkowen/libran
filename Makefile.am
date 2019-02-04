@@ -16,7 +16,11 @@ AUTOMAKE_OPTIONS=foreign subdir-objects no-installinfo
 
 #ACLOCAL_AMFLAGS=-I config
 
-SUBDIRS = . urand tests
+if CUNIT
+	MAYBE_TESTS=tests
+endif
+SUBDIRS = . urand $(MAYBE_TESTS)
+
 #AM_CPPFLAGS = -I$(srcdir)/include -I$(srcdir)
 
 LR_srcs	=								\
@@ -52,6 +56,11 @@ EXTRA_DIST=				\
 		config			\
 		docs
 
+if CUNIT
+test:
+	cd tests; $(MAKE) test
+endif
+
 #dist-hook:
 #	rm -rf `find $(distdir) -name CVS -print`
 #	rm -rf `find $(distdir) -name Makefile -print`
@@ -66,6 +75,9 @@ help:
 	@echo ""
 	@echo "make		- compiles sources to library"
 	@echo "make all		- same as above"
+if CUNIT
+	@echo "make test	- make & run the test suite (if have CUnit)"
+endif
 	@echo "make install	- copy library & man pages to destination"
 	@echo "make clean	- cleans out most useless files"
 	@echo "make dist-gzip	- makes a .tar.gz tarball"
