@@ -17,6 +17,24 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 	ptr->uf = LR_frand;
 	ptr->ud = LR_drand;
 
+	/* set the default values */
+	ptr->t = t;
+	switch (t) {
+	case unif:
+		if (d == LR_double) {
+			ptr->a.d = (double) 0.0;
+			ptr->b.d = (double) 1.0;
+		} else if (d == LR_int) {
+			ptr->a.f = (float) 0.0;
+			ptr->b.f = (float) 1.0;
+		} else {
+			/* error */
+		}
+	default:
+		/* error */
+		break;
+	}
+
 	return  ptr;
 }
 

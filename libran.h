@@ -5,6 +5,8 @@
 #ifndef 	_LIBRAN_H_
 #  define	_LIBRAN_H
 
+#  include <stdarg.h>
+
 /*!
 \enum LR_type - an enum of allowed distribution types
 */
@@ -67,5 +69,10 @@ int LR_rm(LR_obj **o);
 int LR_vset(LR_obj *o, char *x, va_list ap);
 int LR_set(LR_obj *o, char x, ...);
 int LR_set_all(LR_obj *o, char *x, ...);
+
+/* double unif */
+double LRd_unif_RAN(LR_obj *o);
+double LRd_unif_PDF(LR_obj *o, double x);
+double LRd_unif_CDF(LR_obj *o, double x);
 
 #endif		/* _LIBRAN_H_ */
