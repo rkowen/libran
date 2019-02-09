@@ -62,17 +62,38 @@ typedef struct {
 	double	(*ud)(void);	/**< ud - double */
 }	LR_obj;
 
+/*!
+\struct LR_bin - the binning object
+*/
+typedef struct {
+	LR_data_type	d;	/**< t - binning type */
+	int		n;	/**< n - number of bins */
+	int		nn;	/**< nn - number of bins declared */
+	double *	bdrs;	/**< bdrs - set of bin boundaries (n - 1) */
+	long *		bins;	/**< bins - set of bins (n) */
+}	LR_bin;
+
 /* LibRan function declarations */
 LR_obj *LR_new(LR_type t, LR_data_type d);
 int LR_rm(LR_obj **o);
 
+/* LibRan object parameter setting */
 int LR_vset(LR_obj *o, char *x, va_list ap);
 int LR_set(LR_obj *o, char x, ...);
 int LR_set_all(LR_obj *o, char *x, ...);
+
+/* LibRan binning object */
+LR_bin *LR_bin_new(LR_data_type d, int n);
+int LR_bin_rm(LR_bin **b);
+int LR_bin_set(LR_bin *b, double x);
 
 /* double unif */
 double LRd_unif_RAN(LR_obj *o);
 double LRd_unif_PDF(LR_obj *o, double x);
 double LRd_unif_CDF(LR_obj *o, double x);
+/* float unif */
+double LRf_unif_RAN(LR_obj *o);
+double LRf_unif_PDF(LR_obj *o, float x);
+double LRf_unif_CDF(LR_obj *o, float x);
 
 #endif		/* _LIBRAN_H_ */

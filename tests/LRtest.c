@@ -96,6 +96,27 @@ testLRsetall3(float,.,f)
 testLRsetall3(long,L,l)
 testLRsetall3(double,.,d)
 
+/* binning object */
+#define testLRbinnew(tt)		void test_bin_new_##tt(void) {	\
+	LR_bin *b = LR_bin_new(LR_##tt,10);				\
+	CU_ASSERT_PTR_NOT_NULL(b);					\
+	CU_ASSERT_EQUAL(b->d, LR_##tt);					\
+	CU_ASSERT_EQUAL(b->n, 10);					\
+	CU_ASSERT_EQUAL(b->nn, 0);					\
+	CU_ASSERT_EQUAL(sizeof(b), sizeof(LR_bin *));			\
+	CU_ASSERT_EQUAL(sizeof(*b), sizeof(LR_bin));			\
+	CU_ASSERT_EQUAL(sizeof(*b), sizeof(LR_bin));			\
+	CU_ASSERT_EQUAL(sizeof(b->bdrs[0]), sizeof(double));		\
+	CU_ASSERT_EQUAL(sizeof(b->bins[0]), sizeof(long));		\
+	LR_bin_rm(&b);							\
+	CU_ASSERT_PTR_NULL(b);						\
+}
+
+testLRbinnew(int)
+testLRbinnew(long)
+testLRbinnew(float)
+testLRbinnew(double)
+
 int main(int argc, char* argv[]) {
 	CU_pSuite		pS		= NULL;
 	CU_BasicRunMode		mode		= CU_BRM_VERBOSE;
@@ -162,6 +183,10 @@ int main(int argc, char* argv[]) {
 	||  (NULL == CU_add_test(pS,"set_all3 - float", test_set_all3_float))
 	||  (NULL == CU_add_test(pS,"set_all3 - long", test_set_all3_long))
 	||  (NULL == CU_add_test(pS,"set_all3 - double",test_set_all3_double))
+	||  (NULL == CU_add_test(pS,"new_bin - int", test_bin_new_int))
+	||  (NULL == CU_add_test(pS,"new_bin - float", test_bin_new_float))
+	||  (NULL == CU_add_test(pS,"new_bin - long", test_bin_new_long))
+	||  (NULL == CU_add_test(pS,"new_bin - double", test_bin_new_double))
 	) {
 		printf("\nTest Suite additions failure.");
 		CU_cleanup_registry();

@@ -7,7 +7,6 @@
 
 LR_obj *LR_new(LR_type t, LR_data_type d) {
 	LR_obj *ptr = (void *) NULL;
-	/* ignore LR_type for now */
 	if (!(ptr = (LR_obj *) malloc(sizeof(LR_obj))))
 		return ptr;
 	ptr->d = d;
@@ -17,11 +16,10 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 	ptr->uf = LR_frand;
 	ptr->ud = LR_drand;
 
-	/* set the default values */
+	/* set the default values based on LR_type */
 	ptr->t = t;
 	switch (t) {
-	case unif:
-		if (d == LR_double) {
+	case unif: if (d == LR_double) {
 			ptr->a.d = (double) 0.0;
 			ptr->b.d = (double) 1.0;
 		} else if (d == LR_int) {
