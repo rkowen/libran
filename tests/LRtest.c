@@ -102,7 +102,7 @@ testLRsetall3(double,.,d)
 	CU_ASSERT_PTR_NOT_NULL(b);					\
 	CU_ASSERT_EQUAL(b->d, LR_##tt);					\
 	CU_ASSERT_EQUAL(b->n, 10);					\
-	CU_ASSERT_EQUAL(b->nn, 0);					\
+	CU_ASSERT_EQUAL(b->nn, 1);					\
 	CU_ASSERT_EQUAL(sizeof(b), sizeof(LR_bin *));			\
 	CU_ASSERT_EQUAL(sizeof(*b), sizeof(LR_bin));			\
 	CU_ASSERT_EQUAL(sizeof(*b), sizeof(LR_bin));			\
@@ -116,6 +116,26 @@ testLRbinnew(int)
 testLRbinnew(long)
 testLRbinnew(float)
 testLRbinnew(double)
+
+#define testLRbinset(nn,aa,bb,cc,dd)	void test_bin_set_##nn(void) {	\
+	LR_bin *b = LR_bin_new(LR_double,5);				\
+	CU_ASSERT_EQUAL(LR_bin_set(b, aa),0);				\
+	CU_ASSERT_EQUAL(LR_bin_set(b, bb),0);				\
+	CU_ASSERT_EQUAL(LR_bin_set(b, cc),0);				\
+	CU_ASSERT_EQUAL(LR_bin_set(b, dd),0);				\
+	CU_ASSERT_NOT_EQUAL(LR_bin_set(b, aa+bb),0);			\
+	CU_ASSERT_DOUBLE_EQUAL(b->bdrs[0],-1.0,.0001);			\
+	CU_ASSERT_DOUBLE_EQUAL(b->bdrs[1], 0.0,.0001);			\
+	CU_ASSERT_DOUBLE_EQUAL(b->bdrs[2], 3.3,.0001);			\
+	CU_ASSERT_DOUBLE_EQUAL(b->bdrs[3], 4.5,.0001);			\
+	CU_ASSERT_DOUBLE_EQUAL(b->bdrs[4], 0.0,.0001);			\
+	LR_bin_rm(&b);							\
+}
+
+testLRbinset(1,-1.0,0.0,3.3,4.5)
+testLRbinset(2,4.5,3.3,0.0,-1.0)
+testLRbinset(3,-1.0,4.5,3.3,0.0)
+testLRbinset(4,3.3,-1.0,4.5,0.0)
 
 int main(int argc, char* argv[]) {
 	CU_pSuite		pS		= NULL;
@@ -187,6 +207,10 @@ int main(int argc, char* argv[]) {
 	||  (NULL == CU_add_test(pS,"new_bin - float", test_bin_new_float))
 	||  (NULL == CU_add_test(pS,"new_bin - long", test_bin_new_long))
 	||  (NULL == CU_add_test(pS,"new_bin - double", test_bin_new_double))
+	||  (NULL == CU_add_test(pS,"new_bin_set - 1", test_bin_set_1))
+	||  (NULL == CU_add_test(pS,"new_bin_set - 2", test_bin_set_2))
+	||  (NULL == CU_add_test(pS,"new_bin_set - 3", test_bin_set_3))
+	||  (NULL == CU_add_test(pS,"new_bin_set - 4", test_bin_set_4))
 	) {
 		printf("\nTest Suite additions failure.");
 		CU_cleanup_registry();
