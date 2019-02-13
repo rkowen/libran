@@ -15,12 +15,11 @@ This set of functions: set-up, count values into bins, and take-down
 @param	n	number of bins
 @return	LR_bin object
 */
-LR_bin *LR_bin_new(LR_data_type d, int n) {
+LR_bin *LR_bin_new(int n) {
 	LR_bin *ptr = (void *) NULL;
 
 	if (!(ptr = (LR_bin *) malloc(sizeof(LR_bin))))
 		return ptr;
-	ptr->d  = d;
 	ptr->n  = n;
 	ptr->nn = 1;	/* always start with one bin */
 

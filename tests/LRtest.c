@@ -98,9 +98,8 @@ testLRsetall3(double,.,d)
 
 /* binning object */
 #define testLRbinnew(tt)		void test_bin_new_##tt(void) {	\
-	LR_bin *b = LR_bin_new(LR_##tt,10);				\
+	LR_bin *b = LR_bin_new(10);					\
 	CU_ASSERT_PTR_NOT_NULL(b);					\
-	CU_ASSERT_EQUAL(b->d, LR_##tt);					\
 	CU_ASSERT_EQUAL(b->n, 10);					\
 	CU_ASSERT_EQUAL(b->nn, 1);					\
 	CU_ASSERT_EQUAL(sizeof(b), sizeof(LR_bin *));			\
@@ -112,13 +111,15 @@ testLRsetall3(double,.,d)
 	CU_ASSERT_PTR_NULL(b);						\
 }
 
+/*
 testLRbinnew(int)
 testLRbinnew(long)
 testLRbinnew(float)
+*/
 testLRbinnew(double)
 
 #define testLRbinset(nn,aa,bb,cc,dd)	void test_bin_set_##nn(void) {	\
-	LR_bin *b = LR_bin_new(LR_double,5);				\
+	LR_bin *b = LR_bin_new(5);					\
 	CU_ASSERT_EQUAL(LR_bin_set(b, aa),0);				\
 	CU_ASSERT_EQUAL(LR_bin_set(b, bb),0);				\
 	CU_ASSERT_EQUAL(LR_bin_set(b, cc),0);				\
@@ -203,9 +204,11 @@ int main(int argc, char* argv[]) {
 	||  (NULL == CU_add_test(pS,"set_all3 - float", test_set_all3_float))
 	||  (NULL == CU_add_test(pS,"set_all3 - long", test_set_all3_long))
 	||  (NULL == CU_add_test(pS,"set_all3 - double",test_set_all3_double))
+/*
 	||  (NULL == CU_add_test(pS,"new_bin - int", test_bin_new_int))
 	||  (NULL == CU_add_test(pS,"new_bin - float", test_bin_new_float))
 	||  (NULL == CU_add_test(pS,"new_bin - long", test_bin_new_long))
+*/
 	||  (NULL == CU_add_test(pS,"new_bin - double", test_bin_new_double))
 	||  (NULL == CU_add_test(pS,"new_bin_set - 1", test_bin_set_1))
 	||  (NULL == CU_add_test(pS,"new_bin_set - 2", test_bin_set_2))

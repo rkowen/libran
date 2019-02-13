@@ -66,7 +66,6 @@ typedef struct {
 \struct LR_bin - the binning object
 */
 typedef struct {
-	LR_data_type	d;	/**< t - binning type */
 	int		n;	/**< n - number of bins */
 	int		nn;	/**< nn - number of bins declared */
 	double *	bdrs;	/**< bdrs - set of bin boundaries (n - 1) */
@@ -83,7 +82,7 @@ int LR_set(LR_obj *o, char x, ...);
 int LR_set_all(LR_obj *o, char *x, ...);
 
 /* LibRan binning object */
-LR_bin *LR_bin_new(LR_data_type d, int n);
+LR_bin *LR_bin_new(int n);
 int LR_bin_rm(LR_bin **b);
 int LR_bin_set(LR_bin *b, double x);
 
