@@ -138,6 +138,25 @@ testLRbinset(2,4.5,3.3,0.0,-1.0)
 testLRbinset(3,-1.0,4.5,3.3,0.0)
 testLRbinset(4,3.3,-1.0,4.5,0.0)
 
+#define testLRbinadd(nn,aa)		void test_bin_add_##nn(void) {	\
+	LR_bin *b = LR_bin_new(aa+2);					\
+	for (int i = 1; i < aa; i++) {					\
+		CU_ASSERT_EQUAL(LR_bin_set(b, i/(double) aa),0);	\
+	}								\
+	for (int i = 0; i < 10000; i++) {				\
+		CU_ASSERT_EQUAL(LR_bin_add(b, 0.0001*i),0);		\
+	}								\
+	for (int i = 0; i < aa; i++) {					\
+		CU_ASSERT_DOUBLE_EQUAL(b->bins[i],10000./(double) aa, 1.);\
+	}								\
+	LR_bin_rm(&b);							\
+}
+
+testLRbinadd(1,10)
+testLRbinadd(2,30)
+testLRbinadd(3,50)
+testLRbinadd(4,100)
+
 int main(int argc, char* argv[]) {
 	CU_pSuite		pS		= NULL;
 	CU_BasicRunMode		mode		= CU_BRM_VERBOSE;
@@ -214,6 +233,10 @@ int main(int argc, char* argv[]) {
 	||  (NULL == CU_add_test(pS,"new_bin_set - 2", test_bin_set_2))
 	||  (NULL == CU_add_test(pS,"new_bin_set - 3", test_bin_set_3))
 	||  (NULL == CU_add_test(pS,"new_bin_set - 4", test_bin_set_4))
+	||  (NULL == CU_add_test(pS,"new_bin_add - 1", test_bin_add_1))
+	||  (NULL == CU_add_test(pS,"new_bin_add - 2", test_bin_add_2))
+	||  (NULL == CU_add_test(pS,"new_bin_add - 3", test_bin_add_3))
+	||  (NULL == CU_add_test(pS,"new_bin_add - 4", test_bin_add_4))
 	) {
 		printf("\nTest Suite additions failure.");
 		CU_cleanup_registry();

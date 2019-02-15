@@ -22,6 +22,7 @@ LR_bin *LR_bin_new(int n) {
 		return ptr;
 	ptr->n  = n;
 	ptr->nn = 1;	/* always start with one bin */
+	ptr->c  = 0;
 
 	if (!(ptr->bdrs = (double *) calloc(n, sizeof(double))))
 		goto bad0;
@@ -89,6 +90,31 @@ int LR_bin_set(LR_bin *b, double x) {
 		}
 	}
 	b->nn++;
+
+	return 0;
+}
+
+/*!
+@brief	LR_bin_add(LR_bin *b, double x) - collect value to be binned.
+
+@param	b	LR_bin object
+@param	x	value to count within the given bin.
+@return	0 if successful, else non-zero if failed
+*/
+int LR_bin_add(LR_bin *b, double x) {
+	int i = 0;
+
+	while (i <= b->nn - 1) {
+		if (x < b->bdrs[i]
+		||  i == b->nn - 1) {
+			b->bins[i]++;
+			break;
+		}
+		i++;
+	}
+	if (i >= b->nn)				return -1;
+
+	b->c++;
 
 	return 0;
 }

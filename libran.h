@@ -68,6 +68,7 @@ typedef struct {
 typedef struct {
 	int		n;	/**< n - number of bins */
 	int		nn;	/**< nn - number of bins declared */
+	long		c;	/**< c - count of values */
 	double *	bdrs;	/**< bdrs - set of bin boundaries (n - 1) */
 	long *		bins;	/**< bins - set of bins (n) */
 }	LR_bin;
@@ -85,6 +86,7 @@ int LR_set_all(LR_obj *o, char *x, ...);
 LR_bin *LR_bin_new(int n);
 int LR_bin_rm(LR_bin **b);
 int LR_bin_set(LR_bin *b, double x);
+int LR_bin_add(LR_bin *b, double x);
 
 /* double unif */
 double LRd_unif_RAN(LR_obj *o);
