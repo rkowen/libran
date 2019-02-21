@@ -22,7 +22,7 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 	case unif: if (d == LR_double) {
 			ptr->a.d = (double) 0.0;
 			ptr->b.d = (double) 1.0;
-		} else if (d == LR_int) {
+		} else if (d == LR_float) {
 			ptr->a.f = (float) 0.0;
 			ptr->b.f = (float) 1.0;
 		} else {

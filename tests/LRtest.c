@@ -157,8 +157,110 @@ testLRbinadd(2,30)
 testLRbinadd(3,50)
 testLRbinadd(4,100)
 
+/* distributions */
+#define compCdfPdf(tt,dist,oo,xx,xxh,tol)				\
+CU_ASSERT_DOUBLE_EQUAL(							\
+	((LR##tt ## _##dist ## _CDF(oo,xxh)) - (LR##tt ## _##dist ## _CDF(oo,xx)))/((xxh)-(xx)),	\
+	LR##tt ## _##dist ## _PDF(oo,xx),tol)
+
+#define testCdfPdf(nn,tt,ttt,dist,nnt,tol,setup)			\
+void test_cdf_pdf_##tt ## ##dist ## _##nn(void) {			\
+	LR_obj *o = LR_new(dist, LR_##ttt);				\
+	double	incr;							\
+	setup;								\
+	incr = (o->b.tt - o->a.tt)/nnt;					\
+	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _CDF(o,o->a.tt-2*incr),0.,tol) \
+	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _PDF(o,o->a.tt-2*incr),0.,tol) \
+	for (int i; i < nnt; i++) {					\
+	  compCdfPdf(tt,dist,o,o->a.tt+i*incr,o->a.tt+i*incr+.0001,.001)\
+	}								\
+	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _CDF(o,o->b.tt+2*incr),1.,tol) \
+	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _PDF(o,o->b.tt+2*incr),0.,tol) \
+}
+
+/* test some well defined points */
+#define testCdfPdf0(nn,tt,ttt,dist,tol,setup)				\
+void test_cdf_pdf_##tt ## ##dist ## _##nn(void) {			\
+	LR_obj *o = LR_new(dist, LR_##ttt);				\
+	double	ival,pval;						\
+	setup;								\
+	ival = (o->b.tt - o->a.tt);					\
+	pval = 1.0/ival;						\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _CDF(o,o->a.tt-.1),0.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _PDF(o,o->a.tt-.1),0.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _CDF(o,o->a.tt),0.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _PDF(o,o->a.tt),pval,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _CDF(o,o->a.tt+.25*ival),.25,tol) \
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _PDF(o,o->a.tt+.25*ival),pval,tol)\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _CDF(o,o->a.tt+.5*ival),.5,tol) \
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _PDF(o,o->a.tt+.5*ival),pval,tol)\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _CDF(o,o->a.tt+.75*ival),.75,tol) \
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _PDF(o,o->a.tt+.75*ival),pval,tol)\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _CDF(o,o->b.tt),1.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _PDF(o,o->b.tt),0.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _CDF(o,o->b.tt+.1),1.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _##dist ## _PDF(o,o->b.tt+.1),0.,tol)	\
+}
+
+/* uniform distribution */
+int tirand(void);
+long tlrand(void);
+float tfrand(void);
+double tdrand(void);
+
+testCdfPdf0(0,d,double,unif,.001,)
+testCdfPdf(1,d,double,unif,20,.001,)
+testCdfPdf(2,d,double,unif,50,.001,)
+testCdfPdf(3,d,double,unif,90,.001,)
+
+testCdfPdf0(4,d,double,unif,.001,LR_set_all(o,"ab",-2.,2.))
+testCdfPdf(5,d,double,unif,33,.001,LR_set_all(o,"ab",-1.,3.))
+
+testCdfPdf0(0,f,float,unif,.001,)
+testCdfPdf(1,f,float,unif,20,.001,)
+testCdfPdf(2,f,float,unif,50,.001,)
+testCdfPdf(3,f,float,unif,90,.001,)
+
+testCdfPdf0(4,f,float,unif,.001,LR_set_all(o,"ab",-2.,2.))
+testCdfPdf(5,f,float,unif,33,.001,LR_set_all(o,"ab",-1.,3.))
+
+/* the last bin will have one less then rest ... so may be off by 2. */
+#define testLRunif(nn,tt,ttt,dist,bn,setup)				\
+void test_unif_##tt ## _##nn(void) {\
+	LR_obj *o = LR_new(dist, LR_##ttt);				\
+	LR_bin *b = LR_bin_new(bn);					\
+	double	x, cdf[bn], tot = 10007.;				\
+	setup;								\
+	double	incr = (o->b.tt - o->a.tt) / bn;			\
+	o->uf = tfrand; o->ud = tdrand;					\
+	for (int i = 1; i < bn; i++) {					\
+		LR_bin_set(b,o->a.tt + i*incr);				\
+		cdf[i-1] = tot*(LR##tt ## _##dist ## _CDF(o,o->a.tt+i*incr) \
+			- LR##tt ## _##dist ## _CDF(o,o->a.tt+(i-1)*incr)); \
+	}								\
+	cdf[bn-1] = tot*(LR##tt ## _##dist ## _CDF(o,o->b.tt)		\
+			- LR##tt ## _##dist ## _CDF(o,o->b.tt - incr));	\
+	for (int i = 0; i < tot; i++) {					\
+		LR_bin_add(b,LR##tt ## _##dist ## _RAN(o));		\
+	}								\
+	for (int i = 0; i < bn; i++) {					\
+		CU_ASSERT_DOUBLE_EQUAL(b->bins[i],cdf[i],2.);		\
+	}								\
+}
+
+testLRunif(1,d,double,unif,10,)
+testLRunif(2,d,double,unif,25,)
+testLRunif(3,d,double,unif,20,LR_set_all(o,"ab",-2.,2.))
+testLRunif(4,d,double,unif,60,LR_set_all(o,"ab",-5.,1.))
+
+testLRunif(1,f,float,unif,10,)
+testLRunif(2,f,float,unif,25,)
+testLRunif(3,f,float,unif,20,LR_set_all(o,"ab",-2.,2.))
+testLRunif(4,f,float,unif,60,LR_set_all(o,"ab",-5.,1.))
+
 int main(int argc, char* argv[]) {
 	CU_pSuite		pS		= NULL;
+	CU_pSuite		pSint		= NULL;
 	CU_BasicRunMode		mode		= CU_BRM_VERBOSE;
 	CU_ErrorAction		error_action	= CUEA_IGNORE;
 	int i;
@@ -202,6 +304,13 @@ int main(int argc, char* argv[]) {
 		CU_cleanup_registry();
 		return CU_get_error();
 	}
+	pSint = CU_add_suite("LR_test_suite_interval",
+		init_suite, clean_suite);
+	if (pSint == NULL) {
+		printf("\nTest Registry Suite interval failure.");
+		CU_cleanup_registry();
+		return CU_get_error();
+	}
 	/* add tests to the suite */
 	if ((NULL == CU_add_test(pS,"new - int", test_new_int))
 	||  (NULL == CU_add_test(pS,"new - float", test_new_float))
@@ -239,6 +348,31 @@ int main(int argc, char* argv[]) {
 	||  (NULL == CU_add_test(pS,"new_bin_add - 4", test_bin_add_4))
 	) {
 		printf("\nTest Suite additions failure.");
+		CU_cleanup_registry();
+		return CU_get_error();
+	}
+	if ((NULL == CU_add_test(pSint,"Unif-P/CDF-d-0", test_cdf_pdf_dunif_0))
+	||  (NULL == CU_add_test(pSint,"Unif-P/CDF-d-1", test_cdf_pdf_dunif_1))
+	||  (NULL == CU_add_test(pSint,"Unif-P/CDF-d-2", test_cdf_pdf_dunif_2))
+	||  (NULL == CU_add_test(pSint,"Unif-P/CDF-d-3", test_cdf_pdf_dunif_3))
+	||  (NULL == CU_add_test(pSint,"Unif-P/CDF-d-4", test_cdf_pdf_dunif_4))
+	||  (NULL == CU_add_test(pSint,"Unif-P/CDF-d-5", test_cdf_pdf_dunif_5))
+	||  (NULL == CU_add_test(pSint,"Unif-Ran-d-1", test_unif_d_1))
+	||  (NULL == CU_add_test(pSint,"Unif-Ran-d-2", test_unif_d_2))
+	||  (NULL == CU_add_test(pSint,"Unif-Ran-d-3", test_unif_d_3))
+	||  (NULL == CU_add_test(pSint,"Unif-Ran-d-4", test_unif_d_4))
+	||  (NULL == CU_add_test(pSint,"Unif-P/CDF-f-0", test_cdf_pdf_funif_0))
+	||  (NULL == CU_add_test(pSint,"Unif-P/CDF-f-1", test_cdf_pdf_funif_1))
+	||  (NULL == CU_add_test(pSint,"Unif-P/CDF-f-2", test_cdf_pdf_funif_2))
+	||  (NULL == CU_add_test(pSint,"Unif-P/CDF-f-3", test_cdf_pdf_funif_3))
+	||  (NULL == CU_add_test(pSint,"Unif-P/CDF-f-4", test_cdf_pdf_funif_4))
+	||  (NULL == CU_add_test(pSint,"Unif-P/CDF-f-5", test_cdf_pdf_funif_5))
+	||  (NULL == CU_add_test(pSint,"Unif-Ran-f-1", test_unif_f_1))
+	||  (NULL == CU_add_test(pSint,"Unif-Ran-f-2", test_unif_f_2))
+	||  (NULL == CU_add_test(pSint,"Unif-Ran-f-3", test_unif_f_3))
+	||  (NULL == CU_add_test(pSint,"Unif-Ran-f-4", test_unif_f_4))
+	) {
+		printf("\nTest Suite interval additions failure.");
 		CU_cleanup_registry();
 		return CU_get_error();
 	}

@@ -93,8 +93,8 @@ double LRd_unif_RAN(LR_obj *o);
 double LRd_unif_PDF(LR_obj *o, double x);
 double LRd_unif_CDF(LR_obj *o, double x);
 /* float unif */
-double LRf_unif_RAN(LR_obj *o);
-double LRf_unif_PDF(LR_obj *o, float x);
-double LRf_unif_CDF(LR_obj *o, float x);
+float LRf_unif_RAN(LR_obj *o);
+float LRf_unif_PDF(LR_obj *o, float x);
+float LRf_unif_CDF(LR_obj *o, float x);
 
 #endif		/* _LIBRAN_H_ */

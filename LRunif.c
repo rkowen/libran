@@ -61,3 +61,52 @@ double LRd_unif_CDF(LR_obj *o, double x) {
 	}
 }
 
+/*!
+@brief	LRf_unif_RAN(LR_obj *o) - float random uniform distribution
+
+@param o	LR_obj object
+@return float
+*/
+float LRf_unif_RAN(LR_obj *o) {
+	float x, diff = (o->b.f - o->a.f); 
+	x = o->uf();
+
+	return o->a.f + x * diff;
+}
+
+/*!
+@brief	LRf_unif_PDF(LR_obj *o, float x) - float uniform probablity distribution function
+
+@param o	LR_obj object
+@param x	value
+@return float PDF at x
+*/
+float LRf_unif_PDF(LR_obj *o, float x) {
+	float diff = (o->b.f - o->a.f); 
+
+	if (x < o->a.f || x >= o->b.f) {
+		return 0.0;
+	} else {
+		return 1.0 / diff;
+	}
+}
+
+/*!
+@brief	LRf_unif_CDF(LR_obj *o, float x) - float uniform cumulative distribution function
+
+@param o	LR_obj object
+@param x	value
+@return float CDF at x
+*/
+float LRf_unif_CDF(LR_obj *o, float x) {
+	float diff = (o->b.f - o->a.f); 
+
+	if (x < o->a.f) {
+		return 0.0;
+	} else if (x >= o->b.f) {
+		return 1.0;
+	} else {
+		return (x - o->a.f) / diff;
+	}
+}
+
