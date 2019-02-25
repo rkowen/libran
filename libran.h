@@ -17,9 +17,9 @@ typedef	enum {
 /**< continuum distributions */
 	unif,	/**< unif	- uniform */
 	gaus,	/**< guas	- Gaussian */
-	g2,	/**< g2		- Gaussian like - 2 uni (saw tooth) */
-	g4,	/**< g4		- Gaussian like - 4 uni */
-	g12,	/**< g12	- Gaussian like - 12 uni */
+	gsn2,	/**< gsn2	- Gaussian like - 2 uni (saw tooth) */
+	gsn4,	/**< gsn4	- Gaussian like - 4 uni */
+	gsn12,	/**< gsn12	- Gaussian like - 12 uni */
 	logd,	/**< logd	- logirithmic */
 	nexp,	/**< nexp	- negative exponential */
 	cauchy	/**< cauchy	- Cauchy */
@@ -48,7 +48,11 @@ typedef enum {
 /*!
 \struct LR_obj - the fundamental LibRan distribution object
 */
-typedef struct {
+/* tag & predefine the fns object */
+typedef struct LR_obj LR_obj;
+
+struct LR_obj {
+	const char const *	type;	/**< named distribution type */
 	LR_type		t;	/**< t - distribution type */
 	LR_data_type	d;	/**< d - data type */
 	LR_val		a;	/**< a - lower bound */
@@ -60,7 +64,16 @@ typedef struct {
 	long	(*ul)(void);	/**< ul - long */
 	float	(*uf)(void);	/**< uf - float */
 	double	(*ud)(void);	/**< ud - double */
-}	LR_obj;
+	/**< set of Random Fns for this distribution type */
+	float	(*rnf)(LR_obj *);		/**< rnf - float */
+	double	(*rnd)(LR_obj *);		/**< rnd - double */
+	/**< set of PDFs for this distribution type */
+	float	(*pdff)(LR_obj *, float);	/**< pdff - float */
+	double	(*pdfd)(LR_obj *, double);	/**< pdfd - double */
+	/**< set of CDFs for this distribution type  */
+	float	(*cdff)(LR_obj *, float);	/**< cdff - float */
+	double	(*cdfd)(LR_obj *, double);	/**< cdfd - double */
+};
 
 /*!
 \struct LR_bin - the binning object
@@ -88,6 +101,17 @@ int LR_bin_rm(LR_bin **b);
 int LR_bin_set(LR_bin *b, double x);
 int LR_bin_add(LR_bin *b, double x);
 
+/* LibRan generic distribution functions */
+/* double */
+double LRd_RAN(LR_obj *o);
+double LRd_PDF(LR_obj *o, double x);
+double LRd_CDF(LR_obj *o, double x);
+/* float */
+float LRf_RAN(LR_obj *o);
+float LRf_PDF(LR_obj *o, float x);
+float LRf_CDF(LR_obj *o, float x);
+
+/* specific LibRan distribution functions */
 /* double unif */
 double LRd_unif_RAN(LR_obj *o);
 double LRd_unif_PDF(LR_obj *o, double x);
@@ -96,5 +120,14 @@ double LRd_unif_CDF(LR_obj *o, double x);
 float LRf_unif_RAN(LR_obj *o);
 float LRf_unif_PDF(LR_obj *o, float x);
 float LRf_unif_CDF(LR_obj *o, float x);
+
+/* double gsn2 */
+double LRd_gsn2_RAN(LR_obj *o);
+double LRd_gsn2_PDF(LR_obj *o, double x);
+double LRd_gsn2_CDF(LR_obj *o, double x);
+/* float gsn2 */
+float LRf_gsn2_RAN(LR_obj *o);
+float LRf_gsn2_PDF(LR_obj *o, float x);
+float LRf_gsn2_CDF(LR_obj *o, float x);
 
 #endif		/* _LIBRAN_H_ */

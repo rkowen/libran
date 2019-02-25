@@ -19,15 +19,46 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 	/* set the default values based on LR_type */
 	ptr->t = t;
 	switch (t) {
-	case unif: if (d == LR_double) {
+	case unif:
+		ptr->type = "unif";
+		if (d == LR_double) {
 			ptr->a.d = (double) 0.0;
 			ptr->b.d = (double) 1.0;
+			ptr->rnd  = LRd_unif_RAN;
+			ptr->pdfd = LRd_unif_PDF;
+			ptr->cdfd = LRd_unif_CDF;
 		} else if (d == LR_float) {
 			ptr->a.f = (float) 0.0;
 			ptr->b.f = (float) 1.0;
+			ptr->rnf  = LRf_unif_RAN;
+			ptr->pdff = LRf_unif_PDF;
+			ptr->cdff = LRf_unif_CDF;
 		} else {
 			/* error */
 		}
+		break;
+	case gsn2:
+		ptr->type = "gsn2";
+		if (d == LR_double) {
+			ptr->a.d = (double) -1.0;
+			ptr->b.d = (double)  1.0;
+			ptr->m.d = (double) 0.0;
+			ptr->s.d = (double) 1.0;
+			ptr->rnd  = LRd_gsn2_RAN;
+			ptr->pdfd = LRd_gsn2_PDF;
+			ptr->cdfd = LRd_gsn2_CDF;
+		} else if (d == LR_float) {
+			ptr->a.f = (float)  -1.0;
+			ptr->b.f = (float)   1.0;
+			ptr->m.f = (float) 0.0;
+			ptr->s.f = (float) 1.0;
+			ptr->rnf  = LRf_gsn2_RAN;
+			ptr->pdff = LRf_gsn2_PDF;
+			ptr->cdff = LRf_gsn2_CDF;
+		} else {
+			/* error */
+		}
+		break;
 	default:
 		/* error */
 		break;
