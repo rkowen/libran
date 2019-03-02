@@ -16,6 +16,7 @@ typedef	enum {
 	binom,	/**< binom	- Binomial */
 /**< continuum distributions */
 	unif,	/**< unif	- uniform */
+	piece,	/**< piece	- piecewise uniform */
 	gaus,	/**< guas	- Gaussian */
 	gsn2,	/**< gsn2	- Gaussian like - 2 uni (saw tooth) */
 	gsn4,	/**< gsn4	- Gaussian like - 4 uni */
@@ -59,6 +60,7 @@ struct LR_obj {
 	LR_val		b;	/**< b - upper bound */
 	LR_val		m;	/**< m - middle value of distribution */
 	LR_val		s;	/**< s - measure of distribution width */
+	LR_val		x;	/**< x - auxiliary value */
 	/**< set of uniform random number generators - one for each data type */
 	int	(*ui)(void);	/**< ui - int */
 	long	(*ul)(void);	/**< ul - long */
@@ -73,6 +75,8 @@ struct LR_obj {
 	/**< set of CDFs for this distribution type  */
 	float	(*cdff)(LR_obj *, float);	/**< cdff - float */
 	double	(*cdfd)(LR_obj *, double);	/**< cdfd - double */
+	/**< generic (void) pointer to some other object */
+	void *	aux;				/**< aux - auxiliary object */
 };
 
 /*!
@@ -85,6 +89,17 @@ typedef struct {
 	double *	bdrs;	/**< bdrs - set of bin boundaries (n - 1) */
 	long *		bins;	/**< bins - set of bins (n) */
 }	LR_bin;
+
+/*!
+\struct LR_pcs - the piecewise uniform object
+*/
+typedef struct {
+	int		n;	/**< n - number of bins */
+	int		nn;	/**< nn - number of bins declared */
+	long		c;	/**< c - count of values */
+	double *	bdrs;	/**< bdrs - set of bin boundaries (n - 1) */
+	long *		bins;	/**< bins - set of bins (n) */
+}	LR_pcs;
 
 /* LibRan function declarations */
 LR_obj *LR_new(LR_type t, LR_data_type d);

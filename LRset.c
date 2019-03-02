@@ -43,6 +43,9 @@ int LR_vset(LR_obj *o, char *x, va_list ap) {
 		case	's':
 			(void) memcpy(&(o->s), &t, sizeof(LR_val));
 			break;
+		case	'x':
+			(void) memcpy(&(o->x), &t, sizeof(LR_val));
+			break;
 		default:
 			/* it is an error to include non-object attributes */
 			/* but continue on and process remaining */

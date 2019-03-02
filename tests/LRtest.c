@@ -34,11 +34,13 @@ testLRnew(double)
 	CU_ASSERT_EQUAL(LR_set(o, 'b',  3##ptt),0);			\
 	CU_ASSERT_EQUAL(LR_set(o, 'm',  2##ptt),0);			\
 	CU_ASSERT_EQUAL(LR_set(o, 's',  1##ptt),0);			\
-	CU_ASSERT_NOT_EQUAL(LR_set(o, 'x',  9##ptt),0);			\
+	CU_ASSERT_EQUAL(LR_set(o, 'x',  5##ptt),0);			\
+	CU_ASSERT_NOT_EQUAL(LR_set(o, 'z',  9##ptt),0);			\
 	CU_ASSERT_EQUAL(o->a.att, -1##ptt);				\
 	CU_ASSERT_EQUAL(o->b.att,  3##ptt);				\
 	CU_ASSERT_EQUAL(o->m.att,  2##ptt);				\
 	CU_ASSERT_EQUAL(o->s.att,  1##ptt);				\
+	CU_ASSERT_EQUAL(o->x.att,  5##ptt);				\
 	LR_rm(&o);							\
 }
 
@@ -51,11 +53,12 @@ testLRset(double,.,d)
 #define testLRsetall(tt, ptt, att)	void test_set_all_##tt(void) {	\
 	LR_obj *o = LR_new(gaus, LR_##tt);				\
 	CU_ASSERT_EQUAL(						\
-	  LR_set_all(o,"abms",-1##ptt,3##ptt,2##ptt,1##ptt),0);		\
+	  LR_set_all(o,"abmsx",-1##ptt,3##ptt,2##ptt,1##ptt,5##ptt),0);	\
 	CU_ASSERT_EQUAL(o->a.att, -1##ptt);				\
 	CU_ASSERT_EQUAL(o->b.att,  3##ptt);				\
 	CU_ASSERT_EQUAL(o->m.att,  2##ptt);				\
 	CU_ASSERT_EQUAL(o->s.att,  1##ptt);				\
+	CU_ASSERT_EQUAL(o->x.att,  5##ptt);				\
 	LR_rm(&o);							\
 }
 
@@ -68,11 +71,12 @@ testLRsetall(double,.,d)
 #define testLRsetall2(tt, ptt, att)	void test_set_all2_##tt(void) {	\
 	LR_obj *o = LR_new(gaus, LR_##tt);				\
 	CU_ASSERT_EQUAL(						\
-	  LR_set_all(o,"masb",2##ptt,-1##ptt,1##ptt,3##ptt),0);		\
+	  LR_set_all(o,"maxsb",2##ptt,-1##ptt,5##ptt,1##ptt,3##ptt),0);	\
 	CU_ASSERT_EQUAL(o->a.att, -1##ptt);				\
 	CU_ASSERT_EQUAL(o->b.att,  3##ptt);				\
 	CU_ASSERT_EQUAL(o->m.att,  2##ptt);				\
 	CU_ASSERT_EQUAL(o->s.att,  1##ptt);				\
+	CU_ASSERT_EQUAL(o->x.att,  5##ptt);				\
 	LR_rm(&o);							\
 }
 
@@ -85,11 +89,12 @@ testLRsetall2(double,.,d)
 #define testLRsetall3(tt, ptt, att)	void test_set_all3_##tt(void) {	\
 	LR_obj *o = LR_new(gaus, LR_##tt);				\
 	CU_ASSERT_NOT_EQUAL(						\
-	  LR_set_all(o,"maxsby",2##ptt,-1##ptt,33##ptt,1##ptt,3##ptt,9##ptt),0);	\
+	  LR_set_all(o,"maxzsby",2##ptt,-1##ptt,5##ptt,33##ptt,1##ptt,3##ptt,9##ptt),0);	\
 	CU_ASSERT_EQUAL(o->a.att, -1##ptt);				\
 	CU_ASSERT_EQUAL(o->b.att,  3##ptt);				\
 	CU_ASSERT_EQUAL(o->m.att,  2##ptt);				\
 	CU_ASSERT_EQUAL(o->s.att,  1##ptt);				\
+	CU_ASSERT_EQUAL(o->x.att,  5##ptt);				\
 	LR_rm(&o);							\
 }
 
