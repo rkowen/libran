@@ -37,6 +37,30 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			/* error */
 		}
 		break;
+	case piece:
+		ptr->type = "piece";
+		if (!(ptr->aux = (void *) malloc(sizeof(LR_pcs))))
+			goto objerr;
+		if (d == LR_double) {
+			ptr->a.d = (double) -1.0;
+			ptr->b.d = (double)  1.0;
+			ptr->x.d = (double)  1.0;
+			ptr->rnd  = LRd_piece_RAN;
+			ptr->pdfd = LRd_piece_PDF;
+			ptr->cdfd = LRd_piece_CDF;
+		} else if (d == LR_float) {
+			ptr->a.f = (float) -1.0;
+			ptr->b.f = (float)  1.0;
+			ptr->x.f = (float)  1.0;
+/*
+			ptr->rnf  = LRf_piece_RAN;
+			ptr->pdff = LRf_piece_PDF;
+			ptr->cdff = LRf_piece_CDF;
+*/
+		} else {
+			/* error */
+		}
+		break;
 	case gsn2:
 		ptr->type = "gsn2";
 		if (d == LR_double) {
@@ -65,11 +89,19 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 	}
 
 	return  ptr;
+
+objerr:
+	free((void *) ptr);
+	ptr = (void *) NULL;
+	return  ptr;
 }
 
 int LR_rm(LR_obj **o) {
 	/* check if LR_obj */
 	if (o && *o) {
+		if ((*o)->t == piece) {
+			free((void *) (*o)->aux);
+		}
 		switch ((*o)->d) {
 		case LR_int:
 		case LR_long:

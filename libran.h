@@ -94,11 +94,12 @@ typedef struct {
 \struct LR_pcs - the piecewise uniform object
 */
 typedef struct {
-	int		n;	/**< n - number of bins */
-	int		nn;	/**< nn - number of bins declared */
-	long		c;	/**< c - count of values */
-	double *	bdrs;	/**< bdrs - set of bin boundaries (n - 1) */
-	long *		bins;	/**< bins - set of bins (n) */
+	int		n;	/**< n - number of intervals */
+	int		nn;	/**< nn - number of intervals declared */
+	double *	bdrs;	/**< bdrs - set of interval boundaries (n-1) */
+	double *	c;	/**< relative probability for each interval (n) */
+	double *	sc;	/**< cumulative probability for each interval (n) */
+	double 		norm;	/**< norm - normalization factor for c */
 }	LR_pcs;
 
 /* LibRan function declarations */
@@ -135,6 +136,20 @@ double LRd_unif_CDF(LR_obj *o, double x);
 float LRf_unif_RAN(LR_obj *o);
 float LRf_unif_PDF(LR_obj *o, float x);
 float LRf_unif_CDF(LR_obj *o, float x);
+
+/* piecewise uniform */
+int LR_pcs_new(LR_obj *o, int n);
+int LR_pcs_rm(LR_obj *o);
+int LR_pcs_set(LR_obj *o, double x, double p);
+int LR_pcs_norm(LR_obj *o);
+/* double piece */
+double LRd_piece_RAN(LR_obj *o);
+double LRd_piece_PDF(LR_obj *o, double x);
+double LRd_piece_CDF(LR_obj *o, double x);
+/* float piece */
+float LRf_piece_RAN(LR_obj *o);
+float LRf_piece_PDF(LR_obj *o, float x);
+float LRf_piece_CDF(LR_obj *o, float x);
 
 /* double gsn2 */
 double LRd_gsn2_RAN(LR_obj *o);
