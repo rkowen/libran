@@ -3,6 +3,7 @@
 #include "urand/urand.h"
 #include <CUnit/CUnit.h>
 #include <CUnit/Basic.h>
+#include <CUnit/Console.h>
 
 #define max(a,b) (a > b ? a : b)
 
@@ -233,7 +234,7 @@ testCdfPdf(5,f,float,unif,33,.001,LR_set_all(o,"ab",-1.,3.))
 
 /* the last bin will have one less then rest ... so may be off by 2. */
 #define testLRunif(nn,tt,ttt,dist,bn,setup)				\
-void test_unif_##tt ## _##nn(void) {\
+void test_##dist ## _##tt ## _##nn(void) {\
 	LR_obj *o = LR_new(dist, LR_##ttt);				\
 	LR_bin *b = LR_bin_new(bn);					\
 	double	x, cdf[bn], tot = 10007.;				\
@@ -264,6 +265,158 @@ testLRunif(1,f,float,unif,10,)
 testLRunif(2,f,float,unif,25,)
 testLRunif(3,f,float,unif,20,LR_set_all(o,"ab",-2.,2.))
 testLRunif(4,f,float,unif,60,LR_set_all(o,"ab",-5.,1.))
+
+/* piece */
+/* test some well defined points */
+
+#define testCdfPdf0piece(nn,tt,ttt,tol,lo,hi)				\
+void test_cdf_pdf_##tt ## piece ## _##nn(void) {			\
+	LR_obj *o = LR_new(piece, LR_##ttt);				\
+	LR_pcs_new(o,6);						\
+	ttt xlo = lo, xhi = hi, xlen = (xhi - xlo), xun = xlen/8.;	\
+	LR_set_all(o,"abx", xlo, xhi, 4.0);				\
+	LR_pcs_set(o, xlo + 2.0*xun, 1.0);				\
+	LR_pcs_set(o, xlo + 3.0*xun, 3.0);				\
+	LR_pcs_set(o, xlo + 4.0*xun, 0.0);				\
+	LR_pcs_set(o, xlo + 5.0*xun, 5.0);				\
+	LR_pcs_set(o, xlo + 7.0*xun, 2.0);				\
+	LR_pcs_norm(o);							\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo- .1),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xlo- .1),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo+ .5*xun),.0833,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xlo+ .5*xun),.1667/xun,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo+1.5*xun),.25,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xlo+1.5*xun),.1667/xun,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo+2.5*xun),.3542,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xlo+2.5*xun),.0417/xun,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo+3.5*xun),.4375,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xlo+3.5*xun),.125/xun,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo+4.5*xun),.5,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xlo+4.5*xun),.0,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo+5.5*xun),.6042,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xlo+5.5*xun),.2083/xun,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo+6.5*xun),.8125,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xlo+6.5*xun),.2083/xun,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo+7.5*xun),.9583,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xlo+7.5*xun),.0833/xun,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xhi+.1),1.,tol)			\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xhi+.1),0.,tol)			\
+}
+
+testCdfPdf(0,d,double,piece,75,.001,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", -2., 6., 4.);
+	LR_pcs_set(o, o->a.d + 2.0, 1.0);
+	LR_pcs_set(o, o->a.d + 3.0, 3.0);
+	LR_pcs_set(o, o->a.d + 4.0, 0.0);
+	LR_pcs_set(o, o->a.d + 5.0, 5.0);
+	LR_pcs_set(o, o->a.d + 7.0, 2.0);
+	LR_pcs_norm(o);
+)
+testCdfPdf(1,d,double,piece,55,.001,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", -2., 6., 4.);
+	LR_pcs_set(o, o->a.d + 2.0, 1.0);
+	LR_pcs_set(o, o->a.d + 3.0, 3.0);
+	LR_pcs_set(o, o->a.d + 4.0, 0.0);
+	LR_pcs_set(o, o->a.d + 5.0, 5.0);
+	LR_pcs_set(o, o->a.d + 7.0, 2.0);
+	LR_pcs_norm(o);
+)
+testCdfPdf0piece(2,d,double,.001,-2.,6.);
+testCdfPdf0piece(3,d,double,.001,0.,8.);
+
+testCdfPdf(0,f,float,piece,75,.001,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", -2., 6., 4.);
+	LR_pcs_set(o, o->a.d + 2.0, 1.0);
+	LR_pcs_set(o, o->a.d + 3.0, 3.0);
+	LR_pcs_set(o, o->a.d + 4.0, 0.0);
+	LR_pcs_set(o, o->a.d + 5.0, 5.0);
+	LR_pcs_set(o, o->a.d + 7.0, 2.0);
+	LR_pcs_norm(o);
+)
+testCdfPdf(1,f,float,piece,55,.001,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", -2., 6., 4.);
+	LR_pcs_set(o, o->a.d + 2.0, 1.0);
+	LR_pcs_set(o, o->a.d + 3.0, 3.0);
+	LR_pcs_set(o, o->a.d + 4.0, 0.0);
+	LR_pcs_set(o, o->a.d + 5.0, 5.0);
+	LR_pcs_set(o, o->a.d + 7.0, 2.0);
+	LR_pcs_norm(o);
+)
+testCdfPdf0piece(2,f,float,.001,-2.,6.);
+testCdfPdf0piece(3,f,float,.001,2.,12.);
+
+testLRunif(1,d,double,piece,32,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", -2., 6., 4.);
+	LR_pcs_set(o, o->a.d + 2.0, 1.0);
+	LR_pcs_set(o, o->a.d + 3.0, 3.0);
+	LR_pcs_set(o, o->a.d + 4.0, 0.0);
+	LR_pcs_set(o, o->a.d + 5.0, 5.0);
+	LR_pcs_set(o, o->a.d + 7.0, 2.0);
+	LR_pcs_norm(o);
+)
+testLRunif(2,d,double,piece,75,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", -4., 4., 4.);
+	LR_pcs_set(o, o->a.d + 2.0, 1.0);
+	LR_pcs_set(o, o->a.d + 3.0, 3.0);
+	LR_pcs_set(o, o->a.d + 4.0, 0.0);
+	LR_pcs_set(o, o->a.d + 5.0, 5.0);
+	LR_pcs_set(o, o->a.d + 7.0, 2.0);
+	LR_pcs_norm(o);
+)
+testLRunif(3,d,double,piece,50,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", -1., 4., 3.);
+	LR_pcs_set(o, o->a.d + 2.0, 1.0);
+	LR_pcs_set(o, o->a.d + 3.0, 3.0);
+	LR_pcs_norm(o);
+)
+testLRunif(4,d,double,piece,60,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", 0., 3., 1.);
+	LR_pcs_set(o, o->a.d + 1.0, 2.0);
+	LR_pcs_set(o, o->a.d + 2.0, 3.0);
+	LR_pcs_norm(o);
+)
+testLRunif(1,f,float,piece,32,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", -2., 6., 4.);
+	LR_pcs_set(o, o->a.f + 2.0, 1.0);
+	LR_pcs_set(o, o->a.f + 3.0, 3.0);
+	LR_pcs_set(o, o->a.f + 4.0, 0.0);
+	LR_pcs_set(o, o->a.f + 5.0, 5.0);
+	LR_pcs_set(o, o->a.f + 7.0, 2.0);
+	LR_pcs_norm(o);
+)
+testLRunif(2,f,float,piece,75,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", -4., 4., 4.);
+	LR_pcs_set(o, o->a.f + 2.0, 1.0);
+	LR_pcs_set(o, o->a.f + 3.0, 3.0);
+	LR_pcs_set(o, o->a.f + 4.0, 0.0);
+	LR_pcs_set(o, o->a.f + 5.0, 5.0);
+	LR_pcs_set(o, o->a.f + 7.0, 2.0);
+	LR_pcs_norm(o);
+)
+testLRunif(3,f,float,piece,50,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", -1., 4., 3.);
+	LR_pcs_set(o, o->a.f + 2.0, 1.0);
+	LR_pcs_set(o, o->a.f + 3.0, 3.0);
+	LR_pcs_norm(o);
+)
+testLRunif(4,f,float,piece,60,
+	LR_pcs_new(o,6);
+	LR_set_all(o,"abx", 0., 3., 1.);
+	LR_pcs_set(o, o->a.f + 1.0, 2.0);
+	LR_pcs_set(o, o->a.f + 2.0, 3.0);
+	LR_pcs_norm(o);
+)
 
 /* gsn2 */
 #define testCdfPdf0gsn2(nn,tt,ttt,tol,setup)				\
@@ -347,6 +500,7 @@ int main(int argc, char* argv[]) {
 	CU_BasicRunMode		mode		= CU_BRM_VERBOSE;
 	CU_ErrorAction		error_action	= CUEA_IGNORE;
 	int i;
+	int interact		= 0;
 
 	setvbuf(stdout, NULL, _IONBF, 0);
 
@@ -361,6 +515,8 @@ int main(int argc, char* argv[]) {
 			mode = CU_BRM_SILENT;
 		} else if (!strcmp("-n", argv[i])) {
 			mode = CU_BRM_NORMAL;
+		} else if (!strcmp("-I", argv[i])) {
+			interact = 1;
 		} else if (!strcmp("-v", argv[i])) {
 			mode = CU_BRM_VERBOSE;
 		} else {
@@ -371,6 +527,7 @@ int main(int argc, char* argv[]) {
 "		-A	abort on framework error.\n\n"
 "		-s	silent mode - no output to screen.\n"
 "		-n	normal mode - standard output to screen.\n"
+"		-I	interactive mode - uses curses.\n"
 "		-v	verbose mode - max output to screen [default].\n\n"
 "		-h	print this message and exit.\n\n", argv[0]);
 			return 0;
@@ -454,22 +611,38 @@ int main(int argc, char* argv[]) {
 	||  (NULL == CU_add_test(pSint,"Unif-Ran-f-2", test_unif_f_2))
 	||  (NULL == CU_add_test(pSint,"Unif-Ran-f-3", test_unif_f_3))
 	||  (NULL == CU_add_test(pSint,"Unif-Ran-f-4", test_unif_f_4))
+	||  (NULL == CU_add_test(pSint,"Piece-P/CDF-d-0",test_cdf_pdf_dpiece_0))
+	||  (NULL == CU_add_test(pSint,"Piece-P/CDF-d-1",test_cdf_pdf_dpiece_1))
+	||  (NULL == CU_add_test(pSint,"Piece-P/CDF-d-2",test_cdf_pdf_dpiece_2))
+	||  (NULL == CU_add_test(pSint,"Piece-P/CDF-d-3",test_cdf_pdf_dpiece_3))
+	||  (NULL == CU_add_test(pSint,"Piece-Ran-d-1", test_piece_d_1))
+	||  (NULL == CU_add_test(pSint,"Piece-Ran-d-2", test_piece_d_2))
+	||  (NULL == CU_add_test(pSint,"Piece-Ran-d-3", test_piece_d_3))
+	||  (NULL == CU_add_test(pSint,"Piece-Ran-d-4", test_piece_d_4))
+	||  (NULL == CU_add_test(pSint,"Piece-P/CDF-f-0",test_cdf_pdf_fpiece_0))
+	||  (NULL == CU_add_test(pSint,"Piece-P/CDF-f-1",test_cdf_pdf_fpiece_1))
+	||  (NULL == CU_add_test(pSint,"Piece-P/CDF-f-2",test_cdf_pdf_fpiece_2))
+	||  (NULL == CU_add_test(pSint,"Piece-P/CDF-f-3",test_cdf_pdf_fpiece_3))
+	||  (NULL == CU_add_test(pSint,"Piece-Ran-f-1", test_piece_f_1))
+	||  (NULL == CU_add_test(pSint,"Piece-Ran-f-2", test_piece_f_2))
+	||  (NULL == CU_add_test(pSint,"Piece-Ran-f-3", test_piece_f_3))
+	||  (NULL == CU_add_test(pSint,"Piece-Ran-f-4", test_piece_f_4))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-0", test_cdf_pdf_dgsn2_0))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-1", test_cdf_pdf_dgsn2_1))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-2", test_cdf_pdf_dgsn2_2))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-3", test_cdf_pdf_dgsn2_3))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-4", test_cdf_pdf_dgsn2_4))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-5", test_cdf_pdf_dgsn2_5))
+	||  (NULL == CU_add_test(pSint,"Gsn2-Ran-d-1", test_gsn2_d_1))
+	||  (NULL == CU_add_test(pSint,"Gsn2-Ran-d-2", test_gsn2_d_2))
+	||  (NULL == CU_add_test(pSint,"Gsn2-Ran-d-3", test_gsn2_d_3))
+	||  (NULL == CU_add_test(pSint,"Gsn2-Ran-d-4", test_gsn2_d_4))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-f-0", test_cdf_pdf_fgsn2_0))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-f-1", test_cdf_pdf_fgsn2_1))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-f-2", test_cdf_pdf_fgsn2_2))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-f-3", test_cdf_pdf_fgsn2_3))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-f-4", test_cdf_pdf_fgsn2_4))
 	||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-f-5", test_cdf_pdf_fgsn2_5))
-	||  (NULL == CU_add_test(pSint,"Gsn2-Ran-d-1", test_gsn2_d_1))
-	||  (NULL == CU_add_test(pSint,"Gsn2-Ran-d-2", test_gsn2_d_2))
-	||  (NULL == CU_add_test(pSint,"Gsn2-Ran-d-3", test_gsn2_d_3))
-	||  (NULL == CU_add_test(pSint,"Gsn2-Ran-d-4", test_gsn2_d_4))
 	||  (NULL == CU_add_test(pSint,"Gsn2-Ran-f-1", test_gsn2_f_1))
 	||  (NULL == CU_add_test(pSint,"Gsn2-Ran-f-2", test_gsn2_f_2))
 	||  (NULL == CU_add_test(pSint,"Gsn2-Ran-f-3", test_gsn2_f_3))
@@ -483,7 +656,11 @@ int main(int argc, char* argv[]) {
 	/* Run all tests using the basic interface */
 	CU_basic_set_mode(mode);
 	CU_set_error_action(error_action);
-	CU_basic_run_tests();
+	if (interact) {
+		CU_console_run_tests();
+	} else {
+		CU_basic_run_tests();
+	}
 	printf("\n");
 
 	/* Clean up and return */

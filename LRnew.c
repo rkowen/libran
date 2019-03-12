@@ -52,11 +52,9 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->a.f = (float) -1.0;
 			ptr->b.f = (float)  1.0;
 			ptr->x.f = (float)  1.0;
-/*
 			ptr->rnf  = LRf_piece_RAN;
 			ptr->pdff = LRf_piece_PDF;
 			ptr->cdff = LRf_piece_CDF;
-*/
 		} else {
 			/* error */
 		}
