@@ -275,7 +275,8 @@ void test_cdf_pdf_##tt ## piece ## _##nn(void) {			\
 	LR_pcs_new(o,6);						\
 	ttt xlo = lo, xhi = hi, xlen = (xhi - xlo), xun = xlen/8.;	\
 	LR_set_all(o,"abx", xlo, xhi, 4.0);				\
-	LR_pcs_set(o, xlo + 2.0*xun, 1.0);				\
+CU_ASSERT_EQUAL(LR_pcs_set(o,xlo+2.0*xun, 1.0),0)			\
+CU_ASSERT_EQUAL(LR_pcs_set(o,xlo+2.5*xun,-1.0),-2)			\
 	LR_pcs_set(o, xlo + 3.0*xun, 3.0);				\
 	LR_pcs_set(o, xlo + 4.0*xun, 0.0);				\
 	LR_pcs_set(o, xlo + 5.0*xun, 5.0);				\

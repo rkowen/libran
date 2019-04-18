@@ -82,6 +82,9 @@ int LR_pcs_set(LR_obj *o, double x, double p) {
 	if (aux->n < aux->nn + 1) {
 		return -1;	/* too many values given */
 	}
+	if (p < 0) {
+		return -2;	/* invalid probability */
+	}
 	t  = aux->bdrs[0];
 	tp = aux->c[0];
 	for (int i = 0, i1 = 1; i <= aux->nn; i++,i1++) {
