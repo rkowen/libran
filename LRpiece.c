@@ -1,8 +1,9 @@
 /*!
 \file	LRpiece.c
-\brief	Set of binning functions
+\brief	Piecewise uniform distribution
 
-This set of functions: set-up, count values into bins, and take-down
+Create and remove special objects within the LR_obj to handle a set of
+piecewise uniform distribution.
 
 */
 #include <stdlib.h>
@@ -18,7 +19,8 @@ This set of functions: set-up, count values into bins, and take-down
 int LR_pcs_new(LR_obj *o, int n) {
 	LR_pcs *ptr = (LR_pcs *) o->aux;
 
-	if (o->t != piece)
+	if (o->t != piece
+	&&  o->t != lspline)
 		return -2;
 
 	ptr->n  = n;
@@ -57,7 +59,8 @@ bad0:
 */
 int LR_pcs_rm(LR_obj *o) {
 	LR_pcs *aux;
-	if (o && o->t == piece && o->aux) {
+	if (o && (o->t == piece || o->t == lspline)
+	&&  o->aux) {
 		aux = (LR_pcs *) o->aux;
 		free((void *) aux->bdrs);
 		free((void *) aux->c);
@@ -228,9 +231,7 @@ double LRd_piece_CDF(LR_obj *o, double x) {
 	} else {
 		/* find interval */
 		int i = 0;
-		double diff = zero; 
 		while (x > aux->bdrs[i])	i++;
-		diff = (aux->bdrs[i] - aux->bdrs[i-1]);
 		return aux->sc[i-1] + aux->c[i-1]*aux->norm*(x-aux->bdrs[i-1]);
 	}
 }
@@ -294,9 +295,7 @@ float LRf_piece_CDF(LR_obj *o, float x) {
 	} else {
 		/* find interval */
 		int i = 0;
-		float diff = zero; 
 		while (x > aux->bdrs[i])	i++;
-		diff = (aux->bdrs[i] - aux->bdrs[i-1]);
 		return aux->sc[i-1] + aux->c[i-1]*aux->norm*(x-aux->bdrs[i-1]);
 	}
 }

@@ -32,10 +32,12 @@ binom	- binomial
 
 Continuum:
 unif	- uniform
+piece	- piecewise uniform segments
+lspline	- linear spline
 gaus	- Gaussian
-g2	- Gaussian like - 2 uni (saw tooth)
-g4	- Gaussian like - 4 uni
-g12	- Gaussian like - 12 uni
+gsn2	- Gaussian like - 2 uni (saw tooth)
+gsn4	- Gaussian like - 4 uni
+gsn12	- Gaussian like - 12 uni
 log	- logirithmic
 nexp	- negative exponential
 cauchy	- Cauchy
@@ -43,4 +45,16 @@ cauchy	- Cauchy
 The last argument should refer to a helper distribution (usually
 uniform distribution) to generate the random variates.  If a (void *)
 then use the standard one from library (LRt_unif_RAN()).
+
+To-Do:
+For piece & lspline have the PDF/CDF/RAN functions raise an exception
+if the norm function was not called prior.
+
+Have the lspline norm raise an exception if the set function has not
+been called prior.  There must be an intermediary non-zero point
+between the endpoints.
+
+Somehow identify and differentiate between piece & lspline in the
+LR_pcs_* auxiliary routines.
+Or ... define generic functions and set pointers to the appropriate methods.
 

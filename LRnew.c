@@ -59,6 +59,26 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			/* error */
 		}
 		break;
+	case lspline:
+		ptr->type = "lspline";
+		if (!(ptr->aux = (void *) malloc(sizeof(LR_pcs))))
+			goto objerr;
+		if (d == LR_double) {
+			ptr->a.d = (double) -1.0;
+			ptr->b.d = (double)  1.0;
+			ptr->rnd  = LRd_lspline_RAN;
+			ptr->pdfd = LRd_lspline_PDF;
+			ptr->cdfd = LRd_lspline_CDF;
+		} else if (d == LR_float) {
+			ptr->a.f = (float) -1.0;
+			ptr->b.f = (float)  1.0;
+			ptr->rnf  = LRf_lspline_RAN;
+			ptr->pdff = LRf_lspline_PDF;
+			ptr->cdff = LRf_lspline_CDF;
+		} else {
+			/* error */
+		}
+		break;
 	case gsn2:
 		ptr->type = "gsn2";
 		if (d == LR_double) {
@@ -97,7 +117,8 @@ objerr:
 int LR_rm(LR_obj **o) {
 	/* check if LR_obj */
 	if (o && *o) {
-		if ((*o)->t == piece) {
+		if (((*o)->t == piece)
+		||  ((*o)->t == lspline)) {
 			free((void *) (*o)->aux);
 		}
 		switch ((*o)->d) {

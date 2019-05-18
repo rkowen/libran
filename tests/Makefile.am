@@ -12,7 +12,7 @@ AUTOMAKE_OPTIONS=foreign no-installinfo
 bin_PROGRAMS			= LRtest
 
 LRtest_SOURCES			= LRtest.c LRtunif.c
-LRtest_LDADD			= -lcunit -lran
+LRtest_LDADD			= -lcunit -lran -lm
 LRtest_LDFLAGS			= -L..
 AM_CPPFLAGS			= -I..
 EXTRA_LRtest_DEPENDENCIES	= ../libran.a

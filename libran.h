@@ -12,18 +12,19 @@
 */
 typedef	enum {
 /**< discrete distributions */
-	poiss,	/**< poiss	- Poison */
-	binom,	/**< binom	- Binomial */
+	poiss,		/**< poiss	- Poison */
+	binom,		/**< binom	- Binomial */
 /**< continuum distributions */
-	unif,	/**< unif	- uniform */
-	piece,	/**< piece	- piecewise uniform */
-	gaus,	/**< guas	- Gaussian */
-	gsn2,	/**< gsn2	- Gaussian like - 2 uni (saw tooth) */
-	gsn4,	/**< gsn4	- Gaussian like - 4 uni */
-	gsn12,	/**< gsn12	- Gaussian like - 12 uni */
-	logd,	/**< logd	- logirithmic */
-	nexp,	/**< nexp	- negative exponential */
-	cauchy	/**< cauchy	- Cauchy */
+	unif,		/**< unif	- uniform */
+	piece,		/**< piece	- piecewise uniform */
+	lspline,	/**< lspline	- linear spline */
+	gaus,		/**< guas	- Gaussian */
+	gsn2,		/**< gsn2	- Gaussian like - 2 uni (saw tooth) */
+	gsn4,		/**< gsn4	- Gaussian like - 4 uni */
+	gsn12,		/**< gsn12	- Gaussian like - 12 uni */
+	logd,		/**< logd	- logirithmic */
+	nexp,		/**< nexp	- negative exponential */
+	cauchy		/**< cauchy	- Cauchy */
 }	LR_type;
 
 /*!
@@ -150,6 +151,19 @@ double LRd_piece_CDF(LR_obj *o, double x);
 float LRf_piece_RAN(LR_obj *o);
 float LRf_piece_PDF(LR_obj *o, float x);
 float LRf_piece_CDF(LR_obj *o, float x);
+/* linear spline */
+int LR_lspl_new(LR_obj *o, int n);
+int LR_lspl_rm(LR_obj *o);
+int LR_lspl_set(LR_obj *o, double x, double p);
+int LR_lspl_norm(LR_obj *o);
+/* double linear spline */
+double LRd_lspline_RAN(LR_obj *o);
+double LRd_lspline_PDF(LR_obj *o, double x);
+double LRd_lspline_CDF(LR_obj *o, double x);
+/* float linear spline */
+float LRf_lspline_RAN(LR_obj *o);
+float LRf_lspline_PDF(LR_obj *o, float x);
+float LRf_lspline_CDF(LR_obj *o, float x);
 
 /* double gsn2 */
 double LRd_gsn2_RAN(LR_obj *o);
