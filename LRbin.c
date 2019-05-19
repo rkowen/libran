@@ -6,6 +6,7 @@ This set of functions: set-up, count values into bins, and take-down
 
 */
 #include <stdlib.h>
+#include <math.h>	/* isnan() */
 #include "libran.h"
 
 /*!
@@ -103,6 +104,8 @@ int LR_bin_set(LR_bin *b, double x) {
 */
 int LR_bin_add(LR_bin *b, double x) {
 	int i = 0;
+
+	if (isnan(x))				return	3;
 
 	while (i <= b->nn - 1) {
 		if (x < b->bdrs[i]

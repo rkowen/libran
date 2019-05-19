@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include "libran.h"
 #include "urand/urand.h"
 #include <CUnit/CUnit.h>
@@ -283,16 +284,16 @@ testLRunif(4,f,float,unif,60,LR_set_all(o,"ab",-5.,1.))
 #define testCdfPdf0piece(nn,tt,ttt,tol,lo,hi)				\
 void test_cdf_pdf_##tt ## piece ## _##nn(void) {			\
 	LR_obj *o = LR_new(piece, LR_##ttt);				\
-	LR_pcs_new(o,6);						\
+	LR_aux_new(o,6);						\
 	ttt xlo = lo, xhi = hi, xlen = (xhi - xlo), xun = xlen/8.;	\
 	LR_set_all(o,"abx", xlo, xhi, 4.0);				\
-CU_ASSERT_EQUAL(LR_pcs_set(o,xlo+2.0*xun, 1.0),0)			\
-CU_ASSERT_EQUAL(LR_pcs_set(o,xlo+2.5*xun,-1.0),-2)			\
-	LR_pcs_set(o, xlo + 3.0*xun, 3.0);				\
-	LR_pcs_set(o, xlo + 4.0*xun, 0.0);				\
-	LR_pcs_set(o, xlo + 5.0*xun, 5.0);				\
-	LR_pcs_set(o, xlo + 7.0*xun, 2.0);				\
-	LR_pcs_norm(o);							\
+CU_ASSERT_EQUAL(LR_aux_set(o,xlo+2.0*xun, 1.0),0)			\
+CU_ASSERT_EQUAL(LR_aux_set(o,xlo+2.5*xun,-1.0),-2)			\
+	LR_aux_set(o, xlo + 3.0*xun, 3.0);				\
+	LR_aux_set(o, xlo + 4.0*xun, 0.0);				\
+	LR_aux_set(o, xlo + 5.0*xun, 5.0);				\
+	LR_aux_set(o, xlo + 7.0*xun, 2.0);				\
+	LR_aux_norm(o);							\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo- .1),0.,tol)		\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xlo- .1),0.,tol)		\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo+ .5*xun),.0833,tol)		\
@@ -316,118 +317,145 @@ CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xhi+.1),0.,tol)			\
 }
 
 testCdfPdf(0,d,double,piece,75,.001,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -2., 6., 4.);
-	LR_pcs_set(o, o->a.d + 2.0, 1.0);
-	LR_pcs_set(o, o->a.d + 3.0, 3.0);
-	LR_pcs_set(o, o->a.d + 4.0, 0.0);
-	LR_pcs_set(o, o->a.d + 5.0, 5.0);
-	LR_pcs_set(o, o->a.d + 7.0, 2.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.d + 2.0, 1.0);
+	LR_aux_set(o, o->a.d + 3.0, 3.0);
+	LR_aux_set(o, o->a.d + 4.0, 0.0);
+	LR_aux_set(o, o->a.d + 5.0, 5.0);
+	LR_aux_set(o, o->a.d + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 testCdfPdf(1,d,double,piece,55,.001,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -2., 6., 4.);
-	LR_pcs_set(o, o->a.d + 2.0, 1.0);
-	LR_pcs_set(o, o->a.d + 3.0, 3.0);
-	LR_pcs_set(o, o->a.d + 4.0, 0.0);
-	LR_pcs_set(o, o->a.d + 5.0, 5.0);
-	LR_pcs_set(o, o->a.d + 7.0, 2.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.d + 2.0, 1.0);
+	LR_aux_set(o, o->a.d + 3.0, 3.0);
+	LR_aux_set(o, o->a.d + 4.0, 0.0);
+	LR_aux_set(o, o->a.d + 5.0, 5.0);
+	LR_aux_set(o, o->a.d + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 testCdfPdf0piece(2,d,double,.001,-2.,6.);
 testCdfPdf0piece(3,d,double,.001,0.,8.);
 
 testCdfPdf(0,f,float,piece,75,.001,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -2., 6., 4.);
-	LR_pcs_set(o, o->a.d + 2.0, 1.0);
-	LR_pcs_set(o, o->a.d + 3.0, 3.0);
-	LR_pcs_set(o, o->a.d + 4.0, 0.0);
-	LR_pcs_set(o, o->a.d + 5.0, 5.0);
-	LR_pcs_set(o, o->a.d + 7.0, 2.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.d + 2.0, 1.0);
+	LR_aux_set(o, o->a.d + 3.0, 3.0);
+	LR_aux_set(o, o->a.d + 4.0, 0.0);
+	LR_aux_set(o, o->a.d + 5.0, 5.0);
+	LR_aux_set(o, o->a.d + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 testCdfPdf(1,f,float,piece,55,.001,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -2., 6., 4.);
-	LR_pcs_set(o, o->a.d + 2.0, 1.0);
-	LR_pcs_set(o, o->a.d + 3.0, 3.0);
-	LR_pcs_set(o, o->a.d + 4.0, 0.0);
-	LR_pcs_set(o, o->a.d + 5.0, 5.0);
-	LR_pcs_set(o, o->a.d + 7.0, 2.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.d + 2.0, 1.0);
+	LR_aux_set(o, o->a.d + 3.0, 3.0);
+	LR_aux_set(o, o->a.d + 4.0, 0.0);
+	LR_aux_set(o, o->a.d + 5.0, 5.0);
+	LR_aux_set(o, o->a.d + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 testCdfPdf0piece(2,f,float,.001,-2.,6.);
 testCdfPdf0piece(3,f,float,.001,2.,12.);
 
 testLRunif(1,d,double,piece,32,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -2., 6., 4.);
-	LR_pcs_set(o, o->a.d + 2.0, 1.0);
-	LR_pcs_set(o, o->a.d + 3.0, 3.0);
-	LR_pcs_set(o, o->a.d + 4.0, 0.0);
-	LR_pcs_set(o, o->a.d + 5.0, 5.0);
-	LR_pcs_set(o, o->a.d + 7.0, 2.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.d + 2.0, 1.0);
+	LR_aux_set(o, o->a.d + 3.0, 3.0);
+	LR_aux_set(o, o->a.d + 4.0, 0.0);
+	LR_aux_set(o, o->a.d + 5.0, 5.0);
+	LR_aux_set(o, o->a.d + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 testLRunif(2,d,double,piece,75,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -4., 4., 4.);
-	LR_pcs_set(o, o->a.d + 2.0, 1.0);
-	LR_pcs_set(o, o->a.d + 3.0, 3.0);
-	LR_pcs_set(o, o->a.d + 4.0, 0.0);
-	LR_pcs_set(o, o->a.d + 5.0, 5.0);
-	LR_pcs_set(o, o->a.d + 7.0, 2.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.d + 2.0, 1.0);
+	LR_aux_set(o, o->a.d + 3.0, 3.0);
+	LR_aux_set(o, o->a.d + 4.0, 0.0);
+	LR_aux_set(o, o->a.d + 5.0, 5.0);
+	LR_aux_set(o, o->a.d + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 testLRunif(3,d,double,piece,50,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -1., 4., 3.);
-	LR_pcs_set(o, o->a.d + 2.0, 1.0);
-	LR_pcs_set(o, o->a.d + 3.0, 3.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.d + 2.0, 1.0);
+	LR_aux_set(o, o->a.d + 3.0, 3.0);
+	LR_aux_norm(o);
 )
 testLRunif(4,d,double,piece,60,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", 0., 3., 1.);
-	LR_pcs_set(o, o->a.d + 1.0, 2.0);
-	LR_pcs_set(o, o->a.d + 2.0, 3.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.d + 1.0, 2.0);
+	LR_aux_set(o, o->a.d + 2.0, 3.0);
+	LR_aux_norm(o);
 )
 testLRunif(1,f,float,piece,32,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -2., 6., 4.);
-	LR_pcs_set(o, o->a.f + 2.0, 1.0);
-	LR_pcs_set(o, o->a.f + 3.0, 3.0);
-	LR_pcs_set(o, o->a.f + 4.0, 0.0);
-	LR_pcs_set(o, o->a.f + 5.0, 5.0);
-	LR_pcs_set(o, o->a.f + 7.0, 2.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.f + 2.0, 1.0);
+	LR_aux_set(o, o->a.f + 3.0, 3.0);
+	LR_aux_set(o, o->a.f + 4.0, 0.0);
+	LR_aux_set(o, o->a.f + 5.0, 5.0);
+	LR_aux_set(o, o->a.f + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 testLRunif(2,f,float,piece,75,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -4., 4., 4.);
-	LR_pcs_set(o, o->a.f + 2.0, 1.0);
-	LR_pcs_set(o, o->a.f + 3.0, 3.0);
-	LR_pcs_set(o, o->a.f + 4.0, 0.0);
-	LR_pcs_set(o, o->a.f + 5.0, 5.0);
-	LR_pcs_set(o, o->a.f + 7.0, 2.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.f + 2.0, 1.0);
+	LR_aux_set(o, o->a.f + 3.0, 3.0);
+	LR_aux_set(o, o->a.f + 4.0, 0.0);
+	LR_aux_set(o, o->a.f + 5.0, 5.0);
+	LR_aux_set(o, o->a.f + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 testLRunif(3,f,float,piece,50,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -1., 4., 3.);
-	LR_pcs_set(o, o->a.f + 2.0, 1.0);
-	LR_pcs_set(o, o->a.f + 3.0, 3.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.f + 2.0, 1.0);
+	LR_aux_set(o, o->a.f + 3.0, 3.0);
+	LR_aux_norm(o);
 )
 testLRunif(4,f,float,piece,60,
-	LR_pcs_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"abx", 0., 3., 1.);
-	LR_pcs_set(o, o->a.f + 1.0, 2.0);
-	LR_pcs_set(o, o->a.f + 2.0, 3.0);
-	LR_pcs_norm(o);
+	LR_aux_set(o, o->a.f + 1.0, 2.0);
+	LR_aux_set(o, o->a.f + 2.0, 3.0);
+	LR_aux_norm(o);
+)
+
+/* test some errors */
+#define testBADpiece(nn,tt,ttt,lo,hi,xx,code)				\
+void test_bad_##tt ## _piece ## _##nn(void) {				\
+	LR_obj *o = LR_new(piece, LR_##ttt);				\
+	LR_aux_new(o,6);						\
+	LR_set_all(o,"abx", lo, hi, xx);				\
+	code;								\
+}
+
+testBADpiece(0,d,double,2.,4.,1.,
+	CU_ASSERT_TRUE(LR_aux_set(o,0.,2.));
+	CU_ASSERT_TRUE(LR_aux_set(o,5.,1.));
+	CU_ASSERT_TRUE(LR_aux_set(o,3.,-2.));
+	CU_ASSERT(isnan(LRd_RAN(o)));
+	CU_ASSERT(isnan(LRd_PDF(o,3.)));
+	CU_ASSERT(isnan(LRd_CDF(o,3.)));
+)
+
+testBADpiece(0,f,float,2.,4.,1.,
+	CU_ASSERT_TRUE(LR_aux_set(o,0.,2.));
+	CU_ASSERT_TRUE(LR_aux_set(o,5.,1.));
+	CU_ASSERT_TRUE(LR_aux_set(o,3.,-2.));
+	CU_ASSERT(isnan(LRf_RAN(o)));
+	CU_ASSERT(isnan(LRf_PDF(o,3.)));
+	CU_ASSERT(isnan(LRf_CDF(o,3.)));
 )
 
 /* gsn2 */
@@ -523,16 +551,16 @@ testLRgsn2(4,f,float,30,LR_set_all(o,"ab",-5.,1.))
 #define testCdfPdf0lspline(nn,tt,ttt,tol,lo,hi)				\
 void test_cdf_pdf_##tt ## lspline ## _##nn(void) {			\
 	LR_obj *o = LR_new(lspline, LR_##ttt);				\
-	LR_lspl_new(o,6);						\
+	LR_aux_new(o,6);						\
 	ttt xlo = lo, xhi = hi, xlen = (xhi - xlo), xun = xlen/8.;	\
 	LR_set_all(o,"ab", xlo, xhi);				\
-CU_ASSERT_EQUAL(LR_lspl_set(o,xlo+2.0*xun, 1.0),0)			\
-CU_ASSERT_EQUAL(LR_lspl_set(o,xlo+2.5*xun,-1.0),-2)			\
-	LR_lspl_set(o, xlo + 3.0*xun, 3.0);				\
-	LR_lspl_set(o, xlo + 4.0*xun, 0.0);				\
-	LR_lspl_set(o, xlo + 5.0*xun, 5.0);				\
-	LR_lspl_set(o, xlo + 7.0*xun, 2.0);				\
-	LR_lspl_norm(o);						\
+CU_ASSERT_EQUAL(LR_aux_set(o,xlo+2.0*xun, 1.0),0)			\
+CU_ASSERT_EQUAL(LR_aux_set(o,xlo+2.5*xun,-1.0),-2)			\
+	LR_aux_set(o, xlo + 3.0*xun, 3.0);				\
+	LR_aux_set(o, xlo + 4.0*xun, 0.0);				\
+	LR_aux_set(o, xlo + 5.0*xun, 5.0);				\
+	LR_aux_set(o, xlo + 7.0*xun, 2.0);				\
+	LR_aux_norm(o);						\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo- .1),0.,tol)		\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xlo- .1),0.,tol)		\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xlo+ .6*xun),.006,tol)		\
@@ -556,48 +584,48 @@ CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xhi+.1),0.,tol)			\
 }
 
 testCdfPdf(0,d,double,lspline,75,.001,
-	LR_lspl_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -2., 6.);
-	LR_lspl_set(o, o->a.d + 2.0, 1.0);
-	LR_lspl_set(o, o->a.d + 3.0, 3.0);
-	LR_lspl_set(o, o->a.d + 4.0, 0.0);
-	LR_lspl_set(o, o->a.d + 5.0, 5.0);
-	LR_lspl_set(o, o->a.d + 7.0, 2.0);
-	LR_lspl_norm(o);
+	LR_aux_set(o, o->a.d + 2.0, 1.0);
+	LR_aux_set(o, o->a.d + 3.0, 3.0);
+	LR_aux_set(o, o->a.d + 4.0, 0.0);
+	LR_aux_set(o, o->a.d + 5.0, 5.0);
+	LR_aux_set(o, o->a.d + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 testCdfPdf(1,d,double,lspline,55,.001,
-	LR_lspl_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -2., 6.);
-	LR_lspl_set(o, o->a.d + 2.0, 1.0);
-	LR_lspl_set(o, o->a.d + 3.0, 3.0);
-	LR_lspl_set(o, o->a.d + 4.0, 0.0);
-	LR_lspl_set(o, o->a.d + 5.0, 5.0);
-	LR_lspl_set(o, o->a.d + 7.0, 2.0);
-	LR_lspl_norm(o);
+	LR_aux_set(o, o->a.d + 2.0, 1.0);
+	LR_aux_set(o, o->a.d + 3.0, 3.0);
+	LR_aux_set(o, o->a.d + 4.0, 0.0);
+	LR_aux_set(o, o->a.d + 5.0, 5.0);
+	LR_aux_set(o, o->a.d + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 
 testCdfPdf0lspline(2,d,double,.001,-2.,6.);
 testCdfPdf0lspline(3,d,double,.001,2.,12.);
 
 testCdfPdf(0,f,float,lspline,75,.001,
-	LR_lspl_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -2., 6.);
-	LR_lspl_set(o, o->a.f + 2.0, 1.0);
-	LR_lspl_set(o, o->a.f + 3.0, 3.0);
-	LR_lspl_set(o, o->a.f + 4.0, 0.0);
-	LR_lspl_set(o, o->a.f + 5.0, 5.0);
-	LR_lspl_set(o, o->a.f + 7.0, 2.0);
-	LR_lspl_norm(o);
+	LR_aux_set(o, o->a.f + 2.0, 1.0);
+	LR_aux_set(o, o->a.f + 3.0, 3.0);
+	LR_aux_set(o, o->a.f + 4.0, 0.0);
+	LR_aux_set(o, o->a.f + 5.0, 5.0);
+	LR_aux_set(o, o->a.f + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 testCdfPdf(1,f,float,lspline,55,.001,
-	LR_lspl_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -2., 6.);
-	LR_lspl_set(o, o->a.f + 2.0, 1.0);
-	LR_lspl_set(o, o->a.f + 3.0, 3.0);
-	LR_lspl_set(o, o->a.f + 4.0, 0.0);
-	LR_lspl_set(o, o->a.f + 5.0, 5.0);
-	LR_lspl_set(o, o->a.f + 7.0, 2.0);
-	LR_lspl_norm(o);
+	LR_aux_set(o, o->a.f + 2.0, 1.0);
+	LR_aux_set(o, o->a.f + 3.0, 3.0);
+	LR_aux_set(o, o->a.f + 4.0, 0.0);
+	LR_aux_set(o, o->a.f + 5.0, 5.0);
+	LR_aux_set(o, o->a.f + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 
 testCdfPdf0lspline(2,f,float,.001,-2.,6.);
@@ -607,74 +635,103 @@ testCdfPdf0lspline(3,f,float,.001,2.,12.);
 	testLRvar(lspline,nn,tt,ttt,bn,.04,2,setup)
 
 testLRlspl(1,d,double,75,
-	LR_lspl_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -2., 6.);
-	LR_lspl_set(o, o->a.d + 2.0, 1.0);
-	LR_lspl_set(o, o->a.d + 3.0, 3.0);
-	LR_lspl_set(o, o->a.d + 4.0, 0.0);
-	LR_lspl_set(o, o->a.d + 5.0, 5.0);
-	LR_lspl_set(o, o->a.d + 7.0, 2.0);
-	LR_lspl_norm(o);
+	LR_aux_set(o, o->a.d + 2.0, 1.0);
+	LR_aux_set(o, o->a.d + 3.0, 3.0);
+	LR_aux_set(o, o->a.d + 4.0, 0.0);
+	LR_aux_set(o, o->a.d + 5.0, 5.0);
+	LR_aux_set(o, o->a.d + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 
 testLRlspl(2,d,double,55,
-	LR_lspl_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -4., 4.);
-	LR_lspl_set(o, o->a.d + 2.0, 1.0);
-	LR_lspl_set(o, o->a.d + 3.0, 3.0);
-	LR_lspl_set(o, o->a.d + 4.0, 0.0);
-	LR_lspl_set(o, o->a.d + 5.0, 5.0);
-	LR_lspl_set(o, o->a.d + 7.0, 2.0);
-	LR_lspl_norm(o);
+	LR_aux_set(o, o->a.d + 2.0, 1.0);
+	LR_aux_set(o, o->a.d + 3.0, 3.0);
+	LR_aux_set(o, o->a.d + 4.0, 0.0);
+	LR_aux_set(o, o->a.d + 5.0, 5.0);
+	LR_aux_set(o, o->a.d + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 
+/* this should be equivalent to default gsn2, but better tolerances */
+
 testLRlspl(3,d,double,80,
-	LR_lspl_new(o,2);
-	LR_lspl_set(o, o->a.d + 1.0, 1.0);
-	LR_lspl_norm(o);
+	LR_aux_new(o,2);
+	LR_aux_set(o, o->a.d + 1.0, 1.0);
+	LR_aux_norm(o);
 )
 
 testLRlspl(4,d,double,50,
-	LR_lspl_new(o,2);
-	LR_lspl_set(o, o->a.d + 1.0, 1.0);
-	LR_lspl_norm(o);
+	LR_aux_new(o,2);
+	LR_aux_set(o, o->a.d + 1.0, 1.0);
+	LR_aux_norm(o);
 )
 
 testLRlspl(1,f,float,75,
-	LR_lspl_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -2., 6.);
-	LR_lspl_set(o, o->a.f + 2.0, 1.0);
-	LR_lspl_set(o, o->a.f + 3.0, 3.0);
-	LR_lspl_set(o, o->a.f + 4.0, 0.0);
-	LR_lspl_set(o, o->a.f + 5.0, 5.0);
-	LR_lspl_set(o, o->a.f + 7.0, 2.0);
-	LR_lspl_norm(o);
+	LR_aux_set(o, o->a.f + 2.0, 1.0);
+	LR_aux_set(o, o->a.f + 3.0, 3.0);
+	LR_aux_set(o, o->a.f + 4.0, 0.0);
+	LR_aux_set(o, o->a.f + 5.0, 5.0);
+	LR_aux_set(o, o->a.f + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 
 testLRlspl(2,f,float,55,
-	LR_lspl_new(o,6);
+	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -4., 4.);
-	LR_lspl_set(o, o->a.f + 2.0, 1.0);
-	LR_lspl_set(o, o->a.f + 3.0, 3.0);
-	LR_lspl_set(o, o->a.f + 4.0, 0.0);
-	LR_lspl_set(o, o->a.f + 5.0, 5.0);
-	LR_lspl_set(o, o->a.f + 7.0, 2.0);
-	LR_lspl_norm(o);
+	LR_aux_set(o, o->a.f + 2.0, 1.0);
+	LR_aux_set(o, o->a.f + 3.0, 3.0);
+	LR_aux_set(o, o->a.f + 4.0, 0.0);
+	LR_aux_set(o, o->a.f + 5.0, 5.0);
+	LR_aux_set(o, o->a.f + 7.0, 2.0);
+	LR_aux_norm(o);
 )
 
 testLRlspl(3,f,float,80,
-	LR_lspl_new(o,2);
-	LR_lspl_set(o, o->a.f + 1.0, 1.0);
-	LR_lspl_norm(o);
+	LR_aux_new(o,2);
+	LR_aux_set(o, o->a.f + 1.0, 1.0);
+	LR_aux_norm(o);
 )
 
 testLRlspl(4,f,float,50,
-	LR_lspl_new(o,2);
-	LR_lspl_set(o, o->a.f + 1.0, 1.0);
-	LR_lspl_norm(o);
+	LR_aux_new(o,2);
+	LR_aux_set(o, o->a.f + 1.0, 1.0);
+	LR_aux_norm(o);
 )
 
-/* this should be equivalent to default gsn2 */
+/* test some errors */
+#define testBADlspline(nn,tt,ttt,lo,hi,code)				\
+void test_bad_##tt ## _lspline ## _##nn(void) {			\
+	LR_obj *o = LR_new(lspline, LR_##ttt);				\
+	LR_aux_new(o,6);						\
+	LR_set_all(o,"ab", lo, hi);					\
+	code;								\
+}
+
+testBADlspline(0,d,double,2.,4.,
+	CU_ASSERT_TRUE(LR_aux_set(o,0.,2.));
+	CU_ASSERT_TRUE(LR_aux_set(o,5.,1.));
+	CU_ASSERT_TRUE(LR_aux_set(o,3.,-2.));
+	CU_ASSERT_TRUE(LR_aux_norm(o));
+	CU_ASSERT(isnan(LRd_RAN(o)));
+	CU_ASSERT(isnan(LRd_PDF(o,3.)));
+	CU_ASSERT(isnan(LRd_CDF(o,3.)));
+)
+
+testBADlspline(0,f,float,2.,4.,
+	CU_ASSERT_TRUE(LR_aux_set(o,0.,2.));
+	CU_ASSERT_TRUE(LR_aux_set(o,5.,1.));
+	CU_ASSERT_TRUE(LR_aux_set(o,3.,-2.));
+	CU_ASSERT_TRUE(LR_aux_norm(o));
+	CU_ASSERT(isnan(LRf_RAN(o)));
+	CU_ASSERT(isnan(LRf_PDF(o,3.)));
+	CU_ASSERT(isnan(LRf_CDF(o,3.)));
+)
 
 int main(int argc, char* argv[]) {
 	CU_pSuite		pS		= NULL;
@@ -809,6 +866,8 @@ if ((NULL == CU_add_test(pSint,"Unif-P/CDF-d-0", test_cdf_pdf_dunif_0))
 ||  (NULL == CU_add_test(pSint,"Piece-Ran-f-2", test_piece_f_2))
 ||  (NULL == CU_add_test(pSint,"Piece-Ran-f-3", test_piece_f_3))
 ||  (NULL == CU_add_test(pSint,"Piece-Ran-f-4", test_piece_f_4))
+||  (NULL == CU_add_test(pSint,"Piece-Bad-d-0", test_bad_d_piece_0))
+||  (NULL == CU_add_test(pSint,"Piece-Bad-f-0", test_bad_f_piece_0))
 ||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-0", test_cdf_pdf_dgsn2_0))
 ||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-1", test_cdf_pdf_dgsn2_1))
 ||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-2", test_cdf_pdf_dgsn2_2))
@@ -845,6 +904,8 @@ if ((NULL == CU_add_test(pSint,"Unif-P/CDF-d-0", test_cdf_pdf_dunif_0))
 ||  (NULL == CU_add_test(pSint,"Lspline-Ran-f-2", test_lspline_f_2))
 ||  (NULL == CU_add_test(pSint,"Lspline-Ran-f-3", test_lspline_f_3))
 ||  (NULL == CU_add_test(pSint,"Lspline-Ran-f-4", test_lspline_f_4))
+||  (NULL == CU_add_test(pSint,"Lspline-Bad-d-0", test_bad_d_lspline_0))
+||  (NULL == CU_add_test(pSint,"Lspline-Bad-f-0", test_bad_f_lspline_0))
 ) {
 		printf("\nTest Suite interval additions failure.");
 		CU_cleanup_registry();

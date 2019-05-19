@@ -38,9 +38,15 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 		}
 		break;
 	case piece:
+	{
 		ptr->type = "piece";
 		if (!(ptr->aux = (void *) malloc(sizeof(LR_pcs))))
 			goto objerr;
+		LR_pcs *aux = (LR_pcs *) ptr->aux;
+		aux->new = LR_pcs_new;
+		aux->rm = LR_pcs_rm;
+		aux->set = LR_pcs_set;
+		aux->normalize = LR_pcs_norm;
 		if (d == LR_double) {
 			ptr->a.d = (double) -1.0;
 			ptr->b.d = (double)  1.0;
@@ -58,11 +64,18 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 		} else {
 			/* error */
 		}
+	}
 		break;
 	case lspline:
+	{
 		ptr->type = "lspline";
 		if (!(ptr->aux = (void *) malloc(sizeof(LR_pcs))))
 			goto objerr;
+		LR_pcs *aux = (LR_pcs *) ptr->aux;
+		aux->new = LR_lspl_new;
+		aux->rm = LR_lspl_rm;
+		aux->set = LR_lspl_set;
+		aux->normalize = LR_lspl_norm;
 		if (d == LR_double) {
 			ptr->a.d = (double) -1.0;
 			ptr->b.d = (double)  1.0;
@@ -78,6 +91,7 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 		} else {
 			/* error */
 		}
+	}
 		break;
 	case gsn2:
 		ptr->type = "gsn2";

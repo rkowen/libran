@@ -9,7 +9,7 @@ at least one point in between with a non-zero value.
 
 */
 #include <stdlib.h>
-#include <math.h>	/* sqrt, sqrtf */
+#include <math.h>	/* sqrt, sqrtf, NAN */
 #include "libran.h"
 #include <stdio.h>
 
@@ -43,7 +43,11 @@ int LR_lspl_rm(LR_obj *o) {
 @return	0 if successful, else non-zero if failed
 */
 int LR_lspl_set(LR_obj *o, double x, double p) {
-	return LR_pcs_set(o,x,p);
+	int ret = LR_pcs_set(o,x,p);
+	/* must have at least one good value set */
+	if ((!ret) && (p > 0))
+		((LR_pcs *) o->aux)->flags |= LR_AUX_SET;
+	return ret;
 }
 
 /*!
@@ -56,6 +60,10 @@ int LR_lspl_norm(LR_obj *o) {
 	double zero = 0.0, half = 0.5, one = 1.0, delta = .000001;
 	double v = zero;
 	LR_pcs *aux = (LR_pcs *) o->aux;
+
+	/* must have at least one good value set else why bother? */
+	if (!(aux->flags & LR_AUX_SET))
+		return 13;
 
 	/* move up the set of values */
 	for (int i = aux->nn - 1, i1 = aux->nn - 2; i >= 1; i--, i1--) {
@@ -97,6 +105,8 @@ int LR_lspl_norm(LR_obj *o) {
 	}
 	aux->sc[0] = zero;
 	aux->sc[aux->nn] = one;
+	/* norm success */
+	((LR_pcs *) o->aux)->flags |= LR_AUX_NORM;
 
 	return 0;
 }
@@ -111,6 +121,10 @@ double LRd_lspline_RAN(LR_obj *o) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
 	double x, y, dy, slope, zero = 0.0, two = 2.0;
 	int i = 0;
+
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
 
 	x = o->ud();
 	/* find interval */
@@ -142,6 +156,10 @@ double LRd_lspline_RAN(LR_obj *o) {
 double LRd_lspline_PDF(LR_obj *o, double x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
 
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
+
 	if (x <= o->a.d || x >= o->b.d) {
 		return 0.0;
 	} else {
@@ -170,6 +188,10 @@ double LRd_lspline_PDF(LR_obj *o, double x) {
 double LRd_lspline_CDF(LR_obj *o, double x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
 	double zero = 0.0, one = 1.0, half = 0.5, y;
+
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
 
 	if (x <= o->a.d) {
 		return zero;
@@ -203,6 +225,10 @@ float LRf_lspline_RAN(LR_obj *o) {
 	float x, y, dy, slope, zero = 0.0, two = 2.0;
 	int i = 0;
 
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
+
 	x = o->uf();
 	/* find interval */
 	while (x >= aux->sc[i])	i++;
@@ -233,6 +259,10 @@ float LRf_lspline_RAN(LR_obj *o) {
 float LRf_lspline_PDF(LR_obj *o, float x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
 
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
+
 	if (x <= o->a.f || x >= o->b.f) {
 		return 0.0;
 	} else {
@@ -261,6 +291,10 @@ float LRf_lspline_PDF(LR_obj *o, float x) {
 float LRf_lspline_CDF(LR_obj *o, float x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
 	float zero = 0.0, one = 1.0, half = 0.5, y;
+
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
 
 	if (x <= o->a.f) {
 		return zero;

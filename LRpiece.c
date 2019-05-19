@@ -7,6 +7,7 @@ piecewise uniform distribution.
 
 */
 #include <stdlib.h>
+#include <math.h>
 #include "libran.h"
 
 /*!
@@ -27,6 +28,7 @@ int LR_pcs_new(LR_obj *o, int n) {
 	ptr->nn = 1;	/* always start with one interval */
 	ptr->c  = 0;
 	ptr->norm  = 0.;
+	ptr->flags  = 0;
 
 	if (!(ptr->bdrs = (double *) calloc(n, sizeof(double))))
 		goto bad0;
@@ -88,6 +90,13 @@ int LR_pcs_set(LR_obj *o, double x, double p) {
 	if (p < 0) {
 		return -2;	/* invalid probability */
 	}
+	if (o->d == LR_double) {
+		if (x < o->a.d || x > o->b.d)
+			return	-5;		/* bad range */
+	} else if (o->d == LR_float) {
+		if (x < o->a.f || x > o->b.f)
+			return	-5;		/* bad range */
+	}
 	t  = aux->bdrs[0];
 	tp = aux->c[0];
 	for (int i = 0, i1 = 1; i <= aux->nn; i++,i1++) {
@@ -126,7 +135,7 @@ int LR_pcs_set(LR_obj *o, double x, double p) {
 */
 int LR_pcs_norm(LR_obj *o) {
 	double zero = 0.0, one = 1.0, delta = .000001;
-	double v = zero;
+	double v= zero;
 	LR_pcs *aux = (LR_pcs *) o->aux;
 
 	/* move up the set of values */
@@ -168,6 +177,8 @@ int LR_pcs_norm(LR_obj *o) {
 	}
 	aux->sc[0] = zero;
 	aux->sc[aux->nn] = one;
+	/* norm success */
+	((LR_pcs *) o->aux)->flags |= LR_AUX_NORM;
 
 	return 0;
 }
@@ -182,6 +193,10 @@ double LRd_piece_RAN(LR_obj *o) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
 	double x, dx, zero = 0.0;
 	int i = 0;
+
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
 
 	x = o->ud();
 	/* find interval */
@@ -203,6 +218,10 @@ double LRd_piece_RAN(LR_obj *o) {
 double LRd_piece_PDF(LR_obj *o, double x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
 
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
+
 	if (x <= o->a.d || x > o->b.d) {
 		return 0.0;
 	} else {
@@ -223,6 +242,10 @@ double LRd_piece_PDF(LR_obj *o, double x) {
 double LRd_piece_CDF(LR_obj *o, double x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
 	double zero = 0.0, one = 1.0;
+
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
 
 	if (x <= o->a.d) {
 		return zero;
@@ -247,6 +270,10 @@ float LRf_piece_RAN(LR_obj *o) {
 	float x, dx, zero = 0.0;
 	int i = 0;
 
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
+
 	x = o->ud();
 	/* find interval */
 	while (x > aux->sc[i])	i++;
@@ -266,6 +293,10 @@ float LRf_piece_RAN(LR_obj *o) {
 */
 float LRf_piece_PDF(LR_obj *o, float x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
+
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
 
 	if (x <= o->a.f || x > o->b.f) {
 		return 0.0;
@@ -287,6 +318,10 @@ float LRf_piece_PDF(LR_obj *o, float x) {
 float LRf_piece_CDF(LR_obj *o, float x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
 	float zero = 0.0, one = 1.0;
+
+	/* must have successfully normalized */
+	if (!(aux->flags & LR_AUX_NORM))
+		return NAN;
 
 	if (x <= o->a.f) {
 		return zero;

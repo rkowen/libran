@@ -92,7 +92,7 @@ typedef struct {
 }	LR_bin;
 
 /*!
-\struct LR_pcs - the piecewise uniform object
+\struct LR_pcs - the piecewise uniform object (also linear spline)
 */
 typedef struct {
 	int		n;	/**< n - number of intervals */
@@ -101,7 +101,18 @@ typedef struct {
 	double *	c;	/**< relative probability for each interval (n) */
 	double *	sc;	/**< cumulative probability for each interval (n) */
 	double 		norm;	/**< norm - normalization factor for c */
+	int		flags;	/**< flags to guarentee certain actions */
+
+/**< special auxiliary methods */
+	int (*new)(LR_obj *o, int n);		/**< aux new */
+	int (*rm)(LR_obj *o);			/**< aux rm */
+	int (*set)(LR_obj *o, double x, double p);	/**< aux set points */
+	int (*normalize)(LR_obj *o);		/**< aux normalize points */
 }	LR_pcs;
+
+/**< special auxiliary flags */
+#  define	LR_AUX_NORM		0x01
+#  define	LR_AUX_SET		0x02
 
 /* LibRan function declarations */
 LR_obj *LR_new(LR_type t, LR_data_type d);
@@ -127,6 +138,11 @@ double LRd_CDF(LR_obj *o, double x);
 float LRf_RAN(LR_obj *o);
 float LRf_PDF(LR_obj *o, float x);
 float LRf_CDF(LR_obj *o, float x);
+/* LibRan generic auxiliary functions */
+int LR_aux_new(LR_obj *o, int n);
+int LR_aux_rm(LR_obj *o);
+int LR_aux_set(LR_obj *o, double x, double p);
+int LR_aux_norm(LR_obj *o);
 
 /* specific LibRan distribution functions */
 /* double unif */
@@ -151,6 +167,7 @@ double LRd_piece_CDF(LR_obj *o, double x);
 float LRf_piece_RAN(LR_obj *o);
 float LRf_piece_PDF(LR_obj *o, float x);
 float LRf_piece_CDF(LR_obj *o, float x);
+
 /* linear spline */
 int LR_lspl_new(LR_obj *o, int n);
 int LR_lspl_rm(LR_obj *o);
