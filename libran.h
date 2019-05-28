@@ -8,6 +8,29 @@
 #  include <stdarg.h>
 
 /*!
+Library Version
+*/
+#  define LR_VERSION	"LibRan_VERSION=0.1.0";
+#  define LR_DATE	"LibRan_DATE=20190512";
+
+/*!
+LibRan Error Numbers
+*/
+#  define LRerr_OK					0x00
+#  define LRerr_Unspecified				0x01
+#  define LRerr_BadDataType				0x03
+#  define LRerr_BadLRType				0x05
+#  define LRerr_NoAuxiliaryObject			0x09
+#  define LRerr_NoAuxNormalizeDone			0x0B
+#  define LRerr_BinGeneric				0x11
+#  define LRerr_TooManyValues				0x13
+#  define LRerr_InvalidInputValue			0x15
+#  define LRerr_InvalidRange				0x17
+#  define LRerr_UnmetPreconditions			0x19
+#  define LRerr_SuspiciousValues			0x1B
+#  define LRerr_AllocFail				0x1D
+
+/*!
 \enum LR_type - an enum of allowed distribution types
 */
 typedef	enum {
@@ -77,7 +100,8 @@ struct LR_obj {
 	float	(*cdff)(LR_obj *, float);	/**< cdff - float */
 	double	(*cdfd)(LR_obj *, double);	/**< cdfd - double */
 	/**< generic (void) pointer to some other object */
-	void *	aux;				/**< aux - auxiliary object */
+	void *		aux;	/**< aux - auxiliary object */
+	int		errno;	/**< errno - last error encountered */
 };
 
 /*!
@@ -89,6 +113,7 @@ typedef struct {
 	long		c;	/**< c - count of values */
 	double *	bdrs;	/**< bdrs - set of bin boundaries (n - 1) */
 	long *		bins;	/**< bins - set of bins (n) */
+	int		errno;	/**< errno - last bin error encountered */
 }	LR_bin;
 
 /*!
@@ -128,6 +153,11 @@ LR_bin *LR_bin_new(int n);
 int LR_bin_rm(LR_bin **b);
 int LR_bin_set(LR_bin *b, double x);
 int LR_bin_add(LR_bin *b, double x);
+
+/* LibRan error routines */
+char *LRstrerror(int LRerrno);
+char *LRstrerrno(int LRerrno);
+void LRperror(char *str, int LRerrno);
 
 /* LibRan generic distribution functions */
 /* double */

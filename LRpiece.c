@@ -22,7 +22,7 @@ int LR_pcs_new(LR_obj *o, int n) {
 
 	if (o->t != piece
 	&&  o->t != lspline)
-		return -2;
+		return o->errno = LRerr_BadLRType;
 
 	ptr->n  = n;
 	ptr->nn = 1;	/* always start with one interval */
@@ -39,7 +39,7 @@ int LR_pcs_new(LR_obj *o, int n) {
 	if (!(ptr->sc = (double *) calloc(n + 1, sizeof(double))))
 		goto bad2;
 
-	return 0;
+	return LRerr_OK;
 
 bad2:
 	free((void *) ptr->sc);
@@ -50,7 +50,7 @@ bad1:
 bad0:
 	free((void *) ptr->bdrs);
 
-	return -1;
+	return o->errno = LRerr_AllocFail;
 }
 
 /*!
@@ -67,9 +67,9 @@ int LR_pcs_rm(LR_obj *o) {
 		free((void *) aux->bdrs);
 		free((void *) aux->c);
 		free((void *) aux->sc);
-		return 0;
+		return LRerr_OK;
 	}
-	return 1;
+	return o->errno = LRerr_Unspecified;
 }
 
 /*!
@@ -85,17 +85,21 @@ int LR_pcs_set(LR_obj *o, double x, double p) {
 	double t, tp;
 	LR_pcs *aux = (LR_pcs *) o->aux;
 	if (aux->n < aux->nn + 1) {
-		return -1;	/* too many values given */
+		/* too many values given */
+		return o->errno = LRerr_TooManyValues;
 	}
 	if (p < 0) {
-		return -2;	/* invalid probability */
+		/* invalid probability */
+		return o->errno = LRerr_InvalidInputValue;
 	}
 	if (o->d == LR_double) {
 		if (x < o->a.d || x > o->b.d)
-			return	-5;		/* bad range */
+			/* bad range */
+			return o->errno = LRerr_InvalidRange;
 	} else if (o->d == LR_float) {
 		if (x < o->a.f || x > o->b.f)
-			return	-5;		/* bad range */
+			/* bad range */
+			return o->errno = LRerr_InvalidRange;
 	}
 	t  = aux->bdrs[0];
 	tp = aux->c[0];
@@ -104,7 +108,7 @@ int LR_pcs_set(LR_obj *o, double x, double p) {
 			aux->bdrs[i] = x;
 			aux->c[i] = p;
 			aux->nn++;
-			return 0;
+			return LRerr_OK;
 		}
 		if (x > t) {
 			/* compare to next one, next round */
@@ -124,7 +128,7 @@ int LR_pcs_set(LR_obj *o, double x, double p) {
 	}
 	aux->nn++;
 
-	return 0;
+	return LRerr_OK;
 }
 
 /*!
@@ -170,7 +174,7 @@ int LR_pcs_norm(LR_obj *o) {
 	if (aux->sc[aux->nn-1] < one - delta
 	||  one + delta < aux->sc[aux->nn-1]) {
 		/* the last value should be 1.0 */
-		return 1;
+		return o->errno = LRerr_SuspiciousValues;
 	}
 	for (int i = aux->nn-1; i > 0; i--) {
 		aux->sc[i] = aux->sc[i-1];
@@ -180,14 +184,14 @@ int LR_pcs_norm(LR_obj *o) {
 	/* norm success */
 	((LR_pcs *) o->aux)->flags |= LR_AUX_NORM;
 
-	return 0;
+	return LRerr_OK;
 }
 
 /*!
 @brief	LRd_piece_RAN(LR_obj *o) - double random piecewise uniform distribution
 
 @param o	LR_obj object
-@return double
+@return double if OK, else NaN
 */
 double LRd_piece_RAN(LR_obj *o) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
@@ -195,8 +199,10 @@ double LRd_piece_RAN(LR_obj *o) {
 	int i = 0;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	x = o->ud();
 	/* find interval */
@@ -217,13 +223,16 @@ double LRd_piece_RAN(LR_obj *o) {
 */
 double LRd_piece_PDF(LR_obj *o, double x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
+	double zero = 0.0;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	if (x <= o->a.d || x > o->b.d) {
-		return 0.0;
+		return zero;
 	} else {
 		/* find interval */
 		int i = 0;
@@ -244,8 +253,10 @@ double LRd_piece_CDF(LR_obj *o, double x) {
 	double zero = 0.0, one = 1.0;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	if (x <= o->a.d) {
 		return zero;
@@ -271,8 +282,10 @@ float LRf_piece_RAN(LR_obj *o) {
 	int i = 0;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	x = o->ud();
 	/* find interval */
@@ -293,13 +306,16 @@ float LRf_piece_RAN(LR_obj *o) {
 */
 float LRf_piece_PDF(LR_obj *o, float x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
+	float zero = 0.0;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	if (x <= o->a.f || x > o->b.f) {
-		return 0.0;
+		return zero;
 	} else {
 		/* find interval */
 		int i = 0;
@@ -320,8 +336,10 @@ float LRf_piece_CDF(LR_obj *o, float x) {
 	float zero = 0.0, one = 1.0;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	if (x <= o->a.f) {
 		return zero;

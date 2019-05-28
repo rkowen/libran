@@ -63,7 +63,7 @@ int LR_lspl_norm(LR_obj *o) {
 
 	/* must have at least one good value set else why bother? */
 	if (!(aux->flags & LR_AUX_SET))
-		return 13;
+		return o->errno = LRerr_UnmetPreconditions;
 
 	/* move up the set of values */
 	for (int i = aux->nn - 1, i1 = aux->nn - 2; i >= 1; i--, i1--) {
@@ -98,7 +98,7 @@ int LR_lspl_norm(LR_obj *o) {
 	if (aux->sc[aux->nn-1] < one - delta
 	||  one + delta < aux->sc[aux->nn-1]) {
 		/* the last value should be 1.0 */
-		return 1;
+		return o->errno = LRerr_SuspiciousValues;
 	}
 	for (int i = aux->nn-1; i > 0; i--) {
 		aux->sc[i] = aux->sc[i-1];
@@ -108,14 +108,14 @@ int LR_lspl_norm(LR_obj *o) {
 	/* norm success */
 	((LR_pcs *) o->aux)->flags |= LR_AUX_NORM;
 
-	return 0;
+	return LRerr_OK;
 }
 
 /*!
 @brief	LRd_lspline_RAN(LR_obj *o) - double random linear spline distribution
 
 @param o	LR_obj object
-@return double
+@return double if OK else NaN
 */
 double LRd_lspline_RAN(LR_obj *o) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
@@ -123,8 +123,10 @@ double LRd_lspline_RAN(LR_obj *o) {
 	int i = 0;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	x = o->ud();
 	/* find interval */
@@ -157,8 +159,10 @@ double LRd_lspline_PDF(LR_obj *o, double x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	if (x <= o->a.d || x >= o->b.d) {
 		return 0.0;
@@ -190,8 +194,10 @@ double LRd_lspline_CDF(LR_obj *o, double x) {
 	double zero = 0.0, one = 1.0, half = 0.5, y;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	if (x <= o->a.d) {
 		return zero;
@@ -218,7 +224,7 @@ double LRd_lspline_CDF(LR_obj *o, double x) {
 @brief	LRf_lspline_RAN(LR_obj *o) - float random linear spline distribution
 
 @param o	LR_obj object
-@return float
+@return float if OK else NaN
 */
 float LRf_lspline_RAN(LR_obj *o) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
@@ -226,8 +232,10 @@ float LRf_lspline_RAN(LR_obj *o) {
 	int i = 0;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	x = o->uf();
 	/* find interval */
@@ -260,8 +268,10 @@ float LRf_lspline_PDF(LR_obj *o, float x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	if (x <= o->a.f || x >= o->b.f) {
 		return 0.0;
@@ -293,8 +303,10 @@ float LRf_lspline_CDF(LR_obj *o, float x) {
 	float zero = 0.0, one = 1.0, half = 0.5, y;
 
 	/* must have successfully normalized */
-	if (!(aux->flags & LR_AUX_NORM))
+	if (!(aux->flags & LR_AUX_NORM)) {
+		o->errno = LRerr_NoAuxNormalizeDone;
 		return NAN;
+	}
 
 	if (x <= o->a.f) {
 		return zero;

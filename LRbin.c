@@ -24,6 +24,7 @@ LR_bin *LR_bin_new(int n) {
 	ptr->n  = n;
 	ptr->nn = 1;	/* always start with one bin */
 	ptr->c  = 0;
+	ptr->errno = 0;
 
 	if (!(ptr->bdrs = (double *) calloc(n, sizeof(double))))
 		goto bad0;
@@ -53,9 +54,9 @@ int LR_bin_rm(LR_bin **b) {
 		free((void *) (*b)->bdrs);
 		free((void *) *b);
 		*b = (LR_bin *) NULL;
-		return 0;
+		return LRerr_OK;
 	}
-	return 1;
+	return LRerr_BinGeneric;
 }
 
 /*!
@@ -69,14 +70,15 @@ int LR_bin_set(LR_bin *b, double x) {
 	int i = 0;
 	double t;
 	if (b->n < b->nn + 1) {
-		return -1;	/* too many values given */
+		/* too many values given */
+		return b->errno = LRerr_TooManyValues;
 	}
 	t = b->bdrs[0];
 	for (int i = 0, i1 = 1; i <= b->nn; i++,i1++) {
-		if (b->nn == i1) {	/* got to top entry */
+		if (b->nn == i1) {		/* got to top entry */
 			b->bdrs[i] = x;
 			b->nn++;
-			return 0;
+			return LRerr_OK;
 		}
 		if (x > t) {
 			/* compare to next one, next round */
@@ -105,7 +107,8 @@ int LR_bin_set(LR_bin *b, double x) {
 int LR_bin_add(LR_bin *b, double x) {
 	int i = 0;
 
-	if (isnan(x))				return	3;
+	if (isnan(x))			
+		return	b->errno = LRerr_InvalidInputValue;
 
 	while (i <= b->nn - 1) {
 		if (x < b->bdrs[i]
@@ -115,9 +118,9 @@ int LR_bin_add(LR_bin *b, double x) {
 		}
 		i++;
 	}
-	if (i >= b->nn)				return -1;
-
+	if (i >= b->nn)
+		return	b->errno = LRerr_InvalidRange;
 	b->c++;
 
-	return 0;
+	return LRerr_OK;
 }

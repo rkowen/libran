@@ -26,7 +26,8 @@ SUBDIRS = . urand $(MAYBE_TESTS)
 #AM_CPPFLAGS = -I$(srcdir)/include -I$(srcdir)
 
 LR_srcs	=								\
-	LRnew.c LRset.c LRbin.c LRdf.c LRunif.c LRgsn.c LRpiece.c LRlspline.c
+	LRnew.c LRset.c LRbin.c LRdf.c LRunif.c LRerror.c		\
+	LRgsn.c LRpiece.c LRlspline.c
 
 URAND_srcs = 								\
 	urand/urand.c

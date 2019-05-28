@@ -22,6 +22,54 @@
 int init_suite(void) { return 0; }
 int clean_suite(void) { return 0; }
 
+/* LibRan error routines */
+void test_LR_errors(void) {
+	FILE *oldstderr = stderr, *newstderr;
+	char strbuf[200], *ptr;
+	struct errset {
+		int err;
+		char *msg;
+	} es[] = {
+0x00,	"LRerr_OK : LibRan - No Error\n",
+0x01,	"LRerr_Unspecified : LibRan - Unspecified Error\n",
+0x03,	"LRerr_BadDataType : LibRan - Bad Data Type given\n",
+0x05,	"LRerr_BadLRType : LibRan - Bad Random Variate Type given\n",
+0x09,	"LRerr_NoAuxiliaryObject : LibRan - Required Auxiliary Object not found\n",
+0x0B,	"LRerr_NoAuxNormalizeDone : LibRan - Auxiliary Object requires normalization\n",
+0x11,	"LRerr_BinGeneric : LibRan - Binning Object Unspecified Error\n",
+0x13,	"LRerr_TooManyValues : LibRan - Too Many Values given\n",
+0x15,	"LRerr_InvalidInputValue : LibRan - Invalid Input Value Error\n",
+0x17,	"LRerr_InvalidRange : LibRan - Invalid Range Value Error\n",
+0x19,	"LRerr_UnmetPreconditions : LibRan - Preconditions Not Performed\n",
+0x1B,	"LRerr_SuspiciousValues : LibRan - Suspicious Value - Normalization Error?\n",
+0x1D,	"LRerr_AllocFail : LibRan - Memory Allocation Error\n"};
+
+/* capture stderr to file */
+	newstderr = stderr = tmpfile();
+
+	for (int i = 0; i < sizeof(es)/sizeof(es[0]); i++) {
+		stderr = newstderr;
+		(void) fseek(stderr,0,SEEK_SET);
+		LRperror(LRstrerrno(es[i].err),es[i].err);
+		(void) fseek(stderr,0,SEEK_SET);
+		ptr = fgets(strbuf, sizeof(strbuf), stderr);
+		stderr = oldstderr;
+/*
+fprintf(stderr, "<<< %x,%d\n:%s:%s",es[i].err,strcmp(ptr,es[i].msg), ptr, es[i].msg);
+*/
+		CU_ASSERT_STRING_EQUAL(ptr, es[i].msg);
+		(void) sscanf(es[i].msg,"%s : ",strbuf);
+		CU_ASSERT_STRING_EQUAL(LRstrerrno(es[i].err), strbuf);
+/*
+fprintf(stderr, ">>> %x,%d\n:%s:%s\n",es[i].err,
+		strcmp(LRstrerrno(es[i].err), strbuf),
+		LRstrerrno(es[i].err), strbuf);
+*/
+	}
+/* restore stderr */
+	stderr = oldstderr;
+}
+
 #define testLRnew(tt)			void test_new_##tt(void) {	\
 	LR_obj *o = LR_new(gaus, LR_##tt);				\
 	CU_ASSERT_PTR_NOT_NULL(o);					\
@@ -288,7 +336,7 @@ void test_cdf_pdf_##tt ## piece ## _##nn(void) {			\
 	ttt xlo = lo, xhi = hi, xlen = (xhi - xlo), xun = xlen/8.;	\
 	LR_set_all(o,"abx", xlo, xhi, 4.0);				\
 CU_ASSERT_EQUAL(LR_aux_set(o,xlo+2.0*xun, 1.0),0)			\
-CU_ASSERT_EQUAL(LR_aux_set(o,xlo+2.5*xun,-1.0),-2)			\
+CU_ASSERT_EQUAL(LR_aux_set(o,xlo+2.5*xun,-1.0),LRerr_InvalidInputValue)	\
 	LR_aux_set(o, xlo + 3.0*xun, 3.0);				\
 	LR_aux_set(o, xlo + 4.0*xun, 0.0);				\
 	LR_aux_set(o, xlo + 5.0*xun, 5.0);				\
@@ -555,7 +603,7 @@ void test_cdf_pdf_##tt ## lspline ## _##nn(void) {			\
 	ttt xlo = lo, xhi = hi, xlen = (xhi - xlo), xun = xlen/8.;	\
 	LR_set_all(o,"ab", xlo, xhi);				\
 CU_ASSERT_EQUAL(LR_aux_set(o,xlo+2.0*xun, 1.0),0)			\
-CU_ASSERT_EQUAL(LR_aux_set(o,xlo+2.5*xun,-1.0),-2)			\
+CU_ASSERT_EQUAL(LR_aux_set(o,xlo+2.5*xun,-1.0),LRerr_InvalidInputValue)	\
 	LR_aux_set(o, xlo + 3.0*xun, 3.0);				\
 	LR_aux_set(o, xlo + 4.0*xun, 0.0);				\
 	LR_aux_set(o, xlo + 5.0*xun, 5.0);				\
@@ -791,7 +839,8 @@ int main(int argc, char* argv[]) {
 		return CU_get_error();
 	}
 	/* add tests to the suite */
-	if ((NULL == CU_add_test(pS,"new - int", test_new_int))
+	if ((NULL == CU_add_test(pS,"errors", test_LR_errors))
+	||  (NULL == CU_add_test(pS,"new - int", test_new_int))
 	||  (NULL == CU_add_test(pS,"new - float", test_new_float))
 	||  (NULL == CU_add_test(pS,"new - long", test_new_long))
 	||  (NULL == CU_add_test(pS,"new - double", test_new_double))

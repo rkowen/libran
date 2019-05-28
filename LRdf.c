@@ -92,9 +92,9 @@ an error.
 */
 int LR_aux_new(LR_obj *o, int n) {
 	if (!o->aux)
-		return 9;
+		return o->errno = LRerr_NoAuxiliaryObject;
 	if (!(((LR_pcs *) o->aux)->new))
-		return 11;
+		return o->errno = LRerr_NoAuxNormalizeDone;
 
 	return ((LR_pcs *) o->aux)->new(o,n);
 }
@@ -107,9 +107,9 @@ int LR_aux_new(LR_obj *o, int n) {
 */
 int LR_aux_rm(LR_obj *o) {
 	if (!o->aux)
-		return 9;
+		return o->errno = LRerr_NoAuxiliaryObject;
 	if (!(((LR_pcs *) o->aux)->rm))
-		return 11;
+		return o->errno = LRerr_NoAuxNormalizeDone;
 
 	return ((LR_pcs *) o->aux)->rm(o);
 }
@@ -125,9 +125,9 @@ int LR_aux_rm(LR_obj *o) {
 */
 int LR_aux_set(LR_obj *o, double x, double p) {
 	if (!o->aux)
-		return 9;
+		return o->errno = LRerr_NoAuxiliaryObject;
 	if (!(((LR_pcs *) o->aux)->set))
-		return 11;
+		return o->errno = LRerr_NoAuxNormalizeDone;
 
 	return ((LR_pcs *) o->aux)->set(o,x,p);
 }
@@ -141,9 +141,9 @@ int LR_aux_set(LR_obj *o, double x, double p) {
 int LR_aux_norm(LR_obj *o) {
 	int ret;
 	if (!o->aux)
-		return 9;
+		return o->errno = LRerr_NoAuxiliaryObject;
 	if (!(((LR_pcs *) o->aux)->normalize))
-		return 11;
+		return o->errno = LRerr_NoAuxNormalizeDone;
 
 	return ((LR_pcs *) o->aux)->normalize(o);
 }

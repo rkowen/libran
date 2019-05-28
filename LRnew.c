@@ -9,6 +9,7 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 	LR_obj *ptr = (void *) NULL;
 	if (!(ptr = (LR_obj *) malloc(sizeof(LR_obj))))
 		return ptr;
+	ptr->errno = 0;
 	ptr->d = d;
 	/* set all the pseudo-uniform random number generator */
 	ptr->ui = LR_irand;
@@ -35,6 +36,7 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->cdff = LRf_unif_CDF;
 		} else {
 			/* error */
+			ptr->errno = LRerr_BadDataType;
 		}
 		break;
 	case piece:
@@ -63,6 +65,7 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->cdff = LRf_piece_CDF;
 		} else {
 			/* error */
+			ptr->errno = LRerr_BadDataType;
 		}
 	}
 		break;
@@ -90,6 +93,7 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->cdff = LRf_lspline_CDF;
 		} else {
 			/* error */
+			ptr->errno = LRerr_BadDataType;
 		}
 	}
 		break;
@@ -113,10 +117,12 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->cdff = LRf_gsn2_CDF;
 		} else {
 			/* error */
+			ptr->errno = LRerr_BadDataType;
 		}
 		break;
 	default:
 		/* error */
+		ptr->errno = LRerr_BadLRType;
 		break;
 	}
 
@@ -142,9 +148,9 @@ int LR_rm(LR_obj **o) {
 		case LR_double:
 			free((void *) *o);
 			*o = (LR_obj *) NULL;
-			return 0;
+			return LRerr_OK;
 		default:
-			return 1;
+			return LRerr_BadDataType;
 		}
 	}
 }
