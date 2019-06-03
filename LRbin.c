@@ -94,7 +94,7 @@ int LR_bin_set(LR_bin *b, double x) {
 	}
 	b->nn++;
 
-	return 0;
+	return LRerr_OK;
 }
 
 /*!

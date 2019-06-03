@@ -27,7 +27,7 @@ SUBDIRS = . urand $(MAYBE_TESTS)
 
 LR_srcs	=								\
 	LRnew.c LRset.c LRbin.c LRdf.c LRunif.c LRerror.c		\
-	LRgsn.c LRpiece.c LRlspline.c
+	LRgaus.c LRgsn.c LRpiece.c LRlspline.c
 
 URAND_srcs = 								\
 	urand/urand.c

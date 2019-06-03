@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <stdlib.h>	/* malloc,free */
 #include <string.h>	/* memcpy */
+#include <math.h>	/* NAN */
 #include "libran.h"
 #include "urand/urand.h"
 
@@ -96,6 +97,27 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->errno = LRerr_BadDataType;
 		}
 	}
+		break;
+	case gausbm:
+		ptr->type = "gausbm";
+		if (d == LR_double) {
+			ptr->m.d = (double) 0.0;
+			ptr->s.d = (double) 1.0;
+			ptr->x.d = NAN;
+			ptr->rnd  = LRd_gausbm_RAN;
+			ptr->pdfd = LRd_gaus_PDF;
+			ptr->cdfd = LRd_gaus_CDF;
+		} else if (d == LR_float) {
+			ptr->m.f = (float) 0.0;
+			ptr->s.f = (float) 1.0;
+			ptr->x.f = NAN;
+			ptr->rnf  = LRf_gausbm_RAN;
+			ptr->pdff = LRf_gaus_PDF;
+			ptr->cdff = LRf_gaus_CDF;
+		} else {
+			/* error */
+			ptr->errno = LRerr_BadDataType;
+		}
 		break;
 	case gsn2:
 		ptr->type = "gsn2";
