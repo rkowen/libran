@@ -17,12 +17,9 @@ The default is m = 0, s = 1.
 /*!
 @brief	LRd_gausbm_RAN(LR_obj *o) - double random gaussian/normal distribution
 using the Box-Muller method.
-@return double
-@param o        LR_obj object
-@param o        LR_obj object
 Default values: mean m = 0, std.deviation s = 1
 
-@param o	LR_obj object
+@param o        LR_obj object
 @return double
 */
 double LRd_gausbm_RAN(LR_obj *o) {
@@ -81,9 +78,6 @@ double LRd_gaus_CDF(LR_obj *o, double x) {
 /*!
 @brief	LRf_gausbm_RAN(LR_obj *o) - float random gaussian/normal distribution
 using the Box-Muller method.
-@return float
-@param o        LR_obj object
-@param o        LR_obj object
 Default values: mean m = 0, std.deviation s = 1
 
 @param o	LR_obj object
