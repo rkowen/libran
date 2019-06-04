@@ -142,6 +142,7 @@ typedef struct {
 /* LibRan function declarations */
 LR_obj *LR_new(LR_type t, LR_data_type d);
 int LR_rm(LR_obj **o);
+int LR_check(LR_obj *o);
 
 /* LibRan object parameter setting */
 int LR_vset(LR_obj *o, char *x, va_list ap);

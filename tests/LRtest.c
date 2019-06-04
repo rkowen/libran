@@ -164,6 +164,60 @@ testLRsetall3(float,.,f)
 testLRsetall3(long,L,l)
 testLRsetall3(double,.,d)
 
+/* test the check method */
+#define testLRcheck(nn, dist, tt, ttt, setup)				\
+void test_check_ ## tt ## _##nn(void) {					\
+	LR_obj *o = LR_new(dist, LR_ ##ttt);				\
+	setup;								\
+	LR_rm(&o);							\
+}
+
+void test_check_bad_0(void) {
+	LR_obj *o = NULL;
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_Unspecified);
+}
+
+testLRcheck(0, unif, d, double, 
+	LR_set_all(o, "ab", 2.0,-1.5);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_OK);
+	CU_ASSERT_EQUAL(o->a.d, -1.5);
+	CU_ASSERT_EQUAL(o->b.d,  2.0);
+)
+testLRcheck(1, unif, d, double, 
+	LR_set_all(o, "ab", 2.0, 2.0);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidRange);
+)
+testLRcheck(2, gausbm, d, double, 
+	LR_set_all(o, "sm",-2.0, 1.5);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_OK);
+	CU_ASSERT_EQUAL(o->m.d,  1.5);
+	CU_ASSERT_EQUAL(o->s.d,  2.0);
+)
+testLRcheck(3, gausbm, d, double, 
+	LR_set_all(o, "sm", 0., 1.5);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidInputValue);
+)
+testLRcheck(0, unif, f, float, 
+	LR_set_all(o, "ab", 2.0,-1.5);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_OK);
+	CU_ASSERT_EQUAL(o->a.f, -1.5);
+	CU_ASSERT_EQUAL(o->b.f,  2.0);
+)
+testLRcheck(1, unif, f, float, 
+	LR_set_all(o, "ab", 2.0, 2.0);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidRange);
+)
+testLRcheck(2, gausbm, f, float, 
+	LR_set_all(o, "sm",-2.0, 1.5);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_OK);
+	CU_ASSERT_EQUAL(o->m.f,  1.5);
+	CU_ASSERT_EQUAL(o->s.f,  2.0);
+)
+testLRcheck(3, gausbm, f, float, 
+	LR_set_all(o, "sm", 0., 1.5);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidInputValue);
+)
+
 /* binning object */
 #define testLRbinnew(tt)		void test_bin_new_##tt(void) {	\
 	LR_bin *b = LR_bin_new(10);					\
@@ -1010,6 +1064,15 @@ if ((NULL == CU_add_test(pS,"errors", test_LR_errors))
 ||  (NULL == CU_add_test(pS,"set_all3 - float", test_set_all3_float))
 ||  (NULL == CU_add_test(pS,"set_all3 - long", test_set_all3_long))
 ||  (NULL == CU_add_test(pS,"set_all3 - double",test_set_all3_double))
+||  (NULL == CU_add_test(pS,"check - bad",test_check_bad_0))
+||  (NULL == CU_add_test(pS,"check - d - 0",test_check_d_0))
+||  (NULL == CU_add_test(pS,"check - d - 1",test_check_d_1))
+||  (NULL == CU_add_test(pS,"check - d - 2",test_check_d_2))
+||  (NULL == CU_add_test(pS,"check - d - 3",test_check_d_3))
+||  (NULL == CU_add_test(pS,"check - f - 0",test_check_f_0))
+||  (NULL == CU_add_test(pS,"check - f - 1",test_check_f_1))
+||  (NULL == CU_add_test(pS,"check - f - 2",test_check_f_2))
+||  (NULL == CU_add_test(pS,"check - f - 3",test_check_f_3))
 /*
 ||  (NULL == CU_add_test(pS,"new_bin - int", test_bin_new_int))
 ||  (NULL == CU_add_test(pS,"new_bin - float", test_bin_new_float))
