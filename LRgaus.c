@@ -28,8 +28,8 @@ double LRd_gausbm_RAN(LR_obj *o) {
 
 	if (isnan(o->x.d)) {
 		/* generate new pair - 1-U avoids possible overflow */
-		c = sqrt(ntwo * log(one - o->ud()));
-		z2 = twopi * o->ud();
+		c = sqrt(ntwo * log(one - o->ud(o)));
+		z2 = twopi * o->ud(o);
 		z1 = c * sin(z2);
 		o->x.d = z2 = c * cos(z2);
 		return o->m.d + o->s.d * z1;
@@ -89,8 +89,8 @@ float LRf_gausbm_RAN(LR_obj *o) {
 
 	if (isnan(o->x.f)) {
 		/* generate new pair - 1-U avoids possible overflow */
-		c = sqrt(ntwo * log(one - o->uf()));
-		z2 = twopi * o->uf();
+		c = sqrt(ntwo * log(one - o->uf(o)));
+		z2 = twopi * o->uf(o);
 		z1 = c * sinf(z2);
 		o->x.f = z2 = c * cosf(z2);
 		return o->m.f + o->s.f * z1;

@@ -21,7 +21,7 @@ Default range: [a,b) = [-1,1)
 */
 double LRd_gsn2_RAN(LR_obj *o) {
 	double sa = .5 * (o->b.d - o->a.d);
-	return o->a.d + sa * (o->ud() + o->ud());
+	return o->a.d + sa * (o->ud(o) + o->ud(o));
 }
 
 /*!
@@ -80,7 +80,7 @@ Default range: [a,b) = [-1,1)
 */
 float LRf_gsn2_RAN(LR_obj *o) {
 	float sa = .5 * (o->b.f - o->a.f);
-	return o->a.f + sa * (o->ud() + o->ud());
+	return o->a.f + sa * (o->ud(o) + o->ud(o));
 }
 
 /*!

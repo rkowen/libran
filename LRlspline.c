@@ -128,7 +128,7 @@ double LRd_lspline_RAN(LR_obj *o) {
 		return NAN;
 	}
 
-	x = o->ud();
+	x = o->ud(o);
 	/* find interval */
 	while (x >= aux->sc[i])	i++;
 
@@ -237,7 +237,7 @@ float LRf_lspline_RAN(LR_obj *o) {
 		return NAN;
 	}
 
-	x = o->uf();
+	x = o->uf(o);
 	/* find interval */
 	while (x >= aux->sc[i])	i++;
 

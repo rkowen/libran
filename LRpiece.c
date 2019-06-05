@@ -204,7 +204,7 @@ double LRd_piece_RAN(LR_obj *o) {
 		return NAN;
 	}
 
-	x = o->ud();
+	x = o->ud(o);
 	/* find interval */
 	while (x > aux->sc[i])	i++;
 
@@ -287,7 +287,7 @@ float LRf_piece_RAN(LR_obj *o) {
 		return NAN;
 	}
 
-	x = o->ud();
+	x = o->ud(o);
 	/* find interval */
 	while (x > aux->sc[i])	i++;
 

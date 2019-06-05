@@ -14,6 +14,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "libran.h"
 #include "urand.h"
 #include "config.h"
 
@@ -31,6 +32,7 @@ int main() {
 	long lmyseed = sizeof(long), lmax = 0, ltst;
 	double dten, dtst;
 	float ftst;
+	LR_obj *o = LR_new(unif,LR_double);
 
 /* lower precision int/float */
 /* initialize arrays */
@@ -39,26 +41,27 @@ int main() {
 		uarr1[i] = 0;
 	}
 /* initialize seed */
-	LR_isetseed(imyseed);
+	LR_isetseed(o, imyseed);
 	dten = 10./((double) LR_IRAND_IMAX);
-	ftst = LR_frand();
-	itst = LR_irand();
-	PTEST(LR_igetrand(), itst );
-	NTEST(LR_fgetrand(), ftst );
-	itst = LR_irand();
-	ftst = LR_frand();
-	PTEST(LR_fgetrand(), ftst );
-	NTEST(LR_igetrand(), itst );
-	PTEST(LR_igetseed(), imyseed );
+	ftst = LR_frand(o);
+	itst = LR_irand(o);
+	PTEST(LR_igetrand(o), itst );
+	NTEST(LR_fgetrand(o), ftst );
+	itst = LR_irand(o);
+	ftst = LR_frand(o);
+	PTEST(LR_fgetrand(o), ftst );
+	NTEST(LR_igetrand(o), itst );
+	PTEST(LR_igetseed(o), imyseed );
 
 /* sample from irand */
-	LR_isetseed(imyseed);
+	LR_isetseed(o, imyseed);
 	for (i = 0; i < sample; ++i) {
-		++iarr1[(int) (((double) LR_irand()) * dten)];
-		imax = (imax > LR_igetrand() ? imax : LR_igetrand());
+		++iarr1[(int) (((double) LR_irand(o)) * dten)];
+		imax = (imax > LR_igetrand(o) ? imax : LR_igetrand(o));
 	}
 /* display results */
-	printf("seed          = %ld %ld\n",(long) imyseed,(long) LR_igetseed());
+	printf("seed          = %ld %ld\n",
+		(long) imyseed,(long) LR_igetseed(o));
 	printf("IRAND MAX     = %ld\n",(long) LR_IRAND_IMAX);
 	printf("LR_IRAND_IMAX = %ld\n",(long) LR_igetval("LR_IRAND_IMAX"));
 	printf("LR_IRAND_IMAX2= %ld\n",(long) LR_igetval("LR_IRAND_IMAX2"));
@@ -71,9 +74,9 @@ int main() {
 	printf("\n");
 /* sample from LR_frand */
 	printf("sampling from LR_frand()\n");
-	LR_isetseed(imyseed);
+	LR_isetseed(o,imyseed);
 	for (i = 0; i < sample; ++i) {
-		++uarr1[((int) (10.*LR_frand()))];
+		++uarr1[((int) (10.*LR_frand(o)))];
 	}
 	for (i=0; i<arrdim; ++i) {
 		printf(" %5d",uarr1[i]);
@@ -96,26 +99,26 @@ int main() {
 		uarr1[i] = 0;
 	}
 /* initialize seed */
-	LR_lsetseed(lmyseed);
+	LR_lsetseed(o,lmyseed);
 	dten = 10./((double) LR_IRAND_LMAX);
-	dtst = LR_drand();
-	ltst = LR_lrand();
-	PTEST(LR_lgetrand(), ltst );
-	NTEST(LR_dgetrand(), dtst );
-	ltst = LR_lrand();
-	dtst = LR_drand();
-	PTEST(LR_dgetrand(), dtst );
-	NTEST(LR_lgetrand(), ltst );
-	PTEST(LR_lgetseed(), lmyseed );
+	dtst = LR_drand(o);
+	ltst = LR_lrand(o);
+	PTEST(LR_lgetrand(o), ltst );
+	NTEST(LR_dgetrand(o), dtst );
+	ltst = LR_lrand(o);
+	dtst = LR_drand(o);
+	PTEST(LR_dgetrand(o), dtst );
+	NTEST(LR_lgetrand(o), ltst );
+	PTEST(LR_lgetseed(o), lmyseed );
 
 /* sample from irand */
-	LR_lsetseed(lmyseed);
+	LR_lsetseed(o,lmyseed);
 	for (i = 0; i < sample; ++i) {
-		++iarr1[(int) (((double) LR_lrand()) * dten)];
-		lmax = (lmax > LR_lgetrand() ? lmax : LR_lgetrand());
+		++iarr1[(int) (((double) LR_lrand(o)) * dten)];
+		lmax = (lmax > LR_lgetrand(o) ? lmax : LR_lgetrand(o));
 	}
 /* display results */
-	printf("seed      = %ld %ld\n",(long) lmyseed, (long) LR_lgetseed());
+	printf("seed      = %ld %ld\n",(long) lmyseed, (long) LR_lgetseed(o));
 	printf("IRAND MAX = %ld\n",(long) LR_IRAND_LMAX);
 	printf("LR_IRAND_LMAX = %ld\n",(long) LR_lgetval("LR_IRAND_LMAX"));
 	printf("LR_IRAND_LMAX2= %ld\n",(long) LR_lgetval("LR_IRAND_LMAX2"));
@@ -128,9 +131,9 @@ int main() {
 	printf("\n");
 /* sample from LR_drand */
 	printf("sampling from LR_drand()\n");
-	LR_lsetseed(lmyseed);
+	LR_lsetseed(o,lmyseed);
 	for (i = 0; i < sample; ++i) {
-		++uarr1[((int) (10.*LR_drand()))];
+		++uarr1[((int) (10.*LR_drand(o)))];
 	}
 	for (i=0; i<arrdim; ++i) {
 		printf(" %5d",uarr1[i]);

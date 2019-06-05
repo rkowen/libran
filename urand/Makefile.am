@@ -1,6 +1,9 @@
-bin_PROGRAMS = turand
-turand_SOURCES = turand.c urand.c
-dist_doc_DATA = README
+bin_PROGRAMS	= turand
+turand_SOURCES	= turand.c urand.c
+turand_LDADD	= -lran -lm
+turand_LDFLAGS	= -L..
+dist_doc_DATA	= README
+AM_CPPFLAGS	= -I..
 
 ChangeLog :
 	@echo "Do Not Edit!  This is a generated file." > ChangeLog

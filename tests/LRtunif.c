@@ -1,10 +1,11 @@
 #include <stdio.h>
+#include "libran.h"	/* LR_obj */
 
 /* only allow 10007 unique "random" numbers */
 
 double fc = 1.0 / 10007.;
 
-int tirand(void) {
+int tirand(LR_obj *o) {
 	static int t_iy = 1777;
 	t_iy *= 1117;
 	t_iy += 37;
@@ -12,14 +13,14 @@ int tirand(void) {
 	return t_iy;
 }
 
-long tlrand(void) {
-	return (long) tirand();
+long tlrand(LR_obj *o) {
+	return (long) tirand(o);
 }
 
-float tfrand(void) {
-	return (float) (fc * tirand());
+float tfrand(LR_obj *o) {
+	return (float) (fc * tirand(o));
 }
 
-double tdrand(void) {
-	return (double) (fc * tirand());
+double tdrand(LR_obj *o) {
+	return (double) (fc * tirand(o));
 }

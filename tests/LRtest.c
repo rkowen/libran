@@ -218,6 +218,38 @@ testLRcheck(3, gausbm, f, float,
 	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidInputValue);
 )
 
+/* independent pseudo-random sequences */
+#define testLRindep(dist, nn, num, incr, setup)				\
+void test_indep_seq_##nn(void) {	\
+	LR_obj *o1 = LR_new(dist, LR_double);				\
+	LR_obj *o2 = LR_new(dist, LR_double);				\
+	double y1, y2;							\
+	setup;								\
+	for (int i = 0; i < num; i++) {					\
+		for (int j = 0; j < incr; j++) {			\
+			y1 = LRd_RAN(o1); y2 = LRd_RAN(o2);		\
+		}							\
+		CU_ASSERT_EQUAL(y1, y2);				\
+	}								\
+	LR_rm(&o1); LR_rm(&o2);						\
+}
+
+testLRindep(unif, 1, 10, 5000,)
+testLRindep(unif, 2, 10, 5000,
+	LR_lsetseed(o1, 19580512l);
+	LR_lsetseed(o2, 19580512l);
+)
+testLRindep(gausbm, 3, 10, 5000,)
+testLRindep(gausbm, 4, 10, 5000,
+	LR_lsetseed(o1, 19580512l);
+	LR_lsetseed(o2, 19580512l);
+)
+testLRindep(gsn2, 5, 10, 5000,)
+testLRindep(gsn2, 6, 10, 5000,
+	LR_lsetseed(o1, 19580512l);
+	LR_lsetseed(o2, 19580512l);
+)
+
 /* binning object */
 #define testLRbinnew(tt)		void test_bin_new_##tt(void) {	\
 	LR_bin *b = LR_bin_new(10);					\
@@ -334,10 +366,10 @@ CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->b.tt+.1),0.,tol)		\
 }
 
 /* uniform distribution */
-int tirand(void);
-long tlrand(void);
-float tfrand(void);
-double tdrand(void);
+int tirand(LR_obj *);
+long tlrand(LR_obj *);
+float tfrand(LR_obj *);
+double tdrand(LR_obj *);
 
 testCdfPdf0unif(0,d,double,.001,)
 testCdfPdf(1,d,double,unif,20,.001,)
@@ -1073,6 +1105,12 @@ if ((NULL == CU_add_test(pS,"errors", test_LR_errors))
 ||  (NULL == CU_add_test(pS,"check - f - 1",test_check_f_1))
 ||  (NULL == CU_add_test(pS,"check - f - 2",test_check_f_2))
 ||  (NULL == CU_add_test(pS,"check - f - 3",test_check_f_3))
+||  (NULL == CU_add_test(pS,"indep seq - 1",test_indep_seq_1))
+||  (NULL == CU_add_test(pS,"indep seq - 2",test_indep_seq_2))
+||  (NULL == CU_add_test(pS,"indep seq - 3",test_indep_seq_3))
+||  (NULL == CU_add_test(pS,"indep seq - 4",test_indep_seq_4))
+||  (NULL == CU_add_test(pS,"indep seq - 5",test_indep_seq_5))
+||  (NULL == CU_add_test(pS,"indep seq - 6",test_indep_seq_6))
 /*
 ||  (NULL == CU_add_test(pS,"new_bin - int", test_bin_new_int))
 ||  (NULL == CU_add_test(pS,"new_bin - float", test_bin_new_float))

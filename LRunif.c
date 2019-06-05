@@ -20,7 +20,7 @@ Default:
 */
 double LRd_unif_RAN(LR_obj *o) {
 	double x, diff = (o->b.d - o->a.d); 
-	x = o->ud();
+	x = o->ud(o);
 
 	return o->a.d + x * diff;
 }
@@ -69,7 +69,7 @@ double LRd_unif_CDF(LR_obj *o, double x) {
 */
 float LRf_unif_RAN(LR_obj *o) {
 	float x, diff = (o->b.f - o->a.f); 
-	x = o->uf();
+	x = o->uf(o);
 
 	return o->a.f + x * diff;
 }

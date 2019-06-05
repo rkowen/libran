@@ -9,6 +9,9 @@ static const char RCSID[]="$Id: urand.c 106 2002-02-10 08:02:39Z rk $";
 	republished by G.E. Forsysth, M.A. Malcolm, and C.B. Moler (1977);
 	and converted from Fortran 77 to C with f2c.
 
+	Modified to fit into the LibRan package, and to isolate each
+	pseudo-random sequence to each LibRan object.
+
  Copyright 2018 by R.K. Owen, Ph.D.
  See LICENSE.LGPL, which must be provided, for details.
 
@@ -39,19 +42,21 @@ static const char RCSID[]="$Id: urand.c 106 2002-02-10 08:02:39Z rk $";
 #ifndef	_URAND_H_
 #  define _URAND_H_
 
-int	LR_irand(void);
-float	LR_frand(void);
-void	LR_isetseed(int ity);
-int	LR_igetseed(void);
-int	LR_igetrand(void);
-float	LR_fgetrand(void);
+#  include "libran.h"
 
-long	LR_lrand(void);
-double	LR_drand(void);
-void	LR_lsetseed(long lty);
-long	LR_lgetseed(void);
-long	LR_lgetrand(void);
-double	LR_dgetrand(void);
+int	LR_irand(LR_obj *);
+float	LR_frand(LR_obj *);
+void	LR_isetseed(LR_obj *, int ity);
+int	LR_igetseed(LR_obj *);
+int	LR_igetrand(LR_obj *);
+float	LR_fgetrand(LR_obj *);
+
+long	LR_lrand(LR_obj *);
+double	LR_drand(LR_obj *);
+void	LR_lsetseed(LR_obj *, long lty);
+long	LR_lgetseed(LR_obj *);
+long	LR_lgetrand(LR_obj *);
+double	LR_dgetrand(LR_obj *);
 
 int	LR_igetval(char *str);
 long	LR_lgetval(char *str);

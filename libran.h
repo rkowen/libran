@@ -3,7 +3,7 @@
 */
 
 #ifndef 	_LIBRAN_H_
-#  define	_LIBRAN_H
+#  define	_LIBRAN_H_
 
 #  include <stdarg.h>
 
@@ -85,11 +85,14 @@ struct LR_obj {
 	LR_val		m;	/**< m - middle value of distribution */
 	LR_val		s;	/**< s - measure of distribution width */
 	LR_val		x;	/**< x - auxiliary value */
+	/**< object random values */
+	LR_val		iy;	/**< iy  - current sequence value */
+	LR_val		iy0;	/**< iy0 - initial sequence value */
 	/**< set of uniform random number generators - one for each data type */
-	int	(*ui)(void);	/**< ui - int */
-	long	(*ul)(void);	/**< ul - long */
-	float	(*uf)(void);	/**< uf - float */
-	double	(*ud)(void);	/**< ud - double */
+	int	(*ui)(LR_obj *);	/**< ui - int */
+	long	(*ul)(LR_obj *);	/**< ul - long */
+	float	(*uf)(LR_obj *);	/**< uf - float */
+	double	(*ud)(LR_obj *);	/**< ud - double */
 	/**< set of Random Fns for this distribution type */
 	float	(*rnf)(LR_obj *);		/**< rnf - float */
 	double	(*rnd)(LR_obj *);		/**< rnd - double */
