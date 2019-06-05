@@ -6,23 +6,42 @@ LRt_xxx_CDF(o,x)	- cummalitive distribution function according to 'xxx'
 			  (Integral of PDF)
 
 o = the libran object
-o.u		pseudo-random uniform distribution
-o.t		random distribution type
-o.d		random distribution data type (int, float, double, etc.)
+o.u		pseudo-random uniform distribution function
+o.t		random distribution type (see below)
+o.d		random distribution data type (LR_int, LR_float, etc)
 o.a		initial value in range
 o.b		final value in range
 o.m		middle value of distribution
 o.s		measure of distribution width
+o.x		auxiliary value
 
-Must call LR_init() prior to calling any distribution routine to fill the
-libran object with appropriate values.  If the distribution routines are
-passed a NULL object then they will assume default values and leaves the
-conversion of values to the user.
-A libran object defined for one type of distribution can not be used by
-a different distribution and will raise an exception.
+However, once the LR object is declared then use the "generic"
+methods which "knows" which RAN,PDF, or CDF method to call for the
+given random variate distribution.  E.g.
+
+LRt_RAN(o)	- random variate sequence
+LRt_PDF(o,x)	- probability distribution function
+LRt_CDF(o,x)	- cummalitive distribution function
 
 t = f or d for single (float) or double precision
   = i or l for an int or long integer precision
+
+The distribution object parameters are set with the following:
+set an individual object parameter
+	LR_set(o, 'x', value)				
+set multiple object parameters
+	LR_setall(o, "abx...", value1, value2, value3, ...)
+
+After the parameters are set, then optionally call
+	LR_check(o)
+which will "fix" the parameters (if it can) or identify "bad"
+parameters.  For example a distribution with a finite range the routine
+will make sure the "a" and "b" parameters are ordered properly and
+flag an error if they are identical.
+
+For those distributions which rely on "m" (mean) and "s" (standard
+deviation) it will fix if "s" is negative and flag an error if it's
+value is zero.
 
 xxx	- generic template
 
@@ -42,19 +61,12 @@ log	- logirithmic
 nexp	- negative exponential
 cauchy	- Cauchy
 
-The last argument should refer to a helper distribution (usually
-uniform distribution) to generate the random variates.  If a (void *)
-then use the standard one from library (LRt_unif_RAN()).
+Some of the random variate distributions also require some auxiliary
+functions to be called to properly set-up the distribution beyond the
+simple set of parameters contained within the LR object.
 
-To-Do:
-For piece & lspline have the PDF/CDF/RAN functions raise an exception
-if the norm function was not called prior.
-
-Have the lspline norm raise an exception if the set function has not
-been called prior.  There must be an intermediary non-zero point
-between the endpoints.
-
-Somehow identify and differentiate between piece & lspline in the
-LR_pcs_* auxiliary routines.
-Or ... define generic functions and set pointers to the appropriate methods.
+The LR object also contains its own uniform pseudo-random variate
+generator and the sequence is independent from other LR objects.
+This function can be replaced, but the replacement version must
+conform to the same signature.  (Check libran.h for details.)
 
