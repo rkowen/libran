@@ -949,6 +949,11 @@ testCdfPdfFR(5,f,float,gausbm,4,80,.001,
 	LR_set_all(o,"ms", 2., 2.50);
 )
 
+testCdfPdf0gaus(gausmar,0,d,double,.0001,0.0, 1.0)
+testCdfPdf0gaus(gausmar,0,f,float,.001,0.0, 1.0)
+testCdfPdfFR(1,d,double,gausmar,3,60,.0001,)
+testCdfPdfFR(1,f,float,gausmar,3,60,.001,)
+
 /* more complicated random variates do not have "uniform" coverage */
 /* also the limited test t*rand functions do not adequately span space */
 /* make tolerance adjustable */
@@ -1006,6 +1011,25 @@ testLRgausbm(2,f,float,3.0,60,
 	LR_set_all(o,"ms", -2., .75);
 )
 testLRgausbm(3,f,float,3.0,60,
+	LR_set_all(o,"ms", 2., 2.50);
+)
+
+#define testLRgausmar(nn,tt,ttt,ww,bn,setup)				\
+	testLRfull(gausmar,nn,tt,ttt,ww,bn,50*10007,.1,100,setup)
+
+testLRgausmar(1,d,double,3.0,60, )
+testLRgausmar(2,d,double,3.0,60,
+	LR_set_all(o,"ms", -2., .75);
+)
+testLRgausmar(3,d,double,3.0,60,
+	LR_set_all(o,"ms", 2., 2.50);
+)
+
+testLRgausmar(1,f,float,3.0,60, )
+testLRgausmar(2,f,float,3.0,60,
+	LR_set_all(o,"ms", -2., .75);
+)
+testLRgausmar(3,f,float,3.0,60,
 	LR_set_all(o,"ms", 2., 2.50);
 )
 
@@ -1230,6 +1254,16 @@ if ((NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-0", test_cdf_pdf_d_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-f-1", test_gausbm_f_1))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-f-1", test_gausbm_f_2))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-f-1", test_gausbm_f_3))
+||  (NULL == CU_add_test(pSfull,"Gausmar-P/CDF-d-0", test_cdf_pdf_d_gausmar_0))
+||  (NULL == CU_add_test(pSfull,"Gausmar-P/CDF-d-1", test_cdf_pdf_d_gausmar_1))
+||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-d-1", test_gausmar_d_1))
+||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-d-1", test_gausmar_d_2))
+||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-d-1", test_gausmar_d_3))
+||  (NULL == CU_add_test(pSfull,"Gausmar-P/CDF-f-0", test_cdf_pdf_f_gausmar_0))
+||  (NULL == CU_add_test(pSfull,"Gausmar-P/CDF-f-1", test_cdf_pdf_f_gausmar_1))
+||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-f-1", test_gausmar_f_1))
+||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-f-1", test_gausmar_f_2))
+||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-f-1", test_gausmar_f_3))
 ) {
 		printf("\nTest Suite full range  additions failure.");
 		CU_cleanup_registry();

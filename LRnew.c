@@ -138,6 +138,27 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->errno = LRerr_BadDataType;
 		}
 		break;
+	case gausmar:
+		ptr->type = "gausmar";
+		if (d == LR_double) {
+			ptr->m.d = (double) 0.0;
+			ptr->s.d = (double) 1.0;
+			ptr->x.d = NAN;
+			ptr->rnd  = LRd_gausmar_RAN;
+			ptr->pdfd = LRd_gaus_PDF;
+			ptr->cdfd = LRd_gaus_CDF;
+		} else if (d == LR_float) {
+			ptr->m.f = (float) 0.0;
+			ptr->s.f = (float) 1.0;
+			ptr->x.f = NAN;
+			ptr->rnf  = LRf_gausmar_RAN;
+			ptr->pdff = LRf_gaus_PDF;
+			ptr->cdff = LRf_gaus_CDF;
+		} else {
+			/* error */
+			ptr->errno = LRerr_BadDataType;
+		}
+		break;
 	case gsn2:
 		ptr->type = "gsn2";
 		if (d == LR_double) {

@@ -41,7 +41,8 @@ typedef	enum {
 	unif,		/**< unif	- uniform */
 	piece,		/**< piece	- piecewise uniform */
 	lspline,	/**< lspline	- linear spline */
-	gausbm,		/**< guas	- Gaussian (Normal) - Box Muller method*/
+	gausbm,		/**< guas	- Gaussian (Normal)-Box Muller method*/
+	gausmar,	/**< guas	- Gaussian (Normal)-Marsaglia method*/
 	gsn2,		/**< gsn2	- Gaussian like - 2 uni (saw tooth) */
 	gsn4,		/**< gsn4	- Gaussian like - 4 uni */
 	gsn12,		/**< gsn12	- Gaussian like - 12 uni */
@@ -218,10 +219,12 @@ float LRf_lspline_CDF(LR_obj *o, float x);
 
 /* double gaussian */
 double LRd_gausbm_RAN(LR_obj *o);
+double LRd_gausmar_RAN(LR_obj *o);
 double LRd_gaus_PDF(LR_obj *o, double x);
 double LRd_gaus_CDF(LR_obj *o, double x);
 /* float gaussian */
 float LRf_gausbm_RAN(LR_obj *o);
+float LRf_gausmar_RAN(LR_obj *o);
 float LRf_gaus_PDF(LR_obj *o, float x);
 float LRf_gaus_CDF(LR_obj *o, float x);
 /* double gsn2 */

@@ -6,6 +6,7 @@ The pseudo-random numbers are distributed from a Gaussian or Normal
 distribution.  The mean is given by m and variance = s.
 
 PDF(z) = 1/(s*sqrt(2pi)) exp(-(z-m)^2 / (2s^2))
+CDF(z) = 1/2*[1 + erf((x-m)/(s*sqrt(2))]
 
 The default is m = 0, s = 1.
  
@@ -38,6 +39,37 @@ double LRd_gausbm_RAN(LR_obj *o) {
 		c = o->x.d;
 		o->x.d = NAN;
 		return o->m.d + o->s.d * c;
+	}
+}
+
+/* double */
+/*!
+@brief	LRd_gausmar_RAN(LR_obj *o) - double random gaussian/normal distribution
+using the Marsaglia method with acceptance-rejection.
+(Avoids using Sine/Cosine.  Only uses one Log/Sqrt)
+Default values: mean m = 0, std.deviation s = 1
+
+@param o        LR_obj object
+@return double
+*/
+double LRd_gausmar_RAN(LR_obj *o) {
+	double one = 1.0, two = 2.0;
+	double s, z1, z2;
+
+	if (isnan(o->x.d)) {
+		do {
+			z1 = two*o->ud(o) - one;
+			z2 = two*o->ud(o) - one;
+			s = z1*z1 + z2*z2;
+		} while (s > one);
+		s = sqrt(-two*log(s)/s);
+		o->x.d = z2 * s;
+		return o->m.d + o->s.d * z1 * s;
+	} else {
+		/* return saved variate */
+		s = o->x.d;
+		o->x.d = NAN;
+		return o->m.d + o->s.d * s;
 	}
 }
 
@@ -99,6 +131,36 @@ float LRf_gausbm_RAN(LR_obj *o) {
 		c = o->x.f;
 		o->x.f = NAN;
 		return o->m.f + o->s.f * c;
+	}
+}
+
+/*!
+@brief	LRf_gausmar_RAN(LR_obj *o) - float random gaussian/normal distribution
+using the Marsaglia method with acceptance-rejection.
+(Avoids using Sine/Cosine.  Only uses one Log/Sqrt)
+Default values: mean m = 0, std.deviation s = 1
+
+@param o        LR_obj object
+@return float
+*/
+float LRf_gausmar_RAN(LR_obj *o) {
+	float one = 1.0, two = 2.0;
+	float s, z1, z2;
+
+	if (isnan(o->x.f)) {
+		do {
+			z1 = two*o->ud(o) - one;
+			z2 = two*o->ud(o) - one;
+			s = z1*z1 + z2*z2;
+		} while (s > one);
+		s = sqrtf(-two*logf(s)/s);
+		o->x.f = z2 * s;
+		return o->m.f + o->s.f * z1 * s;
+	} else {
+		/* return saved variate */
+		s = o->x.f;
+		o->x.f = NAN;
+		return o->m.f + o->s.f * s;
 	}
 }
 
