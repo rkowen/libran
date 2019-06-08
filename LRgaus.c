@@ -1,9 +1,9 @@
 /*!
-\file	LRgs.c
+\file	LRgaus.c
 \brief 	The Gaussian (Normal) distributions centered on m and width given by 2s
 
 The pseudo-random numbers are distributed from a Gaussian or Normal
-distribution.  The mean is given by m and variance = s.
+distribution.  The mean is given by m and variance = s^2.
 
 PDF(z) = 1/(s*sqrt(2pi)) exp(-(z-m)^2 / (2s^2))
 CDF(z) = 1/2*[1 + erf((x-m)/(s*sqrt(2))]
@@ -16,7 +16,7 @@ The default is m = 0, s = 1.
 
 /* double */
 /*!
-@brief	LRd_gausbm_RAN(LR_obj *o) - double random gaussian/normal distribution
+@brief	LRd_gausbm_RAN(LR_obj *o) - double random Gaussian/Normal distribution
 using the Box-Muller method.
 Default values: mean m = 0, std.deviation s = 1
 
@@ -44,7 +44,7 @@ double LRd_gausbm_RAN(LR_obj *o) {
 
 /* double */
 /*!
-@brief	LRd_gausmar_RAN(LR_obj *o) - double random gaussian/normal distribution
+@brief	LRd_gausmar_RAN(LR_obj *o) - double random Gaussian/Normal distribution
 using the Marsaglia method with acceptance-rejection.
 (Avoids using Sine/Cosine.  Only uses one Log/Sqrt)
 Default values: mean m = 0, std.deviation s = 1
@@ -74,7 +74,7 @@ double LRd_gausmar_RAN(LR_obj *o) {
 }
 
 /*!
-@brief	LRd_gaus_PDF(LR_obj *o, double x) - double gaussian/normal probablity distribution function
+@brief	LRd_gaus_PDF(LR_obj *o, double x) - double Gaussian/Normal probablity distribution function
 
 @param o	LR_obj object
 @param x	value
@@ -91,7 +91,7 @@ double LRd_gaus_PDF(LR_obj *o, double x) {
 }
 
 /*!
-@brief	LRd_gaus_CDF(LR_obj *o, double x) - double gaussian/normal cumulative distribution function
+@brief	LRd_gaus_CDF(LR_obj *o, double x) - double Gaussian/Normal cumulative distribution function
 
 @param o	LR_obj object
 @param x	value
@@ -108,7 +108,7 @@ double LRd_gaus_CDF(LR_obj *o, double x) {
 
 /* float */
 /*!
-@brief	LRf_gausbm_RAN(LR_obj *o) - float random gaussian/normal distribution
+@brief	LRf_gausbm_RAN(LR_obj *o) - float random Gaussian/Normal distribution
 using the Box-Muller method.
 Default values: mean m = 0, std.deviation s = 1
 
@@ -135,7 +135,7 @@ float LRf_gausbm_RAN(LR_obj *o) {
 }
 
 /*!
-@brief	LRf_gausmar_RAN(LR_obj *o) - float random gaussian/normal distribution
+@brief	LRf_gausmar_RAN(LR_obj *o) - float random Gaussian/Normal distribution
 using the Marsaglia method with acceptance-rejection.
 (Avoids using Sine/Cosine.  Only uses one Log/Sqrt)
 Default values: mean m = 0, std.deviation s = 1
@@ -165,7 +165,7 @@ float LRf_gausmar_RAN(LR_obj *o) {
 }
 
 /*!
-@brief	LRf_gaus_PDF(LR_obj *o, float x) - float gaussian/normal probablity distribution function
+@brief	LRf_gaus_PDF(LR_obj *o, float x) - float Gaussian/Normal probablity distribution function
 
 @param o	LR_obj object
 @param x	value
@@ -182,7 +182,7 @@ float LRf_gaus_PDF(LR_obj *o, float x) {
 }
 
 /*!
-@brief	LRf_gaus_CDF(LR_obj *o, float x) - float gaussian/normal cumulative distribution function
+@brief	LRf_gaus_CDF(LR_obj *o, float x) - float Gaussian/Normal cumulative distribution function
 
 @param o	LR_obj object
 @param x	value
