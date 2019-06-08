@@ -236,4 +236,13 @@ float LRf_gsn2_RAN(LR_obj *o);
 float LRf_gsn2_PDF(LR_obj *o, float x);
 float LRf_gsn2_CDF(LR_obj *o, float x);
 
+/* double cauchy */
+double LRd_cauchy_RAN(LR_obj *o);
+double LRd_cauchy_PDF(LR_obj *o, double x);
+double LRd_cauchy_CDF(LR_obj *o, double x);
+/* float cauchy */
+float LRf_cauchy_RAN(LR_obj *o);
+float LRf_cauchy_PDF(LR_obj *o, float x);
+float LRf_cauchy_CDF(LR_obj *o, float x);
+
 #endif		/* _LIBRAN_H_ */
