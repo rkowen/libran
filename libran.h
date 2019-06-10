@@ -48,7 +48,8 @@ typedef	enum {
 	gsn12,		/**< gsn12	- Gaussian like - 12 uni */
 	logd,		/**< logd	- logirithmic */
 	nexp,		/**< nexp	- negative exponential */
-	cauchy		/**< cauchy	- Cauchy */
+	cauchy,		/**< cauchy	- Cauchy */
+	cauchymar	/**< cauchymar	- Cauchy using polar/Marsaglia method*/
 }	LR_type;
 
 /*!
@@ -238,10 +239,12 @@ float LRf_gsn2_CDF(LR_obj *o, float x);
 
 /* double cauchy */
 double LRd_cauchy_RAN(LR_obj *o);
+double LRd_cauchymar_RAN(LR_obj *o);
 double LRd_cauchy_PDF(LR_obj *o, double x);
 double LRd_cauchy_CDF(LR_obj *o, double x);
 /* float cauchy */
 float LRf_cauchy_RAN(LR_obj *o);
+float LRf_cauchymar_RAN(LR_obj *o);
 float LRf_cauchy_PDF(LR_obj *o, float x);
 float LRf_cauchy_CDF(LR_obj *o, float x);
 

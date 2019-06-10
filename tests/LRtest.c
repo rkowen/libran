@@ -1041,9 +1041,9 @@ testLRgausmar(3,f,float,3.0,60,
  * peak	- central value
  * wid	- peak width
  */
-#define testCdfPdf0cauchy(nn,tt,ttt,tol,peak,wid)			\
-void test_cdf_pdf_##tt ## _cauchy ## _##nn(void) {			\
-	LR_obj *o = LR_new(cauchy, LR_##ttt);				\
+#define testCdfPdf0cauchy(dist,nn,tt,ttt,tol,peak,wid)			\
+void test_cdf_pdf_##tt ## _## dist ## _##nn(void) {			\
+	LR_obj *o = LR_new(dist, LR_##ttt);				\
 	ttt cc = M_1_PI/wid;						\
 	LR_set_all(o,"ms", peak, wid);					\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,peak-wid),.25,tol)		\
@@ -1054,9 +1054,9 @@ CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,peak+wid),.75,tol)		\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,peak+wid),cc*.5,tol)		\
 }
 
-testCdfPdf0cauchy(0,d,double,.0001,0.0, 1.0)
-testCdfPdf0cauchy(1,d,double,.0001,-1.0, 2.0)
-testCdfPdf0cauchy(2,d,double,.0001,1.5, .5)
+testCdfPdf0cauchy(cauchy,0,d,double,.0001,0.0, 1.0)
+testCdfPdf0cauchy(cauchy,1,d,double,.0001,-1.0, 2.0)
+testCdfPdf0cauchy(cauchy,2,d,double,.0001,1.5, .5)
 
 testCdfPdfFR(3,d,double,cauchy,3,60,.0001,)
 testCdfPdfFR(4,d,double,cauchy,3,60,.0001,
@@ -1066,9 +1066,9 @@ testCdfPdfFR(5,d,double,cauchy,4,80,.0001,
 	LR_set_all(o,"ms", 2., 2.50);
 )
 
-testCdfPdf0cauchy(0,f,float,.001,0.0, 1.0)
-testCdfPdf0cauchy(1,f,float,.001,-1.0, 2.0)
-testCdfPdf0cauchy(2,f,float,.001,1.5, .5)
+testCdfPdf0cauchy(cauchy,0,f,float,.001,0.0, 1.0)
+testCdfPdf0cauchy(cauchy,1,f,float,.001,-1.0, 2.0)
+testCdfPdf0cauchy(cauchy,2,f,float,.001,1.5, .5)
 
 testCdfPdfFR(3,f,float,cauchy,3,60,.001,)
 testCdfPdfFR(4,f,float,cauchy,3,60,.001,
@@ -1077,6 +1077,11 @@ testCdfPdfFR(4,f,float,cauchy,3,60,.001,
 testCdfPdfFR(5,f,float,cauchy,4,80,.001,
 	LR_set_all(o,"ms", 2., 2.50);
 )
+
+testCdfPdf0cauchy(cauchymar,0,d,double,.0001,0.0, 1.0)
+testCdfPdf0cauchy(cauchymar,1,d,double,.0001,-1.0, 2.0)
+testCdfPdf0cauchy(cauchymar,0,f,float,.001,0.0, 1.0)
+testCdfPdf0cauchy(cauchymar,1,f,float,.001,-1.0, 2.0)
 
 #define testLRcauchy(nn,tt,ttt,ww,bn,setup)				\
 	testLRfull(cauchy,nn,tt,ttt,ww,bn,50*10007,.1,100,setup)
@@ -1094,6 +1099,25 @@ testLRcauchy(2,f,float,3.0,60,
 	LR_set_all(o,"ms", -2., .75);
 )
 testLRcauchy(3,f,float,3.0,60,
+	LR_set_all(o,"ms", 2., 2.50);
+)
+
+#define testLRcauchymar(nn,tt,ttt,ww,bn,setup)				\
+	testLRfull(cauchymar,nn,tt,ttt,ww,bn,50*10007,.1,100,setup)
+
+testLRcauchymar(1,d,double,3.0,60, )
+testLRcauchymar(2,d,double,3.0,60,
+	LR_set_all(o,"ms", -2., .75);
+)
+testLRcauchymar(3,d,double,3.0,60,
+	LR_set_all(o,"ms", 2., 2.50);
+)
+
+testLRcauchymar(1,f,float,3.0,60, )
+testLRcauchymar(2,f,float,3.0,60,
+	LR_set_all(o,"ms", -2., .75);
+)
+testLRcauchymar(3,f,float,3.0,60,
 	LR_set_all(o,"ms", 2., 2.50);
 )
 
@@ -1346,6 +1370,16 @@ if ((NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-0", test_cdf_pdf_d_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-f-1", test_cauchy_f_1))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-f-1", test_cauchy_f_2))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-f-1", test_cauchy_f_3))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-P/CDF-d-0", test_cdf_pdf_d_cauchymar_0))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-P/CDF-d-1", test_cdf_pdf_d_cauchymar_1))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-d-1", test_cauchymar_d_1))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-d-1", test_cauchymar_d_2))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-d-1", test_cauchymar_d_3))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-P/CDF-f-0", test_cdf_pdf_f_cauchymar_0))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-P/CDF-f-1", test_cdf_pdf_f_cauchymar_1))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-f-1", test_cauchymar_f_1))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-f-1", test_cauchymar_f_2))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-f-1", test_cauchymar_f_3))
 ) {
 		printf("\nTest Suite full range  additions failure.");
 		CU_cleanup_registry();

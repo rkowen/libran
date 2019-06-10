@@ -201,6 +201,25 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->errno = LRerr_BadDataType;
 		}
 		break;
+	case cauchymar:
+		ptr->type = "cauchymar";
+		if (d == LR_double) {
+			ptr->m.d = (double) 0.0;
+			ptr->s.d = (double) 1.0;
+			ptr->rnd  = LRd_cauchymar_RAN;
+			ptr->pdfd = LRd_cauchy_PDF;
+			ptr->cdfd = LRd_cauchy_CDF;
+		} else if (d == LR_float) {
+			ptr->m.f = (float) 0.0;
+			ptr->s.f = (float) 1.0;
+			ptr->rnf  = LRf_cauchymar_RAN;
+			ptr->pdff = LRf_cauchy_PDF;
+			ptr->cdff = LRf_cauchy_CDF;
+		} else {
+			/* error */
+			ptr->errno = LRerr_BadDataType;
+		}
+		break;
 	default:
 		/* error */
 		ptr->errno = LRerr_BadLRType;

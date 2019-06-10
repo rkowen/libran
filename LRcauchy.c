@@ -30,6 +30,27 @@ double LRd_cauchy_RAN(LR_obj *o) {
 }
 
 /*!
+@brief	LRd_cauchymar_RAN(LR_obj *o) - double random Cauchy/Lorentz distribution
+using the polar method and the Marsagalia method and acceptance/rejection for generating a
+Gaussian/Normal variate.
+Default values: peak m = 0, half width s = 1
+
+@param o        LR_obj object
+@return double
+*/
+double LRd_cauchymar_RAN(LR_obj *o) {
+	double zero = 0.0, one = 1.0, two = 2.0;
+	double s, z1, z2;
+	do {
+		z1 = two*o->ud(o) - one;
+		z2 = two*o->ud(o) - one;
+		s = z1*z1 + z2*z2;
+	} while (s > one || z2 == zero);
+
+	return o->m.d + o->s.d*z1/z2;
+}
+
+/*!
 @brief	LRd_cauchy_PDF(LR_obj *o, double x) - double Cauchy/Lorentz probablity distribution function
 
 @param o	LR_obj object
@@ -69,6 +90,27 @@ Default values: peak m = 0, half width s = 1
 */
 float LRf_cauchy_RAN(LR_obj *o) {
 	return o->m.f + o->s.f*tanf(M_PI * o->uf(o));
+}
+
+/*!
+@brief	LRf_cauchymar_RAN(LR_obj *o) - float random Cauchy/Lorentz distribution
+using the polar method and the Marsagalia method and acceptance/rejection for generating a
+Gaussian/Normal variate.
+Default values: peak m = 0, half width s = 1
+
+@param o        LR_obj object
+@return float
+*/
+float LRf_cauchymar_RAN(LR_obj *o) {
+	float zero = 0.0, one = 1.0, two = 2.0;
+	float s, z1, z2;
+	do {
+		z1 = two*o->uf(o) - one;
+		z2 = two*o->uf(o) - one;
+		s = z1*z1 + z2*z2;
+	} while (s > one || z2 == zero);
+
+	return o->m.f + o->s.f*z1/z2;
 }
 
 /*!
