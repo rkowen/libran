@@ -117,6 +117,25 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 		}
 	}
 		break;
+	case nexp:
+		ptr->type = "nexp";
+		if (d == LR_double) {
+			ptr->m.d = (double) 1.0;
+			ptr->s.d = NAN;
+			ptr->rnd  = LRd_nexp_RAN;
+			ptr->pdfd = LRd_nexp_PDF;
+			ptr->cdfd = LRd_nexp_CDF;
+		} else if (d == LR_float) {
+			ptr->m.f = (float) 1.0;
+			ptr->s.f = NAN;
+			ptr->rnf  = LRf_nexp_RAN;
+			ptr->pdff = LRf_nexp_PDF;
+			ptr->cdff = LRf_nexp_CDF;
+		} else {
+			/* error */
+			ptr->errno = LRerr_BadDataType;
+		}
+		break;
 	case gausbm:
 		ptr->type = "gausbm";
 		if (d == LR_double) {

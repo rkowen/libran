@@ -876,6 +876,131 @@ testBADlspline(0,f,float,2.,4.,
 	CU_ASSERT(isnan(LRf_CDF(o,3.)));
 )
 
+/* CDF/PDF tests for half range */
+/* testCdfPdfHR (half range)
+ * nn	- test number
+ * tt	- LR data type (d or f)
+ * ttt	- LR data type (double or float)
+ * dist	- LR variate type
+ * end	- upper value
+ * nnt	- number of test values
+ * tol	- absolute tolerance
+ * setup- LR object parameter set-up
+ */
+#define testCdfPdfHR(nn,tt,ttt,dist,end,nnt,tol,setup)			\
+void test_cdf_pdf_##tt ## _##dist ## _##nn(void) {			\
+	LR_obj *o = LR_new(dist, LR_##ttt);				\
+	double	incr = end/nnt, x = 0.0;				\
+	setup;								\
+	for (int i = 0; i < nnt; i++) {					\
+		compCdfPdf(tt,o,x,x+.0001,tol)				\
+		x += incr;						\
+	}								\
+}
+
+/* negative exponential */
+/* nn	- test # 
+ * tt	- LR data type (d or f)
+ * ttt	- data type (double or float)
+ * tol	- tolerance
+ * mean	- mean value
+ */
+#define testCdfPdf0nexp(nn,tt,ttt,tol,mean)				\
+void test_cdf_pdf_##tt ## _nexp ## _##nn(void) {			\
+	LR_obj *o = LR_new(nexp, LR_##ttt);				\
+	LR_set_all(o,"m", mean);					\
+	ttt cc = 1.0/M_E;						\
+	ttt cc2 = sqrt(cc);						\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mean*0.5),1.0-cc2,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mean*0.5),cc2/mean,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mean),1.0-cc,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mean),cc/mean,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mean*2.0),1.0-cc*cc,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mean*2.0),cc*cc/mean,tol)	\
+}
+
+testCdfPdf0nexp(0,d,double,.0001,1.0)
+testCdfPdf0nexp(1,d,double,.0001,.3)
+testCdfPdf0nexp(2,d,double,.0001,3.0)
+
+testCdfPdfHR(3,d,double,nexp,3.,60,.0001,)
+testCdfPdfHR(4,d,double,nexp,3.,60,.0005,
+	LR_set_all(o,"m", .5);
+)
+testCdfPdfHR(5,d,double,nexp,4.,80,.0001,
+	LR_set_all(o,"m", 2.);
+)
+
+testCdfPdf0nexp(0,f,float,.001,1.0)
+testCdfPdf0nexp(1,f,float,.001,.3)
+testCdfPdf0nexp(2,f,float,.001,3.0)
+
+testCdfPdfHR(3,f,float,nexp,3.,60,.001,)
+testCdfPdfHR(4,f,float,nexp,3.,60,.005,
+	LR_set_all(o,"m", .5);
+)
+testCdfPdfHR(5,f,float,nexp,4.,80,.001,
+	LR_set_all(o,"m", 2.);
+)
+
+/* more complicated random variates do not have "uniform" coverage */
+/* also the limited test t*rand functions do not adequately span space */
+/* make tolerance adjustable */
+/* vty	- LR distribution
+ * nn	- test #
+ * tt	- type letter (f or d)
+ * ttt	- type (float or double)
+ * end	- the highest value of range
+ * bn	- bin number
+ * xtot	- total number of samples (should be large)
+ * vsc	- % error tolerance (.1 = 10%)
+ * vab	- absolute error tolerance
+ * setup- set-up code
+ */
+#define testLRhalf(vty,nn,tt,ttt,end,bn,xtot,vsc,vab,setup)		\
+void test_##vty ## _##tt ## _##nn(void) {				\
+	LR_obj *o = LR_new(vty, LR_##ttt);				\
+	LR_bin *b = LR_bin_new(bn+2);					\
+	double	x, cdf[bn+2], tol;					\
+	setup;								\
+	double	begin = 0.0,						\
+		incr = end / bn;					\
+	/* o->uf = tfrand; o->ud = tdrand; */				\
+	for (int i = 0; i < bn; i++) {					\
+		x = begin + i*incr;					\
+		LR_bin_set(b,x);					\
+		cdf[i] = xtot*(LR##tt ## _CDF(o,x)			\
+			- LR##tt ## _CDF(o,x - incr));			\
+	}								\
+	cdf[bn] = xtot * (1.0 - LR##tt ## _CDF(o,begin+bn*incr));	\
+	for (int i = 0; i < xtot; i++) {				\
+		LR_bin_add(b,LR##tt ## _RAN(o));			\
+	}								\
+	for (int i = 0; i <= bn; i++) {					\
+		tol = max(cdf[i]*vsc,vab);				\
+		CU_ASSERT_DOUBLE_EQUAL(1.0*b->bins[i],cdf[i],tol);	\
+	}								\
+}
+
+#define testLRnexp(nn,tt,ttt,end,bn,setup)				\
+	testLRhalf(nexp,nn,tt,ttt,end,bn,50*10007,.1,100,setup)
+
+testLRnexp(1,d,double,3.0,60, )
+testLRnexp(2,d,double,2.0,60,
+	LR_set_all(o,"m", .5);
+)
+testLRnexp(3,d,double,4.0,80,
+	LR_set_all(o,"m", 2.0);
+)
+
+testLRnexp(1,f,float,3.0,60, )
+testLRnexp(2,f,float,2.0,60,
+	LR_set_all(o,"m", .5);
+)
+testLRnexp(3,f,float,4.0,80,
+	LR_set_all(o,"m", 2.0);
+)
+
 /* CDF/PDF tests for full range */
 /* testCdfPdfFR (full range)
  * nn	- test number
@@ -1124,6 +1249,7 @@ testLRcauchymar(3,f,float,3.0,60,
 int main(int argc, char* argv[]) {
 	CU_pSuite		pS		= NULL;
 	CU_pSuite		pSint		= NULL;
+	CU_pSuite		pShalf		= NULL;
 	CU_pSuite		pSfull		= NULL;
 	CU_BasicRunMode		mode		= CU_BRM_VERBOSE;
 	CU_ErrorAction		error_action	= CUEA_IGNORE;
@@ -1179,9 +1305,16 @@ int main(int argc, char* argv[]) {
 		CU_cleanup_registry();
 		return CU_get_error();
 	}
+	pShalf = CU_add_suite("LR_test_suite_half_range",
+		init_suite, clean_suite);
+	if (pShalf == NULL) {
+		printf("\nTest Registry Suite Half Range failure.");
+		CU_cleanup_registry();
+		return CU_get_error();
+	}
 	pSfull = CU_add_suite("LR_test_suite_full_range",
 		init_suite, clean_suite);
-	if (pSint == NULL) {
+	if (pSfull == NULL) {
 		printf("\nTest Registry Suite Full Range failure.");
 		CU_cleanup_registry();
 		return CU_get_error();
@@ -1324,34 +1457,58 @@ if ((NULL == CU_add_test(pSint,"Unif-P/CDF-d-0", test_cdf_pdf_d_unif_0))
 		return CU_get_error();
 	}
 
+if ((NULL == CU_add_test(pShalf,"Nexp-P/CDF-d-0", test_cdf_pdf_d_nexp_0))
+||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-d-1", test_cdf_pdf_d_nexp_1))
+||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-d-2", test_cdf_pdf_d_nexp_2))
+||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-d-3", test_cdf_pdf_d_nexp_3))
+||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-d-4", test_cdf_pdf_d_nexp_4))
+||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-d-5", test_cdf_pdf_d_nexp_5))
+||  (NULL == CU_add_test(pSfull,"Nexp-Ran-d-1", test_nexp_d_1))
+||  (NULL == CU_add_test(pSfull,"Nexp-Ran-d-2", test_nexp_d_2))
+||  (NULL == CU_add_test(pSfull,"Nexp-Ran-d-3", test_nexp_d_3))
+||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-0", test_cdf_pdf_f_nexp_0))
+||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-1", test_cdf_pdf_f_nexp_1))
+||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-2", test_cdf_pdf_f_nexp_2))
+||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-3", test_cdf_pdf_f_nexp_3))
+||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-4", test_cdf_pdf_f_nexp_4))
+||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-5", test_cdf_pdf_f_nexp_5))
+||  (NULL == CU_add_test(pSfull,"Nexp-Ran-f-1", test_nexp_f_1))
+||  (NULL == CU_add_test(pSfull,"Nexp-Ran-f-2", test_nexp_f_2))
+||  (NULL == CU_add_test(pSfull,"Nexp-Ran-f-3", test_nexp_f_3))
+) {
+		printf("\nTest Suite interval additions failure.");
+		CU_cleanup_registry();
+		return CU_get_error();
+	}
+
 if ((NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-0", test_cdf_pdf_d_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-1", test_cdf_pdf_d_gausbm_1))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-2", test_cdf_pdf_d_gausbm_2))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-3", test_cdf_pdf_d_gausbm_3))
-||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-3", test_cdf_pdf_d_gausbm_4))
-||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-3", test_cdf_pdf_d_gausbm_5))
+||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-4", test_cdf_pdf_d_gausbm_4))
+||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-5", test_cdf_pdf_d_gausbm_5))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-d-1", test_gausbm_d_1))
-||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-d-1", test_gausbm_d_2))
-||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-d-1", test_gausbm_d_3))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-d-2", test_gausbm_d_2))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-d-3", test_gausbm_d_3))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-f-0", test_cdf_pdf_f_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-f-1", test_cdf_pdf_f_gausbm_1))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-f-2", test_cdf_pdf_f_gausbm_2))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-f-3", test_cdf_pdf_f_gausbm_3))
-||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-f-3", test_cdf_pdf_f_gausbm_4))
-||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-f-3", test_cdf_pdf_f_gausbm_5))
+||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-f-4", test_cdf_pdf_f_gausbm_4))
+||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-f-5", test_cdf_pdf_f_gausbm_5))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-f-1", test_gausbm_f_1))
-||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-f-1", test_gausbm_f_2))
-||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-f-1", test_gausbm_f_3))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-f-2", test_gausbm_f_2))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-f-3", test_gausbm_f_3))
 ||  (NULL == CU_add_test(pSfull,"Gausmar-P/CDF-d-0", test_cdf_pdf_d_gausmar_0))
 ||  (NULL == CU_add_test(pSfull,"Gausmar-P/CDF-d-1", test_cdf_pdf_d_gausmar_1))
 ||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-d-1", test_gausmar_d_1))
-||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-d-1", test_gausmar_d_2))
-||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-d-1", test_gausmar_d_3))
+||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-d-2", test_gausmar_d_2))
+||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-d-3", test_gausmar_d_3))
 ||  (NULL == CU_add_test(pSfull,"Gausmar-P/CDF-f-0", test_cdf_pdf_f_gausmar_0))
 ||  (NULL == CU_add_test(pSfull,"Gausmar-P/CDF-f-1", test_cdf_pdf_f_gausmar_1))
 ||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-f-1", test_gausmar_f_1))
-||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-f-1", test_gausmar_f_2))
-||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-f-1", test_gausmar_f_3))
+||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-f-2", test_gausmar_f_2))
+||  (NULL == CU_add_test(pSfull,"Gausmar-Ran-f-3", test_gausmar_f_3))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-d-0", test_cdf_pdf_d_cauchy_0))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-d-1", test_cdf_pdf_d_cauchy_1))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-d-2", test_cdf_pdf_d_cauchy_2))
@@ -1359,8 +1516,8 @@ if ((NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-0", test_cdf_pdf_d_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-d-4", test_cdf_pdf_d_cauchy_4))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-d-5", test_cdf_pdf_d_cauchy_5))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-d-1", test_cauchy_d_1))
-||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-d-1", test_cauchy_d_2))
-||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-d-1", test_cauchy_d_3))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-d-2", test_cauchy_d_2))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-d-3", test_cauchy_d_3))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-f-0", test_cdf_pdf_f_cauchy_0))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-f-1", test_cdf_pdf_f_cauchy_1))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-f-2", test_cdf_pdf_f_cauchy_2))
@@ -1368,18 +1525,18 @@ if ((NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-0", test_cdf_pdf_d_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-f-4", test_cdf_pdf_f_cauchy_4))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-f-5", test_cdf_pdf_f_cauchy_5))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-f-1", test_cauchy_f_1))
-||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-f-1", test_cauchy_f_2))
-||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-f-1", test_cauchy_f_3))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-f-2", test_cauchy_f_2))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-f-3", test_cauchy_f_3))
 ||  (NULL == CU_add_test(pSfull,"Cauchymar-P/CDF-d-0", test_cdf_pdf_d_cauchymar_0))
 ||  (NULL == CU_add_test(pSfull,"Cauchymar-P/CDF-d-1", test_cdf_pdf_d_cauchymar_1))
 ||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-d-1", test_cauchymar_d_1))
-||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-d-1", test_cauchymar_d_2))
-||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-d-1", test_cauchymar_d_3))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-d-2", test_cauchymar_d_2))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-d-3", test_cauchymar_d_3))
 ||  (NULL == CU_add_test(pSfull,"Cauchymar-P/CDF-f-0", test_cdf_pdf_f_cauchymar_0))
 ||  (NULL == CU_add_test(pSfull,"Cauchymar-P/CDF-f-1", test_cdf_pdf_f_cauchymar_1))
 ||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-f-1", test_cauchymar_f_1))
-||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-f-1", test_cauchymar_f_2))
-||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-f-1", test_cauchymar_f_3))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-f-2", test_cauchymar_f_2))
+||  (NULL == CU_add_test(pSfull,"Cauchymar-Ran-f-3", test_cauchymar_f_3))
 ) {
 		printf("\nTest Suite full range  additions failure.");
 		CU_cleanup_registry();
