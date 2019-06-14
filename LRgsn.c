@@ -9,6 +9,10 @@ The medium m = (a+b)/2, and width s = 1
 The default depends on the distribution.
  
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "libran.h"
 
 /*!
@@ -129,3 +133,6 @@ float LRf_gsn2_CDF(LR_obj *o, float x) {
 	}
 }
 
+#ifdef __cplusplus
+}
+#endif

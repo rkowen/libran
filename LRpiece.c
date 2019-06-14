@@ -6,6 +6,10 @@ Create and remove special objects within the LR_obj to handle a set of
 piecewise uniform distribution.
 
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <math.h>
 #include "libran.h"
@@ -353,3 +357,6 @@ float LRf_piece_CDF(LR_obj *o, float x) {
 	}
 }
 
+#ifdef __cplusplus
+}
+#endif

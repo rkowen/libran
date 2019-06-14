@@ -11,6 +11,10 @@ CDF(z) = 1 - exp(-x/m)
 The default is m = 1 and s will be set to 1/m for efficiency.
  
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <math.h>
 #include "libran.h"
 
@@ -118,3 +122,6 @@ float LRf_nexp_CDF(LR_obj *o, float x) {
 	return one - expf(- o->s.f * x);
 }
 
+#ifdef __cplusplus
+}
+#endif

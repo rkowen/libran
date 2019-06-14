@@ -10,6 +10,10 @@ Default:
 - b = 1
  
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "libran.h"
 
 /*!
@@ -110,3 +114,6 @@ float LRf_unif_CDF(LR_obj *o, float x) {
 	}
 }
 
+#ifdef __cplusplus
+}
+#endif

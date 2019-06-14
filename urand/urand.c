@@ -34,13 +34,13 @@ static const char RCSID[]="$Id: urand.c 106 2002-02-10 08:02:39Z rk $";
  *  LR_lgetval()	- returns URAND long configuration values
  */
 
-#include "config.h"
-#include "libran.h"	/* LR_obj, LR_val */
-#include <string.h>	/* strcmp */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "config.h"
+#include "libran.h"	/* LR_obj, LR_val */
+#include <string.h>	/* strcmp */
 
 /* global variables */
 /* random sequence values */

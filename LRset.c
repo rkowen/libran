@@ -3,6 +3,10 @@
 \brief	Set of methods to handle setting the various LR_obj parameters.
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdarg.h>	/* va_arg */
 #include <string.h>	/* memcpy */
 #include "libran.h"
@@ -120,3 +124,6 @@ int LR_set_all(LR_obj *o, char *x, ...) {
 	return ret;
 }
 
+#ifdef __cplusplus
+}
+#endif

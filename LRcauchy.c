@@ -13,6 +13,10 @@ CDF(z) = 1/pi*arctan((x-m)/s) + 1/2
 The default is m = 0, s = 1.
  
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <math.h>
 #include "libran.h"
 
@@ -142,3 +146,6 @@ float LRf_cauchy_CDF(LR_obj *o, float x) {
 	return half + M_1_PI * atanf(x/o->s.f);
 }
 
+#ifdef __cplusplus
+}
+#endif

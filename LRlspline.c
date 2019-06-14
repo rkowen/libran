@@ -8,6 +8,10 @@ The CDF is pinned to zero at the end points.  So you will need to add
 at least one point in between with a non-zero value. 
 
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <math.h>	/* sqrt, sqrtf, NAN */
 #include "libran.h"
@@ -329,3 +333,6 @@ float LRf_lspline_CDF(LR_obj *o, float x) {
 	}
 }
 
+#ifdef __cplusplus
+}
+#endif

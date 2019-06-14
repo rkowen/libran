@@ -9,6 +9,10 @@ A check function is added to check and correct any of the parameter values
 possible.  (E.g. the interval boundaries b > a, width s > 0, etc.)
 
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>	/* malloc,free */
@@ -351,3 +355,6 @@ int LR_check(LR_obj *o) {
 	}
 }
 
+#ifdef __cplusplus
+}
+#endif

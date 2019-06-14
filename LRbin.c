@@ -5,6 +5,10 @@
 This set of functions: set-up, count values into bins, and take-down
 
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <math.h>	/* isnan() */
 #include "libran.h"
@@ -124,3 +128,7 @@ int LR_bin_add(LR_bin *b, double x) {
 
 	return LRerr_OK;
 }
+
+#ifdef __cplusplus
+}
+#endif

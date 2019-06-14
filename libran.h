@@ -4,6 +4,9 @@
 
 #ifndef 	_LIBRAN_H_
 #  define	_LIBRAN_H_
+#  ifdef __cplusplus
+extern "C" {
+#  endif
 
 #  include <stdarg.h>
 
@@ -258,4 +261,7 @@ float LRf_cauchymar_RAN(LR_obj *o);
 float LRf_cauchy_PDF(LR_obj *o, float x);
 float LRf_cauchy_CDF(LR_obj *o, float x);
 
+#  ifdef __cplusplus
+}
+#  endif
 #endif		/* _LIBRAN_H_ */

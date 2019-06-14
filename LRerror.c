@@ -6,6 +6,10 @@ The LibRan error routines patterned after the Standard C perror()/strerror()
 routines and the like.
 
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include "libran.h"
 
@@ -102,3 +106,7 @@ void LRperror(char *str, int LRerrno) {
 		fprintf(stderr,"%s\n", LRstrerror(LRerrno));
 	}
 }
+
+#ifdef __cplusplus
+}
+#endif

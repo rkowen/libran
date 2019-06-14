@@ -10,6 +10,10 @@ You can also do the same for the auxiliary functions: new, rm, set, and norm.
 The auxiliary methods are not dependent on the LR_data_type.
 
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "libran.h"
 
 /*!
@@ -148,3 +152,6 @@ int LR_aux_norm(LR_obj *o) {
 	return ((LR_pcs *) o->aux)->normalize(o);
 }
 
+#ifdef __cplusplus
+}
+#endif

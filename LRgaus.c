@@ -11,6 +11,10 @@ CDF(z) = 1/2*[1 + erf((x-m)/(s*sqrt(2))]
 The default is m = 0, s = 1.
  
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <math.h>
 #include "libran.h"
 
@@ -197,3 +201,6 @@ float LRf_gaus_CDF(LR_obj *o, float x) {
 	return half * (one + erff(xm));
 }
 
+#ifdef __cplusplus
+}
+#endif
