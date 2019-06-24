@@ -335,7 +335,7 @@ void test_cdf_pdf_ ## tt ## _ ##dist ## _##nn(void) {			\
 	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->a.tt-2*incr),0.,tol)	\
 	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->a.tt-2*incr),0.,tol)	\
 	for (int i = 1; i < nnt; i++) {					\
-	  compCdfPdf(tt,o,o->a.tt+i*incr,o->a.tt+i*incr+.0001,.001)	\
+	  compCdfPdf(tt,o,o->a.tt+i*incr,o->a.tt+i*incr+.0001,tol)	\
 	}								\
 	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->b.tt+2*incr),1.,tol) \
 	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->b.tt+2*incr),0.,tol) \
@@ -634,12 +634,12 @@ testCdfPdf0gsn2(4,d,double,.001,LR_set_all(o,"ab",-3.,1.))
 testCdfPdf(5,d,double,gsn2,33,.001,LR_set_all(o,"ab",-1.,3.))
 
 testCdfPdf0gsn2(0,f,float,.001,)
-testCdfPdf(1,f,float,gsn2,20,.001,)
-testCdfPdf(2,f,float,gsn2,50,.001,)
-testCdfPdf(3,f,float,gsn2,90,.001,)
+testCdfPdf(1,f,float,gsn2,20,.003,)
+testCdfPdf(2,f,float,gsn2,50,.003,)
+testCdfPdf(3,f,float,gsn2,90,.003,)
 
-testCdfPdf0gsn2(4,f,float,.001,LR_set_all(o,"ab",-3.,1.))
-testCdfPdf(5,f,float,gsn2,33,.001,LR_set_all(o,"ab",-1.,3.))
+testCdfPdf0gsn2(4,f,float,.003,LR_set_all(o,"ab",-3.,1.))
+testCdfPdf(5,f,float,gsn2,33,.003,LR_set_all(o,"ab",-1.,3.))
 
 /* more complicated random variates do not have "uniform" coverage */
 /* make tolerance adjustable */
