@@ -197,7 +197,7 @@ void showdf(char *DFstr, int order, LINT xn[][NINT], LINT xd[][NINT]) {
 void writedf(char *DFstr, int order, LINT xn[][NINT]) {
 	LINT maxcoef = 0;
 
-	printf("long %s%d[%d][%d] = {\n", DFstr, order, order+1, order);
+	printf("long %s%d[%d][%d] = {\n", DFstr, order, order+1, order+1);
 	for (int j = 0; j <= order; j++) {
 		printf("{");
 		for (int i = 0; i <= order; i++) {
