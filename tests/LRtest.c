@@ -8,7 +8,7 @@
 
 #define max(a,b) (a > b ? a : b)
 
-#undef LR_DEBUG
+#define LR_DEBUG
 
 #ifdef LR_DEBUG
 #  define CX_ASSERT_DOUBLE_EQUAL(val,exp,tol)			\
@@ -323,10 +323,11 @@ CU_ASSERT_DOUBLE_EQUAL(							\
  * ttt	- LR data type (double or float)
  * dist	- LR variate type
  * nnt	- number of test values
+ * del	- delta
  * tol	- absolute tolerance
  * setup- LR object parameter set-up
  */
-#define testCdfPdf(nn,tt,ttt,dist,nnt,tol,setup)			\
+#define testCdfPdf(nn,tt,ttt,dist,nnt,del,tol,setup)			\
 void test_cdf_pdf_ ## tt ## _ ##dist ## _##nn(void) {			\
 	LR_obj *o = LR_new(dist, LR_##ttt);				\
 	double	incr;							\
@@ -335,7 +336,7 @@ void test_cdf_pdf_ ## tt ## _ ##dist ## _##nn(void) {			\
 	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->a.tt-2*incr),0.,tol)	\
 	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->a.tt-2*incr),0.,tol)	\
 	for (int i = 1; i < nnt; i++) {					\
-	  compCdfPdf(tt,o,o->a.tt+i*incr,o->a.tt+i*incr+.0001,tol)	\
+	  compCdfPdf(tt,o,o->a.tt+i*incr,o->a.tt+i*incr+del,tol)	\
 	}								\
 	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->b.tt+2*incr),1.,tol) \
 	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->b.tt+2*incr),0.,tol) \
@@ -372,20 +373,20 @@ float tfrand(LR_obj *);
 double tdrand(LR_obj *);
 
 testCdfPdf0unif(0,d,double,.001,)
-testCdfPdf(1,d,double,unif,20,.001,)
-testCdfPdf(2,d,double,unif,50,.001,)
-testCdfPdf(3,d,double,unif,90,.001,)
+testCdfPdf(1,d,double,unif,20,.0001,.001,)
+testCdfPdf(2,d,double,unif,50,.0001,.001,)
+testCdfPdf(3,d,double,unif,90,.0001,.001,)
 
 testCdfPdf0unif(4,d,double,.001,LR_set_all(o,"ab",-2.,2.))
-testCdfPdf(5,d,double,unif,33,.001,LR_set_all(o,"ab",-1.,3.))
+testCdfPdf(5,d,double,unif,33,.0001,.001,LR_set_all(o,"ab",-1.,3.))
 
 testCdfPdf0unif(0,f,float,.001,)
-testCdfPdf(1,f,float,unif,20,.001,)
-testCdfPdf(2,f,float,unif,50,.001,)
-testCdfPdf(3,f,float,unif,90,.001,)
+testCdfPdf(1,f,float,unif,20,.0001,.001,)
+testCdfPdf(2,f,float,unif,50,.0001,.001,)
+testCdfPdf(3,f,float,unif,90,.0001,.001,)
 
 testCdfPdf0unif(4,f,float,.001,LR_set_all(o,"ab",-2.,2.))
-testCdfPdf(5,f,float,unif,33,.001,LR_set_all(o,"ab",-1.,3.))
+testCdfPdf(5,f,float,unif,33,.0001,.001,LR_set_all(o,"ab",-1.,3.))
 
 /* the last bin will have one less then rest ... so may be off by 2. */
 #define testLRunif(nn,tt,ttt,dist,bn,setup)				\
@@ -459,7 +460,7 @@ CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xhi+.1),1.,tol)			\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xhi+.1),0.,tol)			\
 }
 
-testCdfPdf(0,d,double,piece,75,.001,
+testCdfPdf(0,d,double,piece,75,.0001,.001,
 	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -2., 6., 4.);
 	LR_aux_set(o, o->a.d + 2.0, 1.0);
@@ -469,7 +470,7 @@ testCdfPdf(0,d,double,piece,75,.001,
 	LR_aux_set(o, o->a.d + 7.0, 2.0);
 	LR_aux_norm(o);
 )
-testCdfPdf(1,d,double,piece,55,.001,
+testCdfPdf(1,d,double,piece,55,.0001,.001,
 	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -2., 6., 4.);
 	LR_aux_set(o, o->a.d + 2.0, 1.0);
@@ -482,7 +483,7 @@ testCdfPdf(1,d,double,piece,55,.001,
 testCdfPdf0piece(2,d,double,.001,-2.,6.);
 testCdfPdf0piece(3,d,double,.001,0.,8.);
 
-testCdfPdf(0,f,float,piece,75,.001,
+testCdfPdf(0,f,float,piece,75,.0001,.001,
 	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -2., 6., 4.);
 	LR_aux_set(o, o->a.d + 2.0, 1.0);
@@ -492,7 +493,7 @@ testCdfPdf(0,f,float,piece,75,.001,
 	LR_aux_set(o, o->a.d + 7.0, 2.0);
 	LR_aux_norm(o);
 )
-testCdfPdf(1,f,float,piece,55,.001,
+testCdfPdf(1,f,float,piece,55,.0001,.001,
 	LR_aux_new(o,6);
 	LR_set_all(o,"abx", -2., 6., 4.);
 	LR_aux_set(o, o->a.d + 2.0, 1.0);
@@ -626,20 +627,20 @@ CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->b.tt+.1),0.,tol)		\
 }
 
 testCdfPdf0gsn2(0,d,double,.001,)
-testCdfPdf(1,d,double,gsn2,20,.001,)
-testCdfPdf(2,d,double,gsn2,50,.001,)
-testCdfPdf(3,d,double,gsn2,90,.001,)
+testCdfPdf(1,d,double,gsn2,20,.0001,.001,)
+testCdfPdf(2,d,double,gsn2,50,.0001,.001,)
+testCdfPdf(3,d,double,gsn2,90,.0001,.001,)
 
 testCdfPdf0gsn2(4,d,double,.001,LR_set_all(o,"ab",-3.,1.))
-testCdfPdf(5,d,double,gsn2,33,.001,LR_set_all(o,"ab",-1.,3.))
+testCdfPdf(5,d,double,gsn2,33,.0001,.001,LR_set_all(o,"ab",-1.,3.))
 
 testCdfPdf0gsn2(0,f,float,.001,)
-testCdfPdf(1,f,float,gsn2,20,.003,)
-testCdfPdf(2,f,float,gsn2,50,.003,)
-testCdfPdf(3,f,float,gsn2,90,.003,)
+testCdfPdf(1,f,float,gsn2,20,.0001,.003,)
+testCdfPdf(2,f,float,gsn2,50,.0001,.003,)
+testCdfPdf(3,f,float,gsn2,90,.0001,.003,)
 
 testCdfPdf0gsn2(4,f,float,.003,LR_set_all(o,"ab",-3.,1.))
-testCdfPdf(5,f,float,gsn2,33,.003,LR_set_all(o,"ab",-1.,3.))
+testCdfPdf(5,f,float,gsn2,33,.0001,.003,LR_set_all(o,"ab",-1.,3.))
 
 /* more complicated random variates do not have "uniform" coverage */
 /* make tolerance adjustable */
@@ -689,6 +690,96 @@ testLRgsn2(2,f,float,25,)
 testLRgsn2(3,f,float,20,LR_set_all(o,"ab",-2.,2.))
 testLRgsn2(4,f,float,30,LR_set_all(o,"ab",-5.,1.))
 
+/* gsn4 */
+#define testCdfPdf0gsn4(nn,tt,ttt,tol,setup)				\
+void test_cdf_pdf_##tt ## _gsn4 ## _##nn(void) {			\
+	LR_obj *o = LR_new(gsn4, LR_##ttt);				\
+	double	ival,pval;						\
+	setup;								\
+	ival = (o->b.tt - o->a.tt);					\
+	pval = 4.0/ival;						\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->a.tt-.1),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->a.tt-.1),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->a.tt),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->a.tt),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->a.tt+.25*ival),.041667,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->a.tt+.25*ival),pval*.16666,tol)\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->a.tt+.5*ival),.5,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->a.tt+.5*ival),pval*.66666,tol)\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->a.tt+.75*ival),.95833,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->a.tt+.75*ival),pval*.16666,tol)\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->b.tt),1.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->b.tt),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->b.tt+.1),1.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->b.tt+.1),0.,tol)		\
+}
+
+testCdfPdf0gsn4(0,d,double,.001,)
+testCdfPdf(1,d,double,gsn4,20,.0001,.001,)
+testCdfPdf(2,d,double,gsn4,50,.0001,.001,)
+testCdfPdf(3,d,double,gsn4,90,.0001,.001,)
+
+testCdfPdf0gsn4(4,d,double,.0001,LR_set_all(o,"ab",-3.,1.))
+testCdfPdf(5,d,double,gsn4,33,.0001,.003,LR_set_all(o,"ab", -1.,4.))
+
+testCdfPdf0gsn4(0,f,float,.001,)
+testCdfPdf(1,f,float,gsn4,20,.0001,.003,)
+testCdfPdf(2,f,float,gsn4,50,.0001,.003,)
+testCdfPdf(3,f,float,gsn4,90,.0001,.003,)
+
+testCdfPdf0gsn4(4,f,float,.001,LR_set_all(o,"ab",-3.,1.))
+testCdfPdf(5,f,float,gsn4,33,.0001,.003,LR_set_all(o,"ab", -1.,4.))
+
+/* even more complicated random variates do not have "uniform" coverage */
+/* also the limited test t*rand functions do not adequately span space */
+/* make tolerance adjustable */
+/* vty - LR distribution
+ * nn  - test #
+ * tt  - type letter (f or d)
+ * ttt - type (float or double)
+ * bn  - bin number
+ * xtot	- total number of samples (should be large)
+ * vsc - % error tolerance (.1 = 10%)
+ * vab - absolute error tolerance
+ * setup - set-up code
+ */
+#define testLRvarx(vty,nn,tt,ttt,bn,xtot,vsc,vab,setup)			\
+void test_##vty ## _##tt ## _##nn(void) {				\
+	LR_obj *o = LR_new(vty, LR_##ttt);				\
+	LR_bin *b = LR_bin_new(bn);					\
+	double	x, cdf[bn], tol;					\
+	setup;								\
+	double	incr = (o->b.tt - o->a.tt) / bn;			\
+	/* o->uf = tfrand; o->ud = tdrand; */				\
+	for (int i = 1; i < bn; i++) {					\
+		LR_bin_set(b,o->a.tt + i*incr);				\
+		cdf[i-1] = xtot*(LR##tt ## _CDF(o,o->a.tt+i*incr)	\
+			- LR##tt ## _CDF(o,o->a.tt+(i-1)*incr));	\
+	}								\
+	cdf[bn-1] = xtot*(LR##tt ## _CDF(o,o->b.tt)			\
+			- LR##tt ## _CDF(o,o->b.tt - incr));		\
+	for (int i = 0; i < xtot; i++) {				\
+		LR_bin_add(b,LR##tt ## _RAN(o));			\
+	}								\
+	for (int i = 0; i < bn; i++) {					\
+		tol = max(cdf[i]*vsc,vab);				\
+		CU_ASSERT_DOUBLE_EQUAL(b->bins[i],cdf[i],tol);		\
+	}								\
+}
+
+#define testLRgsn4(nn,tt,ttt,bn,setup)					\
+	testLRvarx(gsn4,nn,tt,ttt,bn,100*10007,.1,100,setup)
+
+testLRgsn4(1,d,double,10,)
+testLRgsn4(2,d,double,25,)
+testLRgsn4(3,d,double,20,LR_set_all(o,"ab",-4.,-1.))
+testLRgsn4(4,d,double,30,LR_set_all(o,"ab",0.,6.))
+
+testLRgsn4(1,f,float,10,)
+testLRgsn4(2,f,float,25,)
+testLRgsn4(3,f,float,20,LR_set_all(o,"ab",-4.,-1.))
+testLRgsn4(4,f,float,30,LR_set_all(o,"ab",0.,6.))
+
 /* lspline */
 /* test some well defined points */
 #define testCdfPdf0lspline(nn,tt,ttt,tol,lo,hi)				\
@@ -726,7 +817,7 @@ CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,xhi+.1),1.,tol)			\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,xhi+.1),0.,tol)			\
 }
 
-testCdfPdf(0,d,double,lspline,75,.001,
+testCdfPdf(0,d,double,lspline,75,.0001,.001,
 	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -2., 6.);
 	LR_aux_set(o, o->a.d + 2.0, 1.0);
@@ -736,7 +827,7 @@ testCdfPdf(0,d,double,lspline,75,.001,
 	LR_aux_set(o, o->a.d + 7.0, 2.0);
 	LR_aux_norm(o);
 )
-testCdfPdf(1,d,double,lspline,55,.001,
+testCdfPdf(1,d,double,lspline,55,.0001,.001,
 	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -2., 6.);
 	LR_aux_set(o, o->a.d + 2.0, 1.0);
@@ -750,7 +841,7 @@ testCdfPdf(1,d,double,lspline,55,.001,
 testCdfPdf0lspline(2,d,double,.001,-2.,6.);
 testCdfPdf0lspline(3,d,double,.001,2.,12.);
 
-testCdfPdf(0,f,float,lspline,75,.001,
+testCdfPdf(0,f,float,lspline,75,.0001,.001,
 	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -2., 6.);
 	LR_aux_set(o, o->a.f + 2.0, 1.0);
@@ -760,7 +851,7 @@ testCdfPdf(0,f,float,lspline,75,.001,
 	LR_aux_set(o, o->a.f + 7.0, 2.0);
 	LR_aux_norm(o);
 )
-testCdfPdf(1,f,float,lspline,55,.001,
+testCdfPdf(1,f,float,lspline,55,.0001,.001,
 	LR_aux_new(o,6);
 	LR_set_all(o,"ab", -2., 6.);
 	LR_aux_set(o, o->a.f + 2.0, 1.0);
@@ -1433,6 +1524,26 @@ if ((NULL == CU_add_test(pSint,"Unif-P/CDF-d-0", test_cdf_pdf_d_unif_0))
 ||  (NULL == CU_add_test(pSint,"Gsn2-Ran-f-2", test_gsn2_f_2))
 ||  (NULL == CU_add_test(pSint,"Gsn2-Ran-f-3", test_gsn2_f_3))
 ||  (NULL == CU_add_test(pSint,"Gsn2-Ran-f-4", test_gsn2_f_4))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-d-0", test_cdf_pdf_d_gsn4_0))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-d-1", test_cdf_pdf_d_gsn4_1))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-d-2", test_cdf_pdf_d_gsn4_2))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-d-3", test_cdf_pdf_d_gsn4_3))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-d-4", test_cdf_pdf_d_gsn4_4))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-d-5", test_cdf_pdf_d_gsn4_5))
+||  (NULL == CU_add_test(pSint,"Gsn4-Ran-d-1", test_gsn4_d_1))
+||  (NULL == CU_add_test(pSint,"Gsn4-Ran-d-2", test_gsn4_d_2))
+||  (NULL == CU_add_test(pSint,"Gsn4-Ran-d-3", test_gsn4_d_3))
+||  (NULL == CU_add_test(pSint,"Gsn4-Ran-d-4", test_gsn4_d_4))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-f-0", test_cdf_pdf_f_gsn4_0))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-f-1", test_cdf_pdf_f_gsn4_1))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-f-2", test_cdf_pdf_f_gsn4_2))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-f-3", test_cdf_pdf_f_gsn4_3))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-f-4", test_cdf_pdf_f_gsn4_4))
+||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-f-5", test_cdf_pdf_f_gsn4_5))
+||  (NULL == CU_add_test(pSint,"Gsn4-Ran-f-1", test_gsn4_f_1))
+||  (NULL == CU_add_test(pSint,"Gsn4-Ran-f-2", test_gsn4_f_2))
+||  (NULL == CU_add_test(pSint,"Gsn4-Ran-f-3", test_gsn4_f_3))
+||  (NULL == CU_add_test(pSint,"Gsn4-Ran-f-4", test_gsn4_f_4))
 ||  (NULL == CU_add_test(pSint,"Lspline-P/CDF-d-0",test_cdf_pdf_d_lspline_0))
 ||  (NULL == CU_add_test(pSint,"Lspline-P/CDF-d-1",test_cdf_pdf_d_lspline_1))
 ||  (NULL == CU_add_test(pSint,"Lspline-P/CDF-d-2",test_cdf_pdf_d_lspline_2))

@@ -250,6 +250,15 @@ float LRf_gsn2_RAN(LR_obj *o);
 float LRf_gsn2_PDF(LR_obj *o, float x);
 float LRf_gsn2_CDF(LR_obj *o, float x);
 
+/* double gsn4 */
+double LRd_gsn4_RAN(LR_obj *o);
+double LRd_gsn4_PDF(LR_obj *o, double x);
+double LRd_gsn4_CDF(LR_obj *o, double x);
+/* float gsn4 */
+float LRf_gsn4_RAN(LR_obj *o);
+float LRf_gsn4_PDF(LR_obj *o, float x);
+float LRf_gsn4_CDF(LR_obj *o, float x);
+
 /* double cauchy */
 double LRd_cauchy_RAN(LR_obj *o);
 double LRd_cauchymar_RAN(LR_obj *o);

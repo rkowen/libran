@@ -221,17 +221,18 @@ void newcdf(int nn) {
 			cn[NINT][NINT], cd[NINT][NINT];
 
 	LINT ss = 1;
+	/* recenter at n/2 */
 	for (int i = 0; i <= nn; i++) {
-	/* do (x-i)^n for all intervals > i */
+	/* do (x-i+n/2)^n for all intervals > i */
 		LINT coef = ss*icomb((LINT) nn, (LINT) i);
 		ss *= -1;
 		for (int j = i; j <= nn; j++) {
 			/* binomial expansion*/
 			cn[j][nn] += coef;
-			LINT s = (LINT) -i;
+			LINT s = (LINT) (-i + nn/2);
 			for (int k = 1; k <= nn; k++) {
 				cn[j][nn-k]+=(s*coef*icomb((LINT) nn,(LINT) k));
-				s *= -i;
+				s *= (LINT) (-i + nn/2);
 			}
 		}
 	}
@@ -280,8 +281,10 @@ int main() {
 	newpdf(nn);
 	showdf("PDF",nn, pn, pd);
 
+if (1) {
 	writedf("gscdfn", nn, cn);
 	writedf("gscdfd", nn, cd);
 	writedf("gspdfn", nn, pn);
 	writedf("gspdfd", nn, pd);
+}
 }
