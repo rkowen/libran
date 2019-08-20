@@ -342,6 +342,29 @@ void test_cdf_pdf_ ## tt ## _ ##dist ## _##nn(void) {			\
 	CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->b.tt+2*incr),0.,tol) \
 }
 
+/* testSymDF - test symetric values
+ * nn	- test number
+ * tt	- LR data type (d or f)
+ * ttt	- LR data type (double or float)
+ * dist	- LR variate type
+ * x1	- first value
+ * x2	- second symmetric value
+ * tol	- absolute tolerance
+ * setup- LR object parameter set-up
+ */
+#define testSymDF(nn,tt,ttt,dist,x1,x2,tol,setup)			\
+void test_sym_ ## tt ## _ ##dist ## _##nn(void) {			\
+	LR_obj *o = LR_new(dist, LR_##ttt);				\
+	setup;								\
+	ttt c1,p1,c2,p2, one = 1;					\
+	c1 = LR##tt ## _CDF(o,x1);					\
+	p1 = LR##tt ## _PDF(o,x1);					\
+	c2 = LR##tt ## _CDF(o,x2);					\
+	p2 = LR##tt ## _PDF(o,x2);					\
+	CU_ASSERT_DOUBLE_EQUAL(p1,p2,tol)				\
+	CU_ASSERT_DOUBLE_EQUAL(c1+c2,one,tol)				\
+}
+
 /* test some well defined points */
 #define testCdfPdf0unif(nn,tt,ttt,tol,setup)				\
 void test_cdf_pdf_##tt ## _unif ## _##nn(void) {			\
@@ -634,6 +657,10 @@ testCdfPdf(3,d,double,gsn2,90,.0001,.001,)
 testCdfPdf0gsn2(4,d,double,.001,LR_set_all(o,"ab",-3.,1.))
 testCdfPdf(5,d,double,gsn2,33,.0001,.001,LR_set_all(o,"ab",-1.,3.))
 
+testSymDF(6,d, double, gsn2, -.9, .9, .0001,);
+testSymDF(7,d, double, gsn2, -.6, .6, .0001,);
+testSymDF(8,d, double, gsn2, -.3, .3, .0001,);
+
 testCdfPdf0gsn2(0,f,float,.001,)
 testCdfPdf(1,f,float,gsn2,20,.0001,.003,)
 testCdfPdf(2,f,float,gsn2,50,.0001,.003,)
@@ -641,6 +668,10 @@ testCdfPdf(3,f,float,gsn2,90,.0001,.003,)
 
 testCdfPdf0gsn2(4,f,float,.003,LR_set_all(o,"ab",-3.,1.))
 testCdfPdf(5,f,float,gsn2,33,.0001,.003,LR_set_all(o,"ab",-1.,3.))
+
+testSymDF(6,f, float, gsn2, -.9, .9, .0001,);
+testSymDF(7,f, float, gsn2, -.6, .6, .0001,);
+testSymDF(8,f, float, gsn2, -.3, .3, .0001,);
 
 /* more complicated random variates do not have "uniform" coverage */
 /* make tolerance adjustable */
@@ -722,6 +753,13 @@ testCdfPdf(3,d,double,gsn4,90,.0001,.001,)
 testCdfPdf0gsn4(4,d,double,.0001,LR_set_all(o,"ab",-3.,1.))
 testCdfPdf(5,d,double,gsn4,33,.0001,.003,LR_set_all(o,"ab", -1.,4.))
 
+testSymDF(6,d, double, gsn4, -1.9, 1.9, .0001,);
+testSymDF(7,d, double, gsn4, -1.6, 1.6, .0001,);
+testSymDF(8,d, double, gsn4, -1.3, 1.3, .0001,);
+testSymDF( 9,d, double, gsn4, -.9, .9, .0001,);
+testSymDF(10,d, double, gsn4, -.6, .6, .0001,);
+testSymDF(11,d, double, gsn4, -.3, .3, .0001,);
+
 testCdfPdf0gsn4(0,f,float,.001,)
 testCdfPdf(1,f,float,gsn4,20,.0001,.003,)
 testCdfPdf(2,f,float,gsn4,50,.0001,.003,)
@@ -729,6 +767,13 @@ testCdfPdf(3,f,float,gsn4,90,.0001,.003,)
 
 testCdfPdf0gsn4(4,f,float,.001,LR_set_all(o,"ab",-3.,1.))
 testCdfPdf(5,f,float,gsn4,33,.0001,.003,LR_set_all(o,"ab", -1.,4.))
+
+testSymDF(6,f, float, gsn4, -1.9, 1.9, .0001,);
+testSymDF(7,f, float, gsn4, -1.6, 1.6, .0001,);
+testSymDF(8,f, float, gsn4, -1.3, 1.3, .0001,);
+testSymDF( 9,f, float, gsn4, -.9, .9, .0001,);
+testSymDF(10,f, float, gsn4, -.6, .6, .0001,);
+testSymDF(11,f, float, gsn4, -.3, .3, .0001,);
 
 /* even more complicated random variates do not have "uniform" coverage */
 /* also the limited test t*rand functions do not adequately span space */
@@ -1157,6 +1202,13 @@ testCdfPdfFR(5,d,double,gausbm,4,80,.0001,
 	LR_set_all(o,"ms", 2., 2.50);
 )
 
+testSymDF(6,d, double, gausbm, -5.5, 5.5, .0001,);
+testSymDF(7,d, double, gausbm, -4.6, 4.6, .0001,);
+testSymDF(8,d, double, gausbm, -3.3, 3.3, .0001,);
+testSymDF(9,d, double, gausbm, -2.9, 2.9, .0001,);
+testSymDF(10,d, double, gausbm,-1.4, 1.4, .0001,);
+testSymDF(11,d, double, gausbm, -.7,  .7, .0001,);
+
 testCdfPdfFR(3,f,float,gausbm,3,60,.001,)
 testCdfPdfFR(4,f,float,gausbm,3,60,.001,
 	LR_set_all(o,"ms", -2., .75);
@@ -1164,6 +1216,12 @@ testCdfPdfFR(4,f,float,gausbm,3,60,.001,
 testCdfPdfFR(5,f,float,gausbm,4,80,.001,
 	LR_set_all(o,"ms", 2., 2.50);
 )
+testSymDF(6,f, float, gausbm, -5.5, 5.5, .0001,);
+testSymDF(7,f, float, gausbm, -4.6, 4.6, .0001,);
+testSymDF(8,f, float, gausbm, -3.3, 3.3, .0001,);
+testSymDF(9,f, float, gausbm, -2.9, 2.9, .0001,);
+testSymDF(10,f, float, gausbm,-1.4, 1.4, .0001,);
+testSymDF(11,f, float, gausbm, -.7,  .7, .0001,);
 
 testCdfPdf0gaus(gausmar,0,d,double,.0001,0.0, 1.0)
 testCdfPdf0gaus(gausmar,0,f,float,.001,0.0, 1.0)
@@ -1282,6 +1340,13 @@ testCdfPdfFR(5,d,double,cauchy,4,80,.0001,
 	LR_set_all(o,"ms", 2., 2.50);
 )
 
+testSymDF(6,d, double, cauchy, -5.5, 5.5, .0001,);
+testSymDF(7,d, double, cauchy, -4.6, 4.6, .0001,);
+testSymDF(8,d, double, cauchy, -3.3, 3.3, .0001,);
+testSymDF(9,d, double, cauchy, -2.9, 2.9, .0001,);
+testSymDF(10,d, double, cauchy,-1.4, 1.4, .0001,);
+testSymDF(11,d, double, cauchy, -.7,  .7, .0001,);
+
 testCdfPdf0cauchy(cauchy,0,f,float,.001,0.0, 1.0)
 testCdfPdf0cauchy(cauchy,1,f,float,.001,-1.0, 2.0)
 testCdfPdf0cauchy(cauchy,2,f,float,.001,1.5, .5)
@@ -1293,6 +1358,13 @@ testCdfPdfFR(4,f,float,cauchy,3,60,.001,
 testCdfPdfFR(5,f,float,cauchy,4,80,.001,
 	LR_set_all(o,"ms", 2., 2.50);
 )
+
+testSymDF(6,f, float, cauchy, -5.5, 5.5, .0001,);
+testSymDF(7,f, float, cauchy, -4.6, 4.6, .0001,);
+testSymDF(8,f, float, cauchy, -3.3, 3.3, .0001,);
+testSymDF(9,f, float, cauchy, -2.9, 2.9, .0001,);
+testSymDF(10,f, float, cauchy,-1.4, 1.4, .0001,);
+testSymDF(11,f, float, cauchy, -.7,  .7, .0001,);
 
 testCdfPdf0cauchy(cauchymar,0,d,double,.0001,0.0, 1.0)
 testCdfPdf0cauchy(cauchymar,1,d,double,.0001,-1.0, 2.0)
@@ -1510,6 +1582,9 @@ if ((NULL == CU_add_test(pSint,"Unif-P/CDF-d-0", test_cdf_pdf_d_unif_0))
 ||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-3", test_cdf_pdf_d_gsn2_3))
 ||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-4", test_cdf_pdf_d_gsn2_4))
 ||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-d-5", test_cdf_pdf_d_gsn2_5))
+||  (NULL == CU_add_test(pSint,"Gsn2-Sym-d-6", test_sym_d_gsn2_6))
+||  (NULL == CU_add_test(pSint,"Gsn2-Sym-d-7", test_sym_d_gsn2_7))
+||  (NULL == CU_add_test(pSint,"Gsn2-Sym-d-8", test_sym_d_gsn2_8))
 ||  (NULL == CU_add_test(pSint,"Gsn2-Ran-d-1", test_gsn2_d_1))
 ||  (NULL == CU_add_test(pSint,"Gsn2-Ran-d-2", test_gsn2_d_2))
 ||  (NULL == CU_add_test(pSint,"Gsn2-Ran-d-3", test_gsn2_d_3))
@@ -1520,6 +1595,9 @@ if ((NULL == CU_add_test(pSint,"Unif-P/CDF-d-0", test_cdf_pdf_d_unif_0))
 ||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-f-3", test_cdf_pdf_f_gsn2_3))
 ||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-f-4", test_cdf_pdf_f_gsn2_4))
 ||  (NULL == CU_add_test(pSint,"Gsn2-P/CDF-f-5", test_cdf_pdf_f_gsn2_5))
+||  (NULL == CU_add_test(pSint,"Gsn2-Sym-f-6", test_sym_f_gsn2_6))
+||  (NULL == CU_add_test(pSint,"Gsn2-Sym-f-7", test_sym_f_gsn2_7))
+||  (NULL == CU_add_test(pSint,"Gsn2-Sym-f-8", test_sym_f_gsn2_8))
 ||  (NULL == CU_add_test(pSint,"Gsn2-Ran-f-1", test_gsn2_f_1))
 ||  (NULL == CU_add_test(pSint,"Gsn2-Ran-f-2", test_gsn2_f_2))
 ||  (NULL == CU_add_test(pSint,"Gsn2-Ran-f-3", test_gsn2_f_3))
@@ -1530,6 +1608,12 @@ if ((NULL == CU_add_test(pSint,"Unif-P/CDF-d-0", test_cdf_pdf_d_unif_0))
 ||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-d-3", test_cdf_pdf_d_gsn4_3))
 ||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-d-4", test_cdf_pdf_d_gsn4_4))
 ||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-d-5", test_cdf_pdf_d_gsn4_5))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-d-6", test_sym_d_gsn4_6))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-d-7", test_sym_d_gsn4_7))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-d-8", test_sym_d_gsn4_8))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-d-9", test_sym_d_gsn4_9))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-d-10", test_sym_d_gsn4_10))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-d-11", test_sym_d_gsn4_11))
 ||  (NULL == CU_add_test(pSint,"Gsn4-Ran-d-1", test_gsn4_d_1))
 ||  (NULL == CU_add_test(pSint,"Gsn4-Ran-d-2", test_gsn4_d_2))
 ||  (NULL == CU_add_test(pSint,"Gsn4-Ran-d-3", test_gsn4_d_3))
@@ -1540,6 +1624,12 @@ if ((NULL == CU_add_test(pSint,"Unif-P/CDF-d-0", test_cdf_pdf_d_unif_0))
 ||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-f-3", test_cdf_pdf_f_gsn4_3))
 ||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-f-4", test_cdf_pdf_f_gsn4_4))
 ||  (NULL == CU_add_test(pSint,"Gsn4-P/CDF-f-5", test_cdf_pdf_f_gsn4_5))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-f-6", test_sym_f_gsn4_6))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-f-7", test_sym_f_gsn4_7))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-f-8", test_sym_f_gsn4_8))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-f-9", test_sym_f_gsn4_9))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-f-10", test_sym_f_gsn4_10))
+||  (NULL == CU_add_test(pSint,"Gsn4-Sym-f-11", test_sym_f_gsn4_11))
 ||  (NULL == CU_add_test(pSint,"Gsn4-Ran-f-1", test_gsn4_f_1))
 ||  (NULL == CU_add_test(pSint,"Gsn4-Ran-f-2", test_gsn4_f_2))
 ||  (NULL == CU_add_test(pSint,"Gsn4-Ran-f-3", test_gsn4_f_3))
@@ -1598,6 +1688,12 @@ if ((NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-0", test_cdf_pdf_d_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-3", test_cdf_pdf_d_gausbm_3))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-4", test_cdf_pdf_d_gausbm_4))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-5", test_cdf_pdf_d_gausbm_5))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-d-6", test_sym_d_gausbm_6))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-d-7", test_sym_d_gausbm_7))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-d-8", test_sym_d_gausbm_8))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-d-9", test_sym_d_gausbm_9))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-d-10", test_sym_d_gausbm_10))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-d-11", test_sym_d_gausbm_11))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-d-1", test_gausbm_d_1))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-d-2", test_gausbm_d_2))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-d-3", test_gausbm_d_3))
@@ -1607,6 +1703,12 @@ if ((NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-0", test_cdf_pdf_d_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-f-3", test_cdf_pdf_f_gausbm_3))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-f-4", test_cdf_pdf_f_gausbm_4))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-P/CDF-f-5", test_cdf_pdf_f_gausbm_5))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-f-6", test_sym_f_gausbm_6))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-f-7", test_sym_f_gausbm_7))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-f-8", test_sym_f_gausbm_8))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-f-9", test_sym_f_gausbm_9))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-f-10", test_sym_f_gausbm_10))
+||  (NULL == CU_add_test(pSfull,"Gausbm-Sym-f-11", test_sym_f_gausbm_11))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-f-1", test_gausbm_f_1))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-f-2", test_gausbm_f_2))
 ||  (NULL == CU_add_test(pSfull,"Gausbm-Ran-f-3", test_gausbm_f_3))
@@ -1626,6 +1728,12 @@ if ((NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-0", test_cdf_pdf_d_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-d-3", test_cdf_pdf_d_cauchy_3))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-d-4", test_cdf_pdf_d_cauchy_4))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-d-5", test_cdf_pdf_d_cauchy_5))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-d-6", test_sym_d_cauchy_6))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-d-7", test_sym_d_cauchy_7))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-d-8", test_sym_d_cauchy_8))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-d-9", test_sym_d_cauchy_9))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-d-10", test_sym_d_cauchy_10))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-d-11", test_sym_d_cauchy_11))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-d-1", test_cauchy_d_1))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-d-2", test_cauchy_d_2))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-d-3", test_cauchy_d_3))
@@ -1635,6 +1743,12 @@ if ((NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-0", test_cdf_pdf_d_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-f-3", test_cdf_pdf_f_cauchy_3))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-f-4", test_cdf_pdf_f_cauchy_4))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-P/CDF-f-5", test_cdf_pdf_f_cauchy_5))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-f-6", test_sym_f_cauchy_6))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-f-7", test_sym_f_cauchy_7))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-f-8", test_sym_f_cauchy_8))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-f-9", test_sym_f_cauchy_9))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-f-10", test_sym_f_cauchy_10))
+||  (NULL == CU_add_test(pSfull,"Cauchy-Sym-f-11", test_sym_f_cauchy_11))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-f-1", test_cauchy_f_1))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-f-2", test_cauchy_f_2))
 ||  (NULL == CU_add_test(pSfull,"Cauchy-Ran-f-3", test_cauchy_f_3))
