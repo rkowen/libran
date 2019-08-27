@@ -228,6 +228,29 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->errno = LRerr_BadDataType;
 		}
 		break;
+	case gsn12:
+		ptr->type = "gsn12";
+		if (d == LR_double) {
+			ptr->a.d = (double) -6.0;
+			ptr->b.d = (double)  6.0;
+			ptr->m.d = (double) 0.0;
+			ptr->s.d = (double) 1.0;
+			ptr->rnd  = LRd_gsn12_RAN;
+			ptr->pdfd = LRd_gsn12_PDF;
+			ptr->cdfd = LRd_gsn12_CDF;
+		} else if (d == LR_float) {
+			ptr->a.f = (float)  -6.0;
+			ptr->b.f = (float)   6.0;
+			ptr->m.f = (float) 0.0;
+			ptr->s.f = (float) 1.0;
+			ptr->rnf  = LRf_gsn12_RAN;
+			ptr->pdff = LRf_gsn12_PDF;
+			ptr->cdff = LRf_gsn12_CDF;
+		} else {
+			/* error */
+			ptr->errno = LRerr_BadDataType;
+		}
+		break;
 	case cauchy:
 		ptr->type = "cauchy";
 		if (d == LR_double) {

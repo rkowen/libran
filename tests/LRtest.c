@@ -389,28 +389,7 @@ CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,o->b.tt+.1),1.,tol)		\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,o->b.tt+.1),0.,tol)		\
 }
 
-/* uniform distribution */
-int tirand(LR_obj *);
-long tlrand(LR_obj *);
-float tfrand(LR_obj *);
-double tdrand(LR_obj *);
-
-testCdfPdf0unif(0,d,double,.001,)
-testCdfPdf(1,d,double,unif,20,.0001,.001,)
-testCdfPdf(2,d,double,unif,50,.0001,.001,)
-testCdfPdf(3,d,double,unif,90,.0001,.001,)
-
-testCdfPdf0unif(4,d,double,.001,LR_set_all(o,"ab",-2.,2.))
-testCdfPdf(5,d,double,unif,33,.0001,.001,LR_set_all(o,"ab",-1.,3.))
-
-testCdfPdf0unif(0,f,float,.001,)
-testCdfPdf(1,f,float,unif,20,.0001,.001,)
-testCdfPdf(2,f,float,unif,50,.0001,.001,)
-testCdfPdf(3,f,float,unif,90,.0001,.001,)
-
-testCdfPdf0unif(4,f,float,.001,LR_set_all(o,"ab",-2.,2.))
-testCdfPdf(5,f,float,unif,33,.0001,.001,LR_set_all(o,"ab",-1.,3.))
-
+/* random variate generation & binning */
 /* the last bin will have one less then rest ... so may be off by 2. */
 #define testLRunif(nn,tt,ttt,dist,bn,setup)				\
 void test_##dist ## _##tt ## _##nn(void) {\
@@ -434,6 +413,180 @@ void test_##dist ## _##tt ## _##nn(void) {\
 		CU_ASSERT_DOUBLE_EQUAL(b->bins[i],cdf[i],2.);		\
 	}								\
 }
+
+/* more complicated random variates do not have "uniform" coverage */
+/* make tolerance adjustable */
+/* vty - LR distribution
+ * nn  - test #
+ * tt  - type letter (f or d)
+ * ttt - type (float or double)
+ * bn  - bin number
+ * vsc - % error tolerance (.1 = 10%)
+ * vab - absolute error tolerance
+ * setup - set-up code
+ */
+#define testLRvar(vty,nn,tt,ttt,bn,vsc,vab,setup)			\
+void test_##vty ## _##tt ## _##nn(void) {				\
+	LR_obj *o = LR_new(vty, LR_##ttt);				\
+	LR_bin *b = LR_bin_new(bn);					\
+	double	x, cdf[bn], tol, tot = 10007.;				\
+	setup;								\
+	double	incr = (o->b.tt - o->a.tt) / bn;			\
+	o->uf = tfrand; o->ud = tdrand;					\
+	for (int i = 1; i < bn; i++) {					\
+		LR_bin_set(b,o->a.tt + i*incr);				\
+		cdf[i-1] = tot*(LR##tt ## _CDF(o,o->a.tt+i*incr)	\
+			- LR##tt ## _CDF(o,o->a.tt+(i-1)*incr));	\
+	}								\
+	cdf[bn-1] = tot*(LR##tt ## _CDF(o,o->b.tt)			\
+			- LR##tt ## _CDF(o,o->b.tt - incr));		\
+	for (int i = 0; i < tot; i++) {					\
+		LR_bin_add(b,LR##tt ## _RAN(o));			\
+	}								\
+	for (int i = 0; i < bn; i++) {					\
+		tol = max(cdf[i]*vsc,vab);				\
+		CU_ASSERT_DOUBLE_EQUAL(b->bins[i],cdf[i],tol);		\
+	}								\
+}
+
+/* even more complicated random variates do not have "uniform" coverage */
+/* also the limited test t*rand functions do not adequately span space */
+/* make tolerance adjustable */
+/* vty - LR distribution
+ * nn  - test #
+ * tt  - type letter (f or d)
+ * ttt - type (float or double)
+ * bn  - bin number
+ * xtot	- total number of samples (should be large)
+ * vsc - % error tolerance (.1 = 10%)
+ * vab - absolute error tolerance
+ * setup - set-up code
+ */
+#define testLRvarx(vty,nn,tt,ttt,bn,xtot,vsc,vab,setup)			\
+void test_##vty ## _##tt ## _##nn(void) {				\
+	LR_obj *o = LR_new(vty, LR_##ttt);				\
+	LR_bin *b = LR_bin_new(bn);					\
+	double	x, cdf[bn], tol;					\
+	setup;								\
+	double	incr = (o->b.tt - o->a.tt) / bn;			\
+	/* o->uf = tfrand; o->ud = tdrand; */				\
+	for (int i = 1; i < bn; i++) {					\
+		LR_bin_set(b,o->a.tt + i*incr);				\
+		cdf[i-1] = xtot*(LR##tt ## _CDF(o,o->a.tt+i*incr)	\
+			- LR##tt ## _CDF(o,o->a.tt+(i-1)*incr));	\
+	}								\
+	cdf[bn-1] = xtot*(LR##tt ## _CDF(o,o->b.tt)			\
+			- LR##tt ## _CDF(o,o->b.tt - incr));		\
+	for (int i = 0; i < xtot; i++) {				\
+		LR_bin_add(b,LR##tt ## _RAN(o));			\
+	}								\
+	for (int i = 0; i < bn; i++) {					\
+		tol = max(cdf[i]*vsc,vab);				\
+		CU_ASSERT_DOUBLE_EQUAL(b->bins[i],cdf[i],tol);		\
+	}								\
+}
+
+/* more complicated random variates do not have "uniform" coverage */
+/* also the limited test t*rand functions do not adequately span space */
+/* make tolerance adjustable */
+/* vty	- LR distribution
+ * nn	- test #
+ * tt	- type letter (f or d)
+ * ttt	- type (float or double)
+ * end	- the highest value of range
+ * bn	- bin number
+ * xtot	- total number of samples (should be large)
+ * vsc	- % error tolerance (.1 = 10%)
+ * vab	- absolute error tolerance
+ * setup- set-up code
+ */
+#define testLRhalf(vty,nn,tt,ttt,end,bn,xtot,vsc,vab,setup)		\
+void test_##vty ## _##tt ## _##nn(void) {				\
+	LR_obj *o = LR_new(vty, LR_##ttt);				\
+	LR_bin *b = LR_bin_new(bn+2);					\
+	double	x, cdf[bn+2], tol;					\
+	setup;								\
+	double	begin = 0.0,						\
+		incr = end / bn;					\
+	/* o->uf = tfrand; o->ud = tdrand; */				\
+	for (int i = 0; i < bn; i++) {					\
+		x = begin + i*incr;					\
+		LR_bin_set(b,x);					\
+		cdf[i] = xtot*(LR##tt ## _CDF(o,x)			\
+			- LR##tt ## _CDF(o,x - incr));			\
+	}								\
+	cdf[bn] = xtot * (1.0 - LR##tt ## _CDF(o,begin+bn*incr));	\
+	for (int i = 0; i < xtot; i++) {				\
+		LR_bin_add(b,LR##tt ## _RAN(o));			\
+	}								\
+	for (int i = 0; i <= bn; i++) {					\
+		tol = max(cdf[i]*vsc,vab);				\
+		CU_ASSERT_DOUBLE_EQUAL(1.0*b->bins[i],cdf[i],tol);	\
+	}								\
+}
+
+/* more complicated random variates do not have "uniform" coverage */
+/* also the limited test t*rand functions do not adequately span space */
+/* make tolerance adjustable */
+/* vty	- LR distribution
+ * nn	- test #
+ * tt	- type letter (f or d)
+ * ttt	- type (float or double)
+ * ww	- number of std.dev on either side of mean.
+ * bn	- bin number
+ * xtot	- total number of samples (should be large)
+ * vsc	- % error tolerance (.1 = 10%)
+ * vab	- absolute error tolerance
+ * setup- set-up code
+ */
+#define testLRfull(vty,nn,tt,ttt,ww,bn,xtot,vsc,vab,setup)		\
+void test_##vty ## _##tt ## _##nn(void) {				\
+	LR_obj *o = LR_new(vty, LR_##ttt);				\
+	LR_bin *b = LR_bin_new(bn+2);					\
+	double	x, cdf[bn+2], tol;					\
+	setup;								\
+	double	begin = o->m.tt - ww*o->s.tt,				\
+		incr = 2.0*ww*o->s.tt / bn;				\
+	/* o->uf = tfrand; o->ud = tdrand; */				\
+	cdf[0] = xtot * LR##tt ## _CDF(o,begin);			\
+	LR_bin_set(b,begin);						\
+	for (int i = 1; i <= bn; i++) {					\
+		x = begin + i*incr;					\
+		LR_bin_set(b,x);					\
+		cdf[i] = xtot*(LR##tt ## _CDF(o,x)			\
+			- LR##tt ## _CDF(o,x - incr));			\
+	}								\
+	cdf[bn+1] = xtot * (1.0 - LR##tt ## _CDF(o,begin+bn*incr));	\
+	for (int i = 0; i < xtot; i++) {				\
+		LR_bin_add(b,LR##tt ## _RAN(o));			\
+	}								\
+	for (int i = 0; i <= bn+1; i++) {				\
+		tol = max(cdf[i]*vsc,vab);				\
+		CU_ASSERT_DOUBLE_EQUAL(1.0*b->bins[i],cdf[i],tol);	\
+	}								\
+}
+
+/* uniform distribution */
+int tirand(LR_obj *);
+long tlrand(LR_obj *);
+float tfrand(LR_obj *);
+double tdrand(LR_obj *);
+
+testCdfPdf0unif(0,d,double,.001,)
+testCdfPdf(1,d,double,unif,20,.0001,.001,)
+testCdfPdf(2,d,double,unif,50,.0001,.001,)
+testCdfPdf(3,d,double,unif,90,.0001,.001,)
+
+testCdfPdf0unif(4,d,double,.001,LR_set_all(o,"ab",-2.,2.))
+testCdfPdf(5,d,double,unif,33,.0001,.001,LR_set_all(o,"ab",-1.,3.))
+
+testCdfPdf0unif(0,f,float,.001,)
+testCdfPdf(1,f,float,unif,20,.0001,.001,)
+testCdfPdf(2,f,float,unif,50,.0001,.001,)
+testCdfPdf(3,f,float,unif,90,.0001,.001,)
+
+testCdfPdf0unif(4,f,float,.001,LR_set_all(o,"ab",-2.,2.))
+testCdfPdf(5,f,float,unif,33,.0001,.001,LR_set_all(o,"ab",-1.,3.))
 
 testLRunif(1,d,double,unif,10,)
 testLRunif(2,d,double,unif,25,)
@@ -673,41 +826,6 @@ testSymDF(6,f, float, gsn2, -.9, .9, .0001,);
 testSymDF(7,f, float, gsn2, -.6, .6, .0001,);
 testSymDF(8,f, float, gsn2, -.3, .3, .0001,);
 
-/* more complicated random variates do not have "uniform" coverage */
-/* make tolerance adjustable */
-/* vty - LR distribution
- * nn  - test #
- * tt  - type letter (f or d)
- * ttt - type (float or double)
- * bn  - bin number
- * vsc - % error tolerance (.1 = 10%)
- * vab - absolute error tolerance
- * setup - set-up code
- */
-#define testLRvar(vty,nn,tt,ttt,bn,vsc,vab,setup)			\
-void test_##vty ## _##tt ## _##nn(void) {				\
-	LR_obj *o = LR_new(vty, LR_##ttt);				\
-	LR_bin *b = LR_bin_new(bn);					\
-	double	x, cdf[bn], tol, tot = 10007.;				\
-	setup;								\
-	double	incr = (o->b.tt - o->a.tt) / bn;			\
-	o->uf = tfrand; o->ud = tdrand;					\
-	for (int i = 1; i < bn; i++) {					\
-		LR_bin_set(b,o->a.tt + i*incr);				\
-		cdf[i-1] = tot*(LR##tt ## _CDF(o,o->a.tt+i*incr)	\
-			- LR##tt ## _CDF(o,o->a.tt+(i-1)*incr));	\
-	}								\
-	cdf[bn-1] = tot*(LR##tt ## _CDF(o,o->b.tt)			\
-			- LR##tt ## _CDF(o,o->b.tt - incr));		\
-	for (int i = 0; i < tot; i++) {					\
-		LR_bin_add(b,LR##tt ## _RAN(o));			\
-	}								\
-	for (int i = 0; i < bn; i++) {					\
-		tol = max(cdf[i]*vsc,vab);				\
-		CU_ASSERT_DOUBLE_EQUAL(b->bins[i],cdf[i],tol);		\
-	}								\
-}
-
 #define testLRgsn2(nn,tt,ttt,bn,setup)					\
 	testLRvar(gsn2,nn,tt,ttt,bn,.1,27,setup)
 
@@ -775,42 +893,6 @@ testSymDF( 9,f, float, gsn4, -.9, .9, .0001,);
 testSymDF(10,f, float, gsn4, -.6, .6, .0001,);
 testSymDF(11,f, float, gsn4, -.3, .3, .0001,);
 
-/* even more complicated random variates do not have "uniform" coverage */
-/* also the limited test t*rand functions do not adequately span space */
-/* make tolerance adjustable */
-/* vty - LR distribution
- * nn  - test #
- * tt  - type letter (f or d)
- * ttt - type (float or double)
- * bn  - bin number
- * xtot	- total number of samples (should be large)
- * vsc - % error tolerance (.1 = 10%)
- * vab - absolute error tolerance
- * setup - set-up code
- */
-#define testLRvarx(vty,nn,tt,ttt,bn,xtot,vsc,vab,setup)			\
-void test_##vty ## _##tt ## _##nn(void) {				\
-	LR_obj *o = LR_new(vty, LR_##ttt);				\
-	LR_bin *b = LR_bin_new(bn);					\
-	double	x, cdf[bn], tol;					\
-	setup;								\
-	double	incr = (o->b.tt - o->a.tt) / bn;			\
-	/* o->uf = tfrand; o->ud = tdrand; */				\
-	for (int i = 1; i < bn; i++) {					\
-		LR_bin_set(b,o->a.tt + i*incr);				\
-		cdf[i-1] = xtot*(LR##tt ## _CDF(o,o->a.tt+i*incr)	\
-			- LR##tt ## _CDF(o,o->a.tt+(i-1)*incr));	\
-	}								\
-	cdf[bn-1] = xtot*(LR##tt ## _CDF(o,o->b.tt)			\
-			- LR##tt ## _CDF(o,o->b.tt - incr));		\
-	for (int i = 0; i < xtot; i++) {				\
-		LR_bin_add(b,LR##tt ## _RAN(o));			\
-	}								\
-	for (int i = 0; i < bn; i++) {					\
-		tol = max(cdf[i]*vsc,vab);				\
-		CU_ASSERT_DOUBLE_EQUAL(b->bins[i],cdf[i],tol);		\
-	}								\
-}
 
 #define testLRgsn4(nn,tt,ttt,bn,setup)					\
 	testLRvarx(gsn4,nn,tt,ttt,bn,100*10007,.1,100,setup)
@@ -824,6 +906,87 @@ testLRgsn4(1,f,float,10,)
 testLRgsn4(2,f,float,25,)
 testLRgsn4(3,f,float,20,LR_set_all(o,"ab",-4.,-1.))
 testLRgsn4(4,f,float,30,LR_set_all(o,"ab",0.,6.))
+
+/* gsn12 */
+#define testCdfPdf0gsn12(nn,tt,ttt,tol,setup)				\
+void test_cdf_pdf_##tt ## _gsn12 ## _##nn(void) {			\
+	LR_obj *o = LR_new(gsn12, LR_##ttt);				\
+	setup;								\
+	double	m = o->m.tt, s = o->s.tt, iv,pv;			\
+	iv = 2.0*s;							\
+	pv = 2.0/iv;							\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,m-6.1*s),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,m-6.1*s),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,m-6.0*s),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,m-6.0*s),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,m-3.0*s),pv*50879./13305600.,tol)\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,m-3.0*s),397./394240.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,m-2.0*s),pv*1093./19800.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,m-2.0*s),29639./1330560.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,m-s),pv*1623019./6652800.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,m-s),12831419./79833600.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,m),0.5,tol)			\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,m),pv*655177./1663200.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,m+s),pv*1623019./6652800.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,m+s),67002181./79833600.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,m+2.0*s),pv*1093./19800.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,m+2.0*s),1300921./1330560.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,m+3.0*s),pv*50879./13305600.,tol)\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,m+3.0*s),393843./394240.,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,m+6.0*s),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,m+6.0*s),1.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,m+6.1*s),0.,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,m+6.1*s),1.,tol)		\
+}
+
+#define testLRgsn12(nn,tt,ttt,bn,setup)					\
+	testLRfull(gsn12,nn,tt,ttt,4.,bn,100*10007,.1,20,setup)
+
+testCdfPdf0gsn12(0,d,double,.001,)
+testCdfPdf(1,d,double,gsn12,20,.0001,.001,)
+testCdfPdf(2,d,double,gsn12,50,.0001,.001,)
+testCdfPdf(3,d,double,gsn12,90,.0001,.001,)
+
+testCdfPdf0gsn12(4,d,double,.0001,LR_set_all(o,"ms",-3.,.5))
+testCdfPdf(5,d,double,gsn12,33,.0001,.003,LR_set_all(o,"ms", -1.,2.))
+
+testSymDF(6,d, double, gsn12, -4.9, 4.9, .0001,);
+testSymDF(7,d, double, gsn12, -3.6, 3.6, .0001,);
+testSymDF(8,d, double, gsn12, -2.3, 2.3, .0001,);
+testSymDF(9,d, double, gsn12, -1.9, 1.9, .0001,);
+testSymDF(10,d, double, gsn12, -1.6, 1.6, .0001,);
+testSymDF(11,d, double, gsn12, -1.3, 1.3, .0001,);
+testSymDF(12,d, double, gsn12, -.9, .9, .0001,);
+testSymDF(13,d, double, gsn12, -.6, .6, .0001,);
+testSymDF(14,d, double, gsn12, -.3, .3, .0001,);
+
+testLRgsn12(1,d,double,10,)
+testLRgsn12(2,d,double,25,)
+testLRgsn12(3,d,double,20,LR_set_all(o,"ms",-2.,2.))
+testLRgsn12(4,d,double,30,LR_set_all(o,"ms",1.,.5))
+
+testCdfPdf0gsn12(0,f,float,.002,)
+testCdfPdf(1,f,float,gsn12,20,.0001,.002,)
+testCdfPdf(2,f,float,gsn12,50,.0001,.002,)
+testCdfPdf(3,f,float,gsn12,90,.0001,.002,)
+
+testCdfPdf0gsn12(4,f,float,.0001,LR_set_all(o,"ms",-3.,.5))
+testCdfPdf(5,f,float,gsn12,33,.0001,.003,LR_set_all(o,"ms", -1.,2.))
+
+testSymDF(6,f, float, gsn12, -4.9, 4.9, .0001,);
+testSymDF(7,f, float, gsn12, -3.6, 3.6, .0001,);
+testSymDF(8,f, float, gsn12, -2.3, 2.3, .0001,);
+testSymDF(9,f, float, gsn12, -1.9, 1.9, .0001,);
+testSymDF(10,f, float, gsn12, -1.6, 1.6, .0001,);
+testSymDF(11,f, float, gsn12, -1.3, 1.3, .0001,);
+testSymDF(12,f, float, gsn12, -.9, .9, .0001,);
+testSymDF(13,f, float, gsn12, -.6, .6, .0001,);
+testSymDF(14,f, float, gsn12, -.3, .3, .0001,);
+
+testLRgsn12(1,f,float,10,)
+testLRgsn12(2,f,float,25,)
+testLRgsn12(3,f,float,20,LR_set_all(o,"ms",-2.,2.))
+testLRgsn12(4,f,float,30,LR_set_all(o,"ms",1.,.5))
 
 /* lspline */
 /* test some well defined points */
@@ -1079,45 +1242,6 @@ testCdfPdfHR(5,f,float,nexp,4.,80,.001,
 	LR_set_all(o,"m", 2.);
 )
 
-/* more complicated random variates do not have "uniform" coverage */
-/* also the limited test t*rand functions do not adequately span space */
-/* make tolerance adjustable */
-/* vty	- LR distribution
- * nn	- test #
- * tt	- type letter (f or d)
- * ttt	- type (float or double)
- * end	- the highest value of range
- * bn	- bin number
- * xtot	- total number of samples (should be large)
- * vsc	- % error tolerance (.1 = 10%)
- * vab	- absolute error tolerance
- * setup- set-up code
- */
-#define testLRhalf(vty,nn,tt,ttt,end,bn,xtot,vsc,vab,setup)		\
-void test_##vty ## _##tt ## _##nn(void) {				\
-	LR_obj *o = LR_new(vty, LR_##ttt);				\
-	LR_bin *b = LR_bin_new(bn+2);					\
-	double	x, cdf[bn+2], tol;					\
-	setup;								\
-	double	begin = 0.0,						\
-		incr = end / bn;					\
-	/* o->uf = tfrand; o->ud = tdrand; */				\
-	for (int i = 0; i < bn; i++) {					\
-		x = begin + i*incr;					\
-		LR_bin_set(b,x);					\
-		cdf[i] = xtot*(LR##tt ## _CDF(o,x)			\
-			- LR##tt ## _CDF(o,x - incr));			\
-	}								\
-	cdf[bn] = xtot * (1.0 - LR##tt ## _CDF(o,begin+bn*incr));	\
-	for (int i = 0; i < xtot; i++) {				\
-		LR_bin_add(b,LR##tt ## _RAN(o));			\
-	}								\
-	for (int i = 0; i <= bn; i++) {					\
-		tol = max(cdf[i]*vsc,vab);				\
-		CU_ASSERT_DOUBLE_EQUAL(1.0*b->bins[i],cdf[i],tol);	\
-	}								\
-}
-
 #define testLRnexp(nn,tt,ttt,end,bn,setup)				\
 	testLRhalf(nexp,nn,tt,ttt,end,bn,50*10007,.1,100,setup)
 
@@ -1227,47 +1351,6 @@ testCdfPdf0gaus(gausmar,0,d,double,.0001,0.0, 1.0)
 testCdfPdf0gaus(gausmar,0,f,float,.001,0.0, 1.0)
 testCdfPdfFR(1,d,double,gausmar,3,60,.0001,)
 testCdfPdfFR(1,f,float,gausmar,3,60,.001,)
-
-/* more complicated random variates do not have "uniform" coverage */
-/* also the limited test t*rand functions do not adequately span space */
-/* make tolerance adjustable */
-/* vty	- LR distribution
- * nn	- test #
- * tt	- type letter (f or d)
- * ttt	- type (float or double)
- * ww	- number of std.dev on either side of mean.
- * bn	- bin number
- * xtot	- total number of samples (should be large)
- * vsc	- % error tolerance (.1 = 10%)
- * vab	- absolute error tolerance
- * setup- set-up code
- */
-#define testLRfull(vty,nn,tt,ttt,ww,bn,xtot,vsc,vab,setup)		\
-void test_##vty ## _##tt ## _##nn(void) {				\
-	LR_obj *o = LR_new(vty, LR_##ttt);				\
-	LR_bin *b = LR_bin_new(bn+2);					\
-	double	x, cdf[bn+2], tol;					\
-	setup;								\
-	double	begin = o->m.tt - ww*o->s.tt,				\
-		incr = 2.0*ww*o->s.tt / bn;				\
-	/* o->uf = tfrand; o->ud = tdrand; */				\
-	cdf[0] = xtot * LR##tt ## _CDF(o,begin);			\
-	LR_bin_set(b,begin);						\
-	for (int i = 1; i <= bn; i++) {					\
-		x = begin + i*incr;					\
-		LR_bin_set(b,x);					\
-		cdf[i] = xtot*(LR##tt ## _CDF(o,x)			\
-			- LR##tt ## _CDF(o,x - incr));			\
-	}								\
-	cdf[bn+1] = xtot * (1.0 - LR##tt ## _CDF(o,begin+bn*incr));	\
-	for (int i = 0; i < xtot; i++) {				\
-		LR_bin_add(b,LR##tt ## _RAN(o));			\
-	}								\
-	for (int i = 0; i <= bn+1; i++) {				\
-		tol = max(cdf[i]*vsc,vab);				\
-		CU_ASSERT_DOUBLE_EQUAL(1.0*b->bins[i],cdf[i],tol);	\
-	}								\
-}
 
 #define testLRgausbm(nn,tt,ttt,ww,bn,setup)				\
 	testLRfull(gausbm,nn,tt,ttt,ww,bn,50*10007,.1,100,setup)
@@ -1634,6 +1717,25 @@ if ((NULL == CU_add_test(pSint,"Unif-P/CDF-d-0", test_cdf_pdf_d_unif_0))
 ||  (NULL == CU_add_test(pSint,"Gsn4-Ran-f-2", test_gsn4_f_2))
 ||  (NULL == CU_add_test(pSint,"Gsn4-Ran-f-3", test_gsn4_f_3))
 ||  (NULL == CU_add_test(pSint,"Gsn4-Ran-f-4", test_gsn4_f_4))
+||  (NULL == CU_add_test(pSint,"Gsn12-P/CDF-f-0", test_cdf_pdf_f_gsn12_0))
+||  (NULL == CU_add_test(pSint,"Gsn12-P/CDF-f-1", test_cdf_pdf_f_gsn12_1))
+||  (NULL == CU_add_test(pSint,"Gsn12-P/CDF-f-2", test_cdf_pdf_f_gsn12_2))
+||  (NULL == CU_add_test(pSint,"Gsn12-P/CDF-f-3", test_cdf_pdf_f_gsn12_3))
+||  (NULL == CU_add_test(pSint,"Gsn12-P/CDF-f-4", test_cdf_pdf_f_gsn12_4))
+||  (NULL == CU_add_test(pSint,"Gsn12-P/CDF-f-5", test_cdf_pdf_f_gsn12_5))
+||  (NULL == CU_add_test(pSint,"Gsn12-Sym-f-6", test_sym_f_gsn12_6))
+||  (NULL == CU_add_test(pSint,"Gsn12-Sym-f-7", test_sym_f_gsn12_7))
+||  (NULL == CU_add_test(pSint,"Gsn12-Sym-f-8", test_sym_f_gsn12_8))
+||  (NULL == CU_add_test(pSint,"Gsn12-Sym-f-9", test_sym_f_gsn12_9))
+||  (NULL == CU_add_test(pSint,"Gsn12-Sym-f-10", test_sym_f_gsn12_10))
+||  (NULL == CU_add_test(pSint,"Gsn12-Sym-f-11", test_sym_f_gsn12_11))
+||  (NULL == CU_add_test(pSint,"Gsn12-Sym-f-12", test_sym_f_gsn12_12))
+||  (NULL == CU_add_test(pSint,"Gsn12-Sym-f-13", test_sym_f_gsn12_13))
+||  (NULL == CU_add_test(pSint,"Gsn12-Sym-f-14", test_sym_f_gsn12_14))
+||  (NULL == CU_add_test(pSint,"Gsn12-Ran-f-1", test_gsn12_f_1))
+||  (NULL == CU_add_test(pSint,"Gsn12-Ran-f-2", test_gsn12_f_2))
+||  (NULL == CU_add_test(pSint,"Gsn12-Ran-f-3", test_gsn12_f_3))
+||  (NULL == CU_add_test(pSint,"Gsn12-Ran-f-4", test_gsn12_f_4))
 ||  (NULL == CU_add_test(pSint,"Lspline-P/CDF-d-0",test_cdf_pdf_d_lspline_0))
 ||  (NULL == CU_add_test(pSint,"Lspline-P/CDF-d-1",test_cdf_pdf_d_lspline_1))
 ||  (NULL == CU_add_test(pSint,"Lspline-P/CDF-d-2",test_cdf_pdf_d_lspline_2))
