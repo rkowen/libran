@@ -3,13 +3,47 @@
 \brief 	The Gaussian (Normal) distributions centered on m and width given by 2s
 
 The pseudo-random numbers are distributed from a Gaussian or Normal
-distribution.  The mean is given by m and variance = s^2.
+(also Laplace-Gauss) distribution.
+The mean is given by \e m and variance = \f$ s^2 \f$.
+The normal distribution is a very common continuous probability distribution
+and is commonly called the \e bell curve.
 
+\manonly
 PDF(z) = 1/(s*sqrt(2pi)) exp(-(z-m)^2 / (2s^2))
 CDF(z) = 1/2*[1 + erf((x-m)/(s*sqrt(2))]
+\endmanonly
 
-The default is m = 0, s = 1.
+\f{eqnarray*}{
+\mbox{PDF}(x)
+	&= \frac{1}{\sqrt{2\pi s^2}} \exp{-\frac{(x - m)^2}{2 s^2}}	\\
+\mbox{CDF}(x)
+	&= \frac{1}{2}
+	\left[ 1 + \mbox{erf}\left(\frac{x - m}{s\sqrt{2}}\right) \right]
+\f}
+
+The default is m = 0, s = 1; which is called the
+<b>standard normal distribution</b>.
+
+The central limit theorem states that the sum of a large number of identically
+distributed independent random variates will have an approximately
+normal distribution.
  
+Gaussian distributed random variates can be generated in a couple of
+methods.  The first is
+the Box-Muller method which generates a pair of Gaussian distributed
+random variates by considering the 2-dimensional form of the Gaussian
+distribution.  The polar form can yield itself to using the inverse CDF
+for generating the random variates.  However, this requires using
+time-intensive math functions such as the sin, cos, log, and sqrt functions.
+
+The second method uses the Marsagalia's polar method with acceptance/rejection
+for generating random variates confined to the unit circle centered on
+the origin with radius 1.
+This gives an acceptance ratio to be \f$\frac{\pi}{4} \approx 78.5\% \f$, but
+the method only uses a single sqrt, log, and division per generated pair.
+This simplicity may result in a faster generator despite the time to
+calculate rejected samples.
+
 */
 #ifdef __cplusplus
 extern "C" {
@@ -22,6 +56,7 @@ extern "C" {
 /*!
 @brief	LRd_gausbm_RAN(LR_obj *o) - double random Gaussian/Normal distribution
 using the Box-Muller method.
+
 Default values: mean m = 0, std.deviation s = 1
 
 @param o        LR_obj object
@@ -50,7 +85,7 @@ double LRd_gausbm_RAN(LR_obj *o) {
 /*!
 @brief	LRd_gausmar_RAN(LR_obj *o) - double random Gaussian/Normal distribution
 using the Marsaglia method with acceptance-rejection.
-(Avoids using Sine/Cosine.  Only uses one Log/Sqrt)
+
 Default values: mean m = 0, std.deviation s = 1
 
 @param o        LR_obj object
@@ -114,6 +149,7 @@ double LRd_gaus_CDF(LR_obj *o, double x) {
 /*!
 @brief	LRf_gausbm_RAN(LR_obj *o) - float random Gaussian/Normal distribution
 using the Box-Muller method.
+
 Default values: mean m = 0, std.deviation s = 1
 
 @param o	LR_obj object
@@ -141,7 +177,7 @@ float LRf_gausbm_RAN(LR_obj *o) {
 /*!
 @brief	LRf_gausmar_RAN(LR_obj *o) - float random Gaussian/Normal distribution
 using the Marsaglia method with acceptance-rejection.
-(Avoids using Sine/Cosine.  Only uses one Log/Sqrt)
+
 Default values: mean m = 0, std.deviation s = 1
 
 @param o        LR_obj object
