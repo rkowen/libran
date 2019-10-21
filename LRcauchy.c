@@ -4,14 +4,46 @@
 
 The pseudo-random numbers are distributed from a Cauchy or Lorentz
 distribution.  It's a pathological distribution where the mean and variance
-is undefined, but the distribution has a clear peak and width (given by m
+are undefined, but the distribution has a clear peak and width (given by m
 and 2s respectively).
 
+\manonly
 PDF(z) = 1/[s*pi * {1 + (z-m)^2 / s)}]
 CDF(z) = 1/pi*arctan((x-m)/s) + 1/2
+\endmanonly
 
-The default is m = 0, s = 1.
+\f{eqnarray*}{
+\mbox{PDF}(x)
+	&= \frac{1}{ \pi s \left[1 + \left(\frac{x-m}{s} \right)^2 \right]} \\
+	&= \frac{1}{ \pi s }\left[\frac{s^2}{(x-m)^2 + s^2}\right] \\
+\mbox{CDF}(x)
+	&= \frac{1}{\pi}\arctan \left(\frac{x-m}{s} \right) + \frac{ 1}{ 2}
+\f}
+
+
+The default is m = 0, s = 1; which is called the <b>standard Cauchy
+distribution</b>.
  
+The Cauchy-Lorentz distributed random variates can be generated in a couple of
+ways.  The first and most direct way comes using the inverse of the
+\f$ \mbox{CDF}(x) \f$ function, which is simple enough to have an exact
+analytic form.  However, the computational complexity may cause it to be
+slower than the second method.
+
+The second method 
+uses the polar method, the Marsagalia method, and acceptance/rejection for
+generating a Gaussian/Normal variate - the ratio of the two independent 
+variates gives the Cauchy-Lorentz distribution.  However, it relies on
+acceptance/rejection to generate random variates confined to the unit circle
+centered on the origin with radius 1.
+This gives an acceptance ratio to be \f$\frac{\pi}{4} \approx 78.5\% \f$, but
+the only arithmetic operations, however, are couple of multiplications and a
+single division.  This simplicity may be sufficient to overcome the
+time to generate rejected samples and the overall method may be
+competative in comparison to the first method.
+
+Default values: peak m = 0, half width s = 1
+
 */
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +55,7 @@ extern "C" {
 /* double */
 /*!
 @brief	LRd_cauchy_RAN(LR_obj *o) - double random Cauchy/Lorentz distribution
-using the inversion method.
+using the inversion method on the CDF(x).
 Default values: peak m = 0, half width s = 1
 
 @param o        LR_obj object
