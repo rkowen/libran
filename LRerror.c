@@ -2,8 +2,52 @@
 \file	LRerror.c
 \brief	LibRan error codes and messages
 
-The LibRan error routines patterned after the Standard C perror()/strerror()
+The LibRan error routines are patterned after the Standard C perror()/strerror()
 routines and the like.
+
+The object creation routines like `LR_new` and `LR_bin_new` will return
+a NULL value if they fail.  No error value is returned otherwise.
+
+Many of the LibRan routines return a random variate or
+distribution function value.  When these result in an error these functions
+return NAN (Not-A-Number).
+
+The `LR_obj` and `LR_bin` objects have an \e errno attribute which can
+be queried.
+
+An example code fragment:
+
+\code
+#include <math.h>
+#include "libran.h"
+...
+LR_obj *o =  LR_new(piece, LR_double);
+if (!*o) { // handle error }
+...
+if (isnan(x = LRd_RAN(o)) {
+	// handle error
+	LRperror("MyApp",o->errno);
+}
+...
+\endcode
+
+However, the other routines, especially those
+that return an integer value are returning a LibRan error value if non-zero.
+
+\code
+#include "libran.h"
+...
+LR_bin *b =  LR_bin_new(100);
+if (!*b) { // handle error }
+...
+if (!LR_bin_set(b,2.0)) {
+	// handle error
+	LRperror("MyApp",b->errno);
+}
+...
+\endcode
+
+Use these routines to identify the specific LibRan error.
 
 */
 #ifdef __cplusplus
@@ -14,7 +58,8 @@ extern "C" {
 #include "libran.h"
 
 /*!
-@brief	LRstrerror(int LRerrno)	- return some explanatory text regarding the given LR errno.
+@brief	LRstrerror(int LRerrno)	- return some explanatory text regarding
+the given LibRan errno.
 
 @param	LRerrno	LibRan error number
 @return	char * pointer to static constant string.
@@ -52,7 +97,8 @@ char *LRstrerror(int LRerrno) {
 }
 
 /*!
-@brief	LRstrerrno(int LRerrno)	- return the errno code for the given LR errno.
+@brief	LRstrerrno(int LRerrno)	- return the errno code string for the
+given LibRan errno.
 
 @param	LRerrno	LibRan error number
 @return	char * pointer to static constant string.
@@ -90,10 +136,11 @@ char *LRstrerrno(int LRerrno) {
 }
 
 /*!
-@brief	LRperror(char *str, int LRerrno) - print out explanatory error message to stderr.
+@brief	LRperror(char *str, int LRerrno) - print out explanatory error
+message to stderr.
 
-If the char string is not NULL then prepend the string to the LibRan error
-message with a " : " delimiter and sent to stderr.
+If the char `str` string is not NULL then prepend this string to the LibRan
+error message with a " : " delimiter and sent to \e stderr .
 
 @param	str	String to prepend to error message
 @param	LRerrno	LibRan error number
