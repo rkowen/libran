@@ -1,14 +1,37 @@
 /*!
 \file	LRnexp.c
-\brief 	The negative-exponential distribution has mean m and variance m^2.
+\brief 	The negative-exponential distribution has mean \e m and deviation \e m.
 
 The pseudo-random numbers are distributed from a negative exponential
-distribution.  It's only defined on x>=0 and zero otherwise.
+distribution.  It's only defined on interval \f$ x \ge 0 \f$ and zero otherwise.
+This distribution typically represents the time between events of a
+Poisson point process, \e i.e. a process in which events occur continuously
+and independently at a constant average rate.
 
-PDF(z) = 1/m * exp(-x/m)
-CDF(z) = 1 - exp(-x/m)
+\manonly
+   PDF(z) = 1/m * exp(-x/m)
+   CDF(z) = 1 - exp(-x/m)
+\endmanonly
 
-The default is m = 1 and s will be set to 1/m for efficiency.
+\f{eqnarray*}{
+\mbox{PDF}(x) &=
+\left\{ \begin{array}{ll}
+                0, &    x < 0 \\
+        	\frac{1}{m} e^{-\frac{x}{m}}, &    0 \le x .
+        \end{array} \right.
+\\
+\\
+\mbox{CDF}(x) &=
+\left\{ \begin{array}{ll}
+                0, &    x < 0 \\
+        	1 - e^{-\frac{x}{m}}, &    0 \le x .
+        \end{array} \right.
+\f}
+
+
+The default is \f$ m = 1 \f$ and \em s will be set to \f$ 1/m \f$
+for calculation efficiency.
+Do not set \e s when declaring this distribution.
  
 */
 #ifdef __cplusplus

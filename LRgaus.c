@@ -9,13 +9,13 @@ The normal distribution is a very common continuous probability distribution
 and is commonly called the \e bell curve.
 
 \manonly
-PDF(z) = 1/(s*sqrt(2pi)) exp(-(z-m)^2 / (2s^2))
-CDF(z) = 1/2*[1 + erf((x-m)/(s*sqrt(2))]
+   PDF(z) = 1/(s*sqrt(2pi)) exp(-(z-m)^2 / (2s^2))
+   CDF(z) = 1/2*[1 + erf((x-m)/(s*sqrt(2))]
 \endmanonly
 
 \f{eqnarray*}{
 \mbox{PDF}(x)
-	&= \frac{1}{\sqrt{2\pi s^2}} \exp{-\frac{(x - m)^2}{2 s^2}}	\\
+	&= \frac{1}{\sqrt{2\pi s^2}} e^{-\frac{(x - m)^2}{2 s^2}}	\\
 \mbox{CDF}(x)
 	&= \frac{1}{2}
 	\left[ 1 + \mbox{erf}\left(\frac{x - m}{s\sqrt{2}}\right) \right]
