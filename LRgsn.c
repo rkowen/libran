@@ -1,13 +1,150 @@
 /*!
 \file	LRgsn.c
-\brief 	The gaussian-like distributions on the [a,b) interval
+\brief 	The gaussian-like distributions based on the Central Limit Theorem
+
+Adding two random variates will produce a new CDF which is the convolution
+of the two individual respective PDFs.
+
+Here we sum some number of uniformly distributed random variates
+where the uniform random variate has:
+
+\manonly
+   PDF	u(x) =	{ 0 if x < 0 || x >= 1
+		{ 1 if 0 <= x < 1
+
+   CDF	U(x) =	{ 0 if x < 0
+		{ x if 0 <= x < 1
+		{ 1 if 1 <= x
+\endmanonly
+
+\f{eqnarray*}{
+\mbox{PDF } u(x)	&=
+	\left\{ \begin{array}{ll}
+		0, &	x < 0 \mbox{ or } x \ge 1, \\
+		1, &	0 \le x < 1 .
+	\end{array} \right.
+\\
+\mbox{CDF } U(x)	&=
+	\left\{ \begin{array}{ll}
+		0, &	x < 0 ,			\\
+		x, &	0 \le x < 1 ,		\\
+		1, &	x \ge 1 .
+	\end{array} \right.
+\f}
+
+A more detailed derivation can be
+found at page 22 of "Non-Uniform Random Variate Generation" by Luc Devroye.
+
+The CDF of \f$ n \f$ uniform random variates summed together is
+
+\manonly
+F(x)=1/n! [H(x)^n - (n 1)H(x-1)^n + (n 2)H(x-2)^n - ... ]
+
+where H(x) is the positive part of x,
+	H(x) =	{0 if x < 0
+		{x if x >= 0
+
+and (n m) = n!/(m!*(n-m)!) (binomial factor)
+
+\endmanonly
+
+\f[
+F(x) = \frac{1}{n!} \left[H(x)^n
+	- \left(\begin{array}{c} {n} \\ {1} \end{array}\right) H(x-1)^n
+	+ \left(\begin{array}{c} {n} \\ {2} \end{array}\right) H(x-2)^n
+	- \cdots \right]
+\f]
+\f[
+\mbox{where }
+H(x) = \left\{ \begin{array}{ll}
+		0, &	x < 0	\\
+		x, &	0 \le x .
+	\end{array} \right.
+\f]
+\f[
+\mbox{and the combination or binomial factor }
+\left(\begin{array}{c} {n} \\ {m} \end{array}\right)
+= \frac{n!}{m!(n-m)!}
+\f]
+
+The set of distributions here are by default
+symmetric and centered on \f$ x = 0 \f$ and
+on an interval \f$ -n/2 \le x \le n/2 \f$, where \f$ n \f$ is
+the order or number of summed random variates.
 
 The pseudo-random numbers are distributed from
 some lower bound "a" upto "b" (on the interval [a,b) ).
 The medium m = (a+b)/2, and width s = (b - a)/2
 
 The default depends on the distribution.
+
+\see aux/gsn.c
+
+GSN2
+====
+
+The \f$ n=2 \f$ Gaussian-like random variate is just the sum of two
+uniformly distributed random variates.  The resulting PDF is also just a
+saw tooth in form.
+
+The default values are \f$ a = -1 \f$, and \f$ b = 1 \f$.
+
+
+\f{eqnarray*}{
+\mbox{PDF  gsn2}(x)	&=
+	\left\{ \begin{array}{ll}
+		0,	&	x < -1 \mbox{ or } x \ge 1 ,	\\
+		1 + x,	&	-1 \le x < 0 ,			\\
+		1 - x,	&	0 \le x < 1 .
+	\end{array} \right.
+\\
+\mbox{CDF GSN2}(x)	&=
+	\left\{ \begin{array}{ll}
+		0,			&	x < -1 ,		\\
+		\frac{1}{2}(x+1)^2,	&	-1 \le x < 0 ,		\\
+		-\frac{1}{2}x^2 + x + \frac{1}{2}, &	0 \le x < 1 ,	\\
+		1, &	x \ge 1 .
+	\end{array} \right.
+\f}
  
+GSN4
+====
+
+The \f$ n=4 \f$ Gaussian-like random variate is just the sum of four
+uniformly distributed random variates.  However, the resulting PDF
+exhibits the behavior of a bell curve with each segment comprised of
+cubic polynomials and the end points of each segment match the adjacent
+segments endpoints
+and are continuous through the second derivative ... just like cubic
+splines.
+
+The CDF are quartic polynomials where the adjacent segments are continuous
+through the third derivative.
+ 
+The default values are \f$ a = -2 \f$, and \f$ b = 2 \f$.
+
+GSN12
+=====
+
+The \f$ n=12 \f$ Gaussian-like random variate is of special note.
+It's the sum of twelve uniformly distributed random variates.
+This distribution closely approximates the Gaussian or Normal
+distribution.  The variance of the distribution is equal to 1 just like
+the standard normal distribution, but has definite upper and lower bounds.
+
+The PDF are segments of 11th order polynomials.
+The CDF are segments of 12th order polynomials.
+Each of the distribution functions are continuous upto the highest
+derivative.  These distribution functions \e exactly represent the
+\e gsn12 random variate distribution and are not approximations.
+
+The default values are \f$ m = 0 \f$  and \f$ s = 1 \f$.
+Note that this distribution uses the \e mean and \e deviation to identify
+the distribution characteristics.  It is understood that the lower
+bound is \f$ m - s \f$ and the upper bound is \f$ m + s \f$.
+
+\see LRgaus.c
+
 */
 #ifdef __cplusplus
 extern "C" {
