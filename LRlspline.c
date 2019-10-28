@@ -2,10 +2,64 @@
 \file	LRlspline.c
 \brief	Piecewise linear spline distribution
 
-Borrows many of the LRpiece.c functions since the two are very close.
+The piecewise linear spline distribution is similar to the piecewise
+uniform distribution except that the probability distribution function
+looks like the trapezoidal rule for integration, where each segment
+is interpolated by a straight line (an affine function, \e i.e. a
+polynomial of degree 1).
 
-The CDF is pinned to zero at the end points.  So you will need to add
-at least one point in between with a non-zero value. 
+The PDF is pinned to zero at the end points.  So
+at least one point in between must be added with a non-zero value. 
+If this is not done then an error will be raised.
+
+Once the \e linear \e spline distribution object is created the
+set of trapezoidal \e blocks can be defined with the
+set of \c LR_lspl_*() functions.
+(Note: the \c LR_aux_*() 
+functions are equivalent and generic procedures and can be used instead.)
+
+This piecewise distribution borrows many of the similar methods
+as the piecewise \e uniform distribution (LRpiece.c) auxillary
+methods since the two have functional equivalency.
+
+\code
+#include "libran.h"
+...
+LR_obj *o = LR_new(lspline, LR_double);
+...
+// set the endpoints and this pins the probability density height to zero there
+LR_set_all(o,"ab", 0., 8.);
+
+// set the number of segments
+LR_lspl_new(o,6);
+...
+// must set at least one intervening value to a non-zero value.
+LR_lspl_set(o, 2.0, 1.0);
+LR_lspl_set(o, 3.0, 3.0);
+LR_lspl_set(o, 4.0, 0.0);
+LR_lspl_set(o, 5.0, 5.0);
+LR_lspl_set(o, 7.0, 2.0);
+
+// normalize the segmented probability density (the total integral = 1)
+LR_lspl_norm(o);
+...
+// do your typical processing
+...
+// remove the segment pieces
+LR_lspl_rm(o);
+// remove the piecewise LR_obj
+LR_rm(&o);
+...
+\endcode
+
+The probability and cumulative distribution functions as defined by the
+above code fragment looks like this:
+
+\image html LinearSplineDistribution.png
+\image latex LinearSplineDistribution.eps "Linear Spline Distribution"
+
+\see LRlspline.c LRdf.c
+
 
 */
 #ifdef __cplusplus
@@ -20,6 +74,9 @@ extern "C" {
 /*!
 @brief	LR_lspl_new(LR_obj *o, int n) - create a new linear spline object
 
+This routine must me called after the \c LR_obj object is created and it
+allocates memory for the number of expected segments.
+
 @param	o	LR_obj object
 @param	n	largest number of intervals
 @return	0 if successful, else non-zero if failed
@@ -29,7 +86,9 @@ int LR_lspl_new(LR_obj *o, int n) {
 }
 
 /*!
-@brief	LR_lspl_rm(LR_obj *o) - strip down the LR_lspl object part of LR_obj
+@brief	LR_lspl_rm(LR_obj *o) - strip out the LR_lspl object part of LR_obj
+
+Removes the allocated memory for the segment pieces.
 
 @param	o	LR_obj object address
 @return	0 if successful, else non-zero if failed
@@ -40,6 +99,22 @@ int LR_lspl_rm(LR_obj *o) {
 
 /*!
 @brief	LR_lspl_set(LR_obj *o, double x) - add interval boundary (will order internally).
+
+The \c LR_lspl_set function defines the set of segments for the probability
+density function.  It adds a new boundary and the value of the probability
+density at that boundary.
+
+Boundary values can be defined in any order and will be ordered internally
+by this method.
+
+The outer boundaries are defined through the \c LR_set_all()
+function and the probability density is pinned to zero at these
+endpoints.
+
+The set of segments and the probability density is relatively defined
+with \c LR_lspl_set().  Once all the segments are defined then the probability
+density must be normalized with \c LR_lspl_norm()
+such that the total integrated value is equal to one!
 
 @param	o	LR_obj object
 @param	x	interval boundary to add
@@ -56,6 +131,11 @@ int LR_lspl_set(LR_obj *o, double x, double p) {
 
 /*!
 @brief	LR_lspl_norm(LR_obj *o) - normalize the interval scale factors.
+
+The \c LR_lspl_norm() function is absolutely required to be called so the
+integrated probability density equals one.  If this routine
+is not called subsequent calls to the CDF/PDF/RAN functions will raise
+an error (returning a NAN).
 
 @param	o	LR_obj object
 @return	0 if successful, else non-zero if failed
@@ -117,6 +197,7 @@ int LR_lspl_norm(LR_obj *o) {
 
 /*!
 @brief	LRd_lspline_RAN(LR_obj *o) - double random linear spline distribution
+random variate.
 
 @param o	LR_obj object
 @return double if OK else NaN

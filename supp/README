@@ -1,0 +1,11 @@
+To create the EPS files from the PNG files do something like this:
+1)
+pngtopnm xxx.png > xxx.pnm
+2)
+pnmtops -noturn -nocenter xxx.pnm > xxx.ps
+3)
+ps2eps xxx.ps
+
+When trying to skip steps 1 & 2 above and use the PS generated from the
+Gdocs export to PDF this would cause the image to be rotated and truncated
+in the doxygen generated PDF.

@@ -8,6 +8,11 @@ and height of \f$ p_n \f$.
 
 Once the \e piecewise distribution object is created the set of \e blocks
 can be defined with the \c LR_pcs_*() functions.
+(Note: the \c LR_aux_*() 
+functions are equivalent and generic procedures and can be used instead.)
+
+The auxilliary methods found here are also used by the linear spline
+distribution method.
 
 \code
 #include "libran.h"
@@ -44,6 +49,8 @@ above code fragment looks like this:
 
 \image html PiecewiseUniformDistribution.png
 \image latex PiecewiseUniformDistribution.eps "Piecewise Uniform Distribution"
+
+\see LRlspline.c LRdf.c
 
 */
 #ifdef __cplusplus
@@ -127,6 +134,9 @@ int LR_pcs_rm(LR_obj *o) {
 The \c LR_pcs_set function defines the set of segments for the probability
 density function.  It adds a new boundary and the value of the probability
 density following that boundary.
+
+Boundary values can be defined in any order and will be ordered internally
+by this method.
 
 The first segment (and boundary) is defined through the \c LR_set_all()
 function, which also defines the last segment end point.
@@ -255,6 +265,7 @@ int LR_pcs_norm(LR_obj *o) {
 
 /*!
 @brief	LRd_piece_RAN(LR_obj *o) - double random piecewise uniform distribution
+random variate.
 
 @param o	LR_obj object
 @return double if OK, else NaN
