@@ -17,7 +17,6 @@ where the uniform random variate has:
 		{ 1 if 1 <= x
 \endmanonly
 
-\latexonly
 \f{eqnarray*}{
 \mbox{PDF } u(x)	&=
 	\left\{ \begin{array}{ll}
@@ -32,7 +31,6 @@ where the uniform random variate has:
 		1, &	x \ge 1 .
 	\end{array} \right.
 \f}
-\endlatexonly
 
 A more detailed derivation can be
 found at page 22 of "Non-Uniform Random Variate Generation" by Luc Devroye.
@@ -50,7 +48,6 @@ and (n m) = n!/(m!*(n-m)!) (binomial factor)
 
 \endmanonly
 
-\latexonly
 \f[
 F(x) = \frac{1}{n!} \left[H(x)^n
 	- \left(\begin{array}{c} {n} \\ {1} \end{array}\right) H(x-1)^n
@@ -69,7 +66,6 @@ H(x) = \left\{ \begin{array}{ll}
 \left(\begin{array}{c} {n} \\ {m} \end{array}\right)
 = \frac{n!}{m!(n-m)!}
 \f]
-\endlatexonly
 
 The set of distributions here are by default
 symmetric and centered on \f$ x = 0 \f$ and
