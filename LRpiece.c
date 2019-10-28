@@ -2,8 +2,48 @@
 \file	LRpiece.c
 \brief	Piecewise uniform distribution
 
-Create and remove special objects within the LR_obj to handle a set of
-piecewise uniform distribution.
+The Piecewise uniform distribution is a probability distribution function
+that looks like a histogram, where each block is of some width \f$ x_n \f$
+and height of \f$ p_n \f$.
+
+Once the \e piecewise distribution object is created the set of \e blocks
+can be defined with the \c LR_pcs_*() functions.
+
+\code
+#include "libran.h"
+...
+LR_obj *o = LR_new(piece, LR_double);
+...
+// set the end points and the probability density height of the first segment
+LR_set_all(o,"abx", 0., 8., 4.);
+
+// set the number of pieces
+LR_pcs_new(o,6);
+
+// now set the probability density height of the subsequent segments
+LR_pcs_set(o, 2.0, 1.0);
+LR_pcs_set(o, 3.0, 3.0);
+LR_pcs_set(o, 4.0, 0.0);
+LR_pcs_set(o, 5.0, 5.0);
+LR_pcs_set(o, 7.0, 2.0);
+
+// normalize the segmented probability density (the total integral = 1)
+LR_pcs_norm(o);
+...
+// do your typical processing
+...
+// remove the segment pieces
+LR_pcs_rm(o);
+// remove the piecewise LR_obj
+LR_rm(&o);
+...
+\endcode
+
+The probability and cumulative distribution functions as defined by the
+above code fragment looks like this:
+
+\image html PiecewiseUniformDistribution.png
+\image latex PiecewiseUniformDistribution.eps "Piecewise Uniform Distribution"
 
 */
 #ifdef __cplusplus
@@ -15,7 +55,10 @@ extern "C" {
 #include "libran.h"
 
 /*!
-@brief	LR_pcs_new(LR_obj *o, int n) - create a new piecewise uniform object
+@brief	LR_pcs_new(LR_obj *o, int n) - create a new piecewise uniform object set of segments
+
+This routine must me called after the \c LR_obj object is created and it
+allocates memory for the number of expected segments.
 
 @param	o	LR_obj object
 @param	n	largest number of intervals
@@ -58,7 +101,9 @@ bad0:
 }
 
 /*!
-@brief	LR_pcs_rm(LR_obj *o) - strip down the LR_pcs object part of LR_obj
+@brief	LR_pcs_rm(LR_obj *o) - strip out the LR_pcs object part of LR_obj
+
+Removes the allocated memory for the segment pieces.
 
 @param	o	LR_obj object address
 @return	0 if successful, else non-zero if failed
@@ -78,6 +123,18 @@ int LR_pcs_rm(LR_obj *o) {
 
 /*!
 @brief	LR_pcs_set(LR_obj *o, double x) - add interval boundary (will order internally).
+
+The \c LR_pcs_set function defines the set of segments for the probability
+density function.  It adds a new boundary and the value of the probability
+density following that boundary.
+
+The first segment (and boundary) is defined through the \c LR_set_all()
+function, which also defines the last segment end point.
+
+The set of segments and the probability density is relatively defined
+with \c LR_pcs_set().  Once all the segments are defined then the probability
+density must be normalized with \c LR_pcs_norm()
+such that the total integrated value is equal to one!
 
 @param	o	LR_obj object
 @param	x	interval boundary to add
@@ -137,6 +194,11 @@ int LR_pcs_set(LR_obj *o, double x, double p) {
 
 /*!
 @brief	LR_pcs_norm(LR_obj *o) - normalize the interval scale factors.
+
+The \c LR_pcs_norm() function is absolutely required to be called so the
+integrated probability density equals one.  If this routine
+is not called subsequent calls to the CDF/PDF/RAN functions will raise
+an error (returning a NAN).
 
 @param	o	LR_obj object
 @return	0 if successful, else non-zero if failed
@@ -223,7 +285,7 @@ double LRd_piece_RAN(LR_obj *o) {
 
 @param o	LR_obj object
 @param x	value
-@return double PDF at x
+@return double PDF at x, else a NAN if an error
 */
 double LRd_piece_PDF(LR_obj *o, double x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
@@ -250,7 +312,7 @@ double LRd_piece_PDF(LR_obj *o, double x) {
 
 @param o	LR_obj object
 @param x	value
-@return double CDF at x
+@return double CDF at x, else a NAN if an error
 */
 double LRd_piece_CDF(LR_obj *o, double x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
@@ -278,7 +340,7 @@ double LRd_piece_CDF(LR_obj *o, double x) {
 @brief	LRf_piece_RAN(LR_obj *o) - float random piecewise uniform distribution
 
 @param o	LR_obj object
-@return float
+@return float if OK, else NaN
 */
 float LRf_piece_RAN(LR_obj *o) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
@@ -306,7 +368,7 @@ float LRf_piece_RAN(LR_obj *o) {
 
 @param o	LR_obj object
 @param x	value
-@return float PDF at x
+@return float PDF at x, else a NAN if an error
 */
 float LRf_piece_PDF(LR_obj *o, float x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
@@ -333,7 +395,7 @@ float LRf_piece_PDF(LR_obj *o, float x) {
 
 @param o	LR_obj object
 @param x	value
-@return float CDF at x
+@return float CDF at x, else a NAN if an error
 */
 float LRf_piece_CDF(LR_obj *o, float x) {
 	LR_pcs *aux = (LR_pcs *) o->aux;
