@@ -13,6 +13,7 @@ and independently at a constant average rate.
    CDF(z) = 1 - exp(-x/m)
 \endmanonly
 
+\latexonly
 \f{eqnarray*}{
 \mbox{PDF}(x) &=
 \left\{ \begin{array}{ll}
@@ -27,6 +28,7 @@ and independently at a constant average rate.
         	1 - e^{-\frac{x}{m}}, &    0 \le x .
         \end{array} \right.
 \f}
+\endlatexonly
 
 
 The default is \f$ m = 1 \f$ and \em s will be set to \f$ 1/m \f$

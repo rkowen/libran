@@ -12,6 +12,7 @@ PDF(z) = 1/[s*pi * {1 + (z-m)^2 / s)}]
 CDF(z) = 1/pi*arctan((x-m)/s) + 1/2
 \endmanonly
 
+\latexonly
 \f{eqnarray*}{
 \mbox{PDF}(x)
 	&= \frac{1}{ \pi s \left[1 + \left(\frac{x-m}{s} \right)^2 \right]} \\
@@ -19,6 +20,7 @@ CDF(z) = 1/pi*arctan((x-m)/s) + 1/2
 \mbox{CDF}(x)
 	&= \frac{1}{\pi}\arctan \left(\frac{x-m}{s} \right) + \frac{ 1}{ 2}
 \f}
+\endlatexonly
 
 
 The default is m = 0, s = 1; which is called the <b>standard Cauchy

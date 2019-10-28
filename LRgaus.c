@@ -13,6 +13,7 @@ and is commonly called the \e bell curve.
    CDF(z) = 1/2*[1 + erf((x-m)/(s*sqrt(2))]
 \endmanonly
 
+\latexonly
 \f{eqnarray*}{
 \mbox{PDF}(x)
 	&= \frac{1}{\sqrt{2\pi s^2}} e^{-\frac{(x - m)^2}{2 s^2}}	\\
@@ -20,6 +21,7 @@ and is commonly called the \e bell curve.
 	&= \frac{1}{2}
 	\left[ 1 + \mbox{erf}\left(\frac{x - m}{s\sqrt{2}}\right) \right]
 \f}
+\endlatexonly
 
 The default is m = 0, s = 1; which is called the
 <b>standard normal distribution</b>.
