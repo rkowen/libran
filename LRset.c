@@ -1,6 +1,35 @@
 /*!
 \file	LRset.c
-\brief	Set of methods to handle setting the various LR_obj parameters.
+\brief	Collection of methods to handle setting the various LR_obj parameters.
+
+The \c LR_obj contains many attributes for the various random variate
+distributions.  These routines provide a simple interface for accomplishing
+initializing these attributes.
+
+Here is an example of setting the end points for the uniformly
+distributed pseudo-random number generator.
+
+\code
+#include "libran.h"
+...
+LR_obj *o = LR_new(unif, LR_double);
+// set the end points
+if (LR_set_all(o, "ab", 2.0, 5.0) > 0) {
+	// a serious error
+	LRperror("MyApp", o->errno);
+	...
+}
+// set the seed
+LR_lsetseed(19580512L);
+...
+// generate random number between 2.0 and 5.0
+x = LR_RAN(o);
+...
+// remove object
+LR_rm(&o);
+...
+\endcode
+
 */
 
 #ifdef __cplusplus
@@ -14,17 +43,29 @@ extern "C" {
 /*!
 @brief	LR_vset(LR_obj *o, char *x, va_list ap) - read and parse options
 
+This function is similar to vprintf() where the optional arguments are scanned
+according to format *x.  The function  accesses additional arguments by using
+the context information designated by `ap`.
+The program must execute `va_start()` before calling this function, and call
+`va_end()` afterward.
+
+Generally there is no need to call this routine.  Call `LR_set_all()` instead.
+
+However, the list of attributes handled is important -
+'d', 'a', 'b', 'm', 's', and 'x'.
+Any other characters are ignored except causing a negative value
+to be returned representing the number of such ignored characters.
+A \e real error will result in a positive return value.
+
+All other characters in the \e format string are an ignorable error.
+
+The precision of the input values are governed by the \c LR_obj
+\c LR_data_type.
+
 @param	o	LR_obj object
 @param	x	controlling format string
 @param	ap	additional arguments context information
-@return	negative number of non-valid values in format string or error if > 0
-
-This function is similar to vprintf() where the optional arguments are scanned
-according to format *x.  The function  accesses additional arguments by using
-the context information designated by ap.
-The program must execute va_start() before calling this function, and call
-va_end() afterward.
-
+@return	0 if no error else < 0 for non-valid characters in format string or an error if > 0
 */
 int LR_vset(LR_obj *o, char *x, va_list ap) {
 	LR_val t;
@@ -82,10 +123,14 @@ int LR_vset(LR_obj *o, char *x, va_list ap) {
 /*!
 @brief	LR_set(LR_obj *o, char x, ...) - set a single LR object parameter
 
+This routine is designed to set a single \c LR_obj attribute as directed
+by the \e format character.  See \c LR_vset() for allowed list of
+format characters.
+
 @param	o	LR_obj object
 @param	x	single character format
 @param	...	optional argument
-@return	negative number of non-valid values in format string or error if > 0
+@return	negative number of non-valid value in format string or error if > 0
 */
 int LR_set(LR_obj *o, char x, ...) {
 	va_list ap;
@@ -104,6 +149,12 @@ int LR_set(LR_obj *o, char x, ...) {
 
 /*!
 @brief	LR_set_all(LR_obj *o, char *x, ...) - set all given LR object parameters
+
+Set a collection of \c LR_obj attributes.  This routine has any
+number of arguments as defined by the \e format string
+(similar to printf() ).
+
+See LR_vset() for list of allowed format string characters.
 
 @param	o	LR_obj object
 @param	x	format string
