@@ -24,6 +24,9 @@ and is commonly called the \e bell curve.
 The default is m = 0, s = 1; which is called the
 <b>standard normal distribution</b>.
 
+\image html GaussianNormalDistribution.png
+\image latex GaussianNormalDistribution.eps "Gaussian or Normal Distribution"
+
 The central limit theorem states that the sum of a large number of identically
 distributed independent random variates will have an approximately
 normal distribution.
