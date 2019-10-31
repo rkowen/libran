@@ -258,7 +258,6 @@ testLRindep(gsn2, 6, 10, 5000,
 	CU_ASSERT_EQUAL(b->nn, 1);					\
 	CU_ASSERT_EQUAL(sizeof(b), sizeof(LR_bin *));			\
 	CU_ASSERT_EQUAL(sizeof(*b), sizeof(LR_bin));			\
-	CU_ASSERT_EQUAL(sizeof(*b), sizeof(LR_bin));			\
 	CU_ASSERT_EQUAL(sizeof(b->bdrs[0]), sizeof(double));		\
 	CU_ASSERT_EQUAL(sizeof(b->bins[0]), sizeof(long));		\
 	LR_bin_rm(&b);							\
