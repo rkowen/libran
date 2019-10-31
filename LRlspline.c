@@ -74,7 +74,7 @@ extern "C" {
 /*!
 @brief	LR_lspl_new(LR_obj *o, int n) - create a new linear spline object
 
-This routine must me called after the \c LR_obj object is created and it
+This routine must be called after the \c LR_obj object is created and it
 allocates memory for the number of expected segments.
 
 @param	o	LR_obj object
