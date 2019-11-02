@@ -1,3 +1,12 @@
+/*!
+\file	turand.c
+\brief	basic urand test program
+
+Run a series of tests on the urand routines.  This is more for development
+and not part of the test suite.  Just do "make turand" to create the
+executable - "turand" .  Run with "./turand" .
+
+*/
 
 #define PTEST(a,b)	\
 	if ((a) == (b)) printf("OK  "); \
