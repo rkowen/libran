@@ -13,7 +13,9 @@ config.status
 configure
 configure.ac~
 depcomp
+DoxygenLayout.xml
 install-sh
+libran-dox.conf
 missing
 stamp-h1
 html

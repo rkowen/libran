@@ -44,9 +44,16 @@ libran_a_SOURCES	=	\
 	$(URAND_srcs)
 
 
-if DOXYGEN
+if HAVE_DOXYGEN
 @DX_RULES@
+
 man3_MANS: doxygen-doc
+
+docs: $(DX_CLEAN_PDF) man3_MANS
+
+cleandocs: 
+	-@rm -rf $(DX_CLEANFILES)
+
 endif
 
 #	docs/urand.man 
@@ -82,6 +89,10 @@ help:
 	@echo "make all		- same as above"
 if CUNIT
 	@echo "make test	- make & run the test suite (if have CUnit)"
+endif
+if HAVE_DOXYGEN
+	@echo "make docs	- make the docs with Doxygen"
+	@echo "make cleandocs	- removes the generated docs"
 endif
 	@echo "make install	- copy library & man pages to destination"
 	@echo "make clean	- cleans out most useless files"

@@ -1,6 +1,6 @@
 /*!	\file libran.h
-	\brief The LibRan common header file
-*/
+ *	\brief The LibRan common header file
+ */
 
 #ifndef 	_LIBRAN_H_
 #  define	_LIBRAN_H_
@@ -10,10 +10,13 @@ extern "C" {
 
 #  include <stdarg.h>
 
-/*!
-Library Version
-*/
+/*!	\def	LR_VERSION
+ *	\brief	LibRan Library Version (X.Y.Z)
+ */
 #  define LR_VERSION	"LibRan_VERSION=0.1.0";
+/*!	\def	LR_DATE
+ *	\brief	LibRan Library date (YYYYMMDD)
+ */
 #  define LR_DATE	"LibRan_DATE=20190512";
 
 /*!
@@ -34,7 +37,8 @@ LibRan Error Numbers
 #  define LRerr_AllocFail				0x1D
 
 /*!
-\enum LR_type - an enum of allowed distribution types
+\enum	LR_type
+\brief	an enum of allowed distribution types
 */
 typedef	enum {
 /**< discrete distributions */
@@ -56,91 +60,107 @@ typedef	enum {
 }	LR_type;
 
 /*!
-\union LR_val - spans the set of allowed value types
+\union	LR_val
+\brief	spans the set of allowed value types
+
+This union allows all the various allowed types to be used for a given LibRan
+object attribute conserving memory.  The length of this attribute will the
+longest of the given types used in the union.
 */
 typedef	union {
-	long	l; /**< l	- long type */
-	int	i; /**< i	- int type */
-	float	f; /**< f	- float type */
-	double	d; /**< d	- double type */
+	long	l; /*!< long type */
+	int	i; /*!< int type */
+	float	f; /*!< float type */
+	double	d; /*!< double type */
 }	LR_val;
 
 /*!
-\enum LR_data_type - an enum of allowed value types
+\enum	LR_data_type
+\brief	an enum of allowed value types
+
+This enum value identifies which data type is used within the LibRan object.
+Then the associated type should be used from the given LR_val attribute.
 */
 typedef enum {
-	LR_int,
-	LR_long,
-	LR_float,
-	LR_double
+	LR_int,		/*!< integer type */
+	LR_long,	/*!< long integer type */
+	LR_float,	/*!< single precision floating point type */
+	LR_double	/*!< double precision floating type */
 }	LR_data_type;
 
 /*!
-\struct LR_obj - the fundamental LibRan distribution object
+\typedef	LR_obj
+\brief		the fundamental LibRan distribution object - the LR_obj struct
 */
 /* tag & predefine the fns object */
 typedef struct LR_obj LR_obj;
 
+/*!
+\struct	LR_obj
+\brief	the fundamental LibRan distribution object
+*/
 struct LR_obj {
-	const char const *	type;	/**< named distribution type */
-	LR_type		t;	/**< t - distribution type */
-	LR_data_type	d;	/**< d - data type */
-	LR_val		a;	/**< a - lower bound */
-	LR_val		b;	/**< b - upper bound */
-	LR_val		m;	/**< m - middle value of distribution */
-	LR_val		s;	/**< s - measure of distribution width */
-	LR_val		x;	/**< x - auxiliary value */
+	const char const *	type;	/*!< named distribution type */
+	LR_type		t;	/*!< t - distribution type */
+	LR_data_type	d;	/*!< d - data type */
+	LR_val		a;	/*!< a - lower bound */
+	LR_val		b;	/*!< b - upper bound */
+	LR_val		m;	/*!< m - middle value of distribution */
+	LR_val		s;	/*!< s - measure of distribution width */
+	LR_val		x;	/*!< x - auxiliary value */
 	/**< object random values */
-	LR_val		iy;	/**< iy  - current sequence value */
-	LR_val		iy0;	/**< iy0 - initial sequence value */
+	LR_val		iy;	/*!< iy  - current sequence value */
+	LR_val		iy0;	/*!< iy0 - initial sequence value */
 	/**< set of uniform random number generators - one for each data type */
-	int	(*ui)(LR_obj *);	/**< ui - int */
-	long	(*ul)(LR_obj *);	/**< ul - long */
-	float	(*uf)(LR_obj *);	/**< uf - float */
-	double	(*ud)(LR_obj *);	/**< ud - double */
+	int	(*ui)(LR_obj *);	/*!< ui - int */
+	long	(*ul)(LR_obj *);	/*!< ul - long */
+	float	(*uf)(LR_obj *);	/*!< uf - float */
+	double	(*ud)(LR_obj *);	/*!< ud - double */
 	/**< set of Random Fns for this distribution type */
-	float	(*rnf)(LR_obj *);		/**< rnf - float */
-	double	(*rnd)(LR_obj *);		/**< rnd - double */
+	float	(*rnf)(LR_obj *);		/*!< rnf - float */
+	double	(*rnd)(LR_obj *);		/*!< rnd - double */
 	/**< set of PDFs for this distribution type */
-	float	(*pdff)(LR_obj *, float);	/**< pdff - float */
-	double	(*pdfd)(LR_obj *, double);	/**< pdfd - double */
+	float	(*pdff)(LR_obj *, float);	/*!< pdff - float */
+	double	(*pdfd)(LR_obj *, double);	/*!< pdfd - double */
 	/**< set of CDFs for this distribution type  */
-	float	(*cdff)(LR_obj *, float);	/**< cdff - float */
-	double	(*cdfd)(LR_obj *, double);	/**< cdfd - double */
+	float	(*cdff)(LR_obj *, float);	/*!< cdff - float */
+	double	(*cdfd)(LR_obj *, double);	/*!< cdfd - double */
 	/**< generic (void) pointer to some other object */
-	void *		aux;	/**< aux - auxiliary object */
-	int		errno;	/**< errno - last error encountered */
+	void *		aux;	/*!< aux - auxiliary object */
+	int		errno;	/*!< errno - last error encountered */
 };
 
 /*!
-\struct LR_bin - the binning object
+\struct	LR_bin
+\brief	the binning object - for tallying results
 */
 typedef struct {
-	int		n;	/**< n - number of bins */
-	int		nn;	/**< nn - number of bins declared */
-	long		c;	/**< c - count of values */
-	double *	bdrs;	/**< bdrs - set of bin boundaries (n - 1) */
-	long *		bins;	/**< bins - set of bins (n) */
-	int		errno;	/**< errno - last bin error encountered */
+	int		n;	/*!< n - number of bins */
+	int		nn;	/*!< nn - number of bins declared */
+	long		c;	/*!< c - count of values */
+	double *	bdrs;	/*!< bdrs - set of bin boundaries (n - 1) */
+	long *		bins;	/*!< bins - set of bins (n) */
+	int		errno;	/*!< errno - last bin error encountered */
 }	LR_bin;
 
 /*!
-\struct LR_pcs - the piecewise uniform object (also linear spline)
+\struct	LR_pcs
+\brief	the special piecewise uniform object (also linear spline)
 */
 typedef struct {
-	int		n;	/**< n - number of intervals */
-	int		nn;	/**< nn - number of intervals declared */
-	double *	bdrs;	/**< bdrs - set of interval boundaries (n-1) */
-	double *	c;	/**< relative probability for each interval (n) */
-	double *	sc;	/**< cumulative probability for each interval (n) */
-	double 		norm;	/**< norm - normalization factor for c */
-	int		flags;	/**< flags to guarentee certain actions */
+	int		n;	/*!< n - number of intervals */
+	int		nn;	/*!< nn - number of intervals declared */
+	double *	bdrs;	/*!< bdrs - set of interval boundaries (n-1) */
+	double *	c;	/*!< relative probability for each interval (n) */
+	double *	sc;	/*!< cumulative probability for each interval (n) */
+	double 		norm;	/*!< norm - normalization factor for c */
+	int		flags;	/*!< flags to guarentee certain actions */
 
 /**< special auxiliary methods */
-	int (*new)(LR_obj *o, int n);		/**< aux new */
-	int (*rm)(LR_obj *o);			/**< aux rm */
-	int (*set)(LR_obj *o, double x, double p);	/**< aux set points */
-	int (*normalize)(LR_obj *o);		/**< aux normalize points */
+	int (*new)(LR_obj *o, int n);		/*!< aux new */
+	int (*rm)(LR_obj *o);			/*!< aux rm */
+	int (*set)(LR_obj *o, double x, double p);	/*!< aux set points */
+	int (*normalize)(LR_obj *o);		/*!< aux normalize points */
 }	LR_pcs;
 
 /**< special auxiliary flags */

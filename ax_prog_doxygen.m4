@@ -389,6 +389,17 @@ m4_foreach([DX_i], [m4_shift(DX_loop)], [[\\
 
 "]],
 [[DX_SNIPPET_html=""]])
+AS_IF([[test $DX_FLAG_man -eq 1]],
+[[DX_SNIPPET_man="## ------------------------------- ##
+## Rules specific for man output. ##
+## ------------------------------- ##
+
+DX_CLEAN_MAN = \$(DX_DOCDIR)/man]dnl
+m4_foreach([DX_i], [m4_shift(DX_loop)], [[\\
+                \$(DX_DOCDIR]DX_i[)/man]])[
+
+"]],
+[[DX_SNIPPET_man=""]])
 AS_IF([[test $DX_FLAG_chi -eq 1]],
 [[DX_SNIPPET_chi="
 DX_CLEAN_CHI = \$(DX_DOCDIR)/\$(PACKAGE).chi]dnl
