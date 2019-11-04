@@ -188,6 +188,24 @@ char *LRstrerror(int LRerrno);
 char *LRstrerrno(int LRerrno);
 void LRperror(char *str, int LRerrno);
 
+/* urand routines */
+int	LR_irand(LR_obj *);
+float	LR_frand(LR_obj *);
+void	LR_isetseed(LR_obj *, int ity);
+int	LR_igetseed(LR_obj *);
+int	LR_igetrand(LR_obj *);
+float	LR_fgetrand(LR_obj *);
+
+long	LR_lrand(LR_obj *);
+double	LR_drand(LR_obj *);
+void	LR_lsetseed(LR_obj *, long lty);
+long	LR_lgetseed(LR_obj *);
+long	LR_lgetrand(LR_obj *);
+double	LR_dgetrand(LR_obj *);
+
+int	LR_igetval(char *str);
+long	LR_lgetval(char *str);
+
 /* LibRan generic distribution functions */
 /* double */
 double LRd_RAN(LR_obj *o);
