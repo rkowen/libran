@@ -344,11 +344,12 @@ int LR_check(LR_obj *o) {
 	/* check if LR_obj */
 	if (o && o->t && o->d) {
 		switch (o->t) {
-		/* interval types */
+		/* interval types (a,b) */
 		case unif:
 		case piece:
 		case lspline:
 		case gsn2:
+		case gsn4:
 			if (o->d == LR_double) {
 				if (o->a.d > o->b.d) {
 					td = o->a.d;
@@ -371,8 +372,12 @@ int LR_check(LR_obj *o) {
 			}
 			return LRerr_OK;
 
-		/* full range */
+		/* full range (m,s) */
 		case gausbm:
+		case gausmar:
+		case gsn12:
+		case cauchy:
+		case cauchymar:
 			if (o->d == LR_double) {
 				if (o->s.d < dzero) {
 					o->s.d = - o->s.d;
@@ -384,6 +389,27 @@ int LR_check(LR_obj *o) {
 				if (o->s.f < fzero) {
 					o->s.f = - o->s.f;
 				} else if (o->s.f == fzero) {
+					return o->errno
+						= LRerr_InvalidInputValue;
+				}
+			} else {
+				/* error */
+				return o->errno = LRerr_BadDataType;
+			}
+			return LRerr_OK;
+		/* semi-infinite (m)*/
+		case nexp:
+			if (o->d == LR_double) {
+				if (o->m.d < dzero) {
+					o->m.d = - o->m.d;
+				} else if (o->m.d == dzero) {
+					return o->errno
+						= LRerr_InvalidInputValue;
+				}
+			} else if (o->d == LR_float) {
+				if (o->m.f < fzero) {
+					o->m.f = - o->m.f;
+				} else if (o->m.f == fzero) {
 					return o->errno
 						= LRerr_InvalidInputValue;
 				}
