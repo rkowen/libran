@@ -2,12 +2,38 @@
 \file	LRunif.c
 \brief 	The uniform distribution on the [a,b) interval
 
-The pseudo-random numbers are uniformly distributed from
-the lower bound "a" upto "b" (on the interval [a,b) ).
+The pseudo-random numbers are uniformly distributed on an interval
+from the lower bound "a" upto "b" - the interval [a,b).
+
+\manonly
+   PDF	u(x) =	{ 0		if x < a || x >= b
+		{ 1/(b-a)	if a <= x < b
+
+   CDF	U(x) =	{ 0		if x < a
+		{ (x-a)/(b-a)	if a <= x < b
+		{ 1		if b <= x
+\endmanonly
+
+\f{eqnarray*}{
+\mbox{PDF } u(x)	&=
+	\left\{ \begin{array}{ll}
+		0,		& x < a \mbox{ or } x \ge b,	\\
+		\frac{1}{b-a},	& a \le x < b ,			\\
+	\end{array} \right.
+\\
+\mbox{CDF } U(x)	&=
+	\left\{ \begin{array}{ll}
+		0,			& x < a ,		\\
+		\frac{x-a}{b-a},	& a \le x < b ,		\\
+		1,			& x \ge b .
+	\end{array} \right.
+\f}
 
 Default:
-- a = 0
-- b = 1
+- \e a = 0
+- \e b = 1
+
+\see urand/urand.c
  
 */
 #ifdef __cplusplus
