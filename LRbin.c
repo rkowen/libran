@@ -1,8 +1,57 @@
 /*!
 \file	LRbin.c
-\brief	Set of binning functions
+\brief	Set of LibRan binning functions
 
-This set of functions: set-up, count values into bins, and take-down
+This set of LibRan functions will set-up or take-down the bins for
+counting values into bins based on the bin boundaries.
+Each of the `LR_bin` objects is independent of any other object such as
+the `LR_obj`.
+
+Having such bins are useful for visualizing a random variates distribution.
+Given the total number of samples is \e N, then the number of likely
+samples falling within the bin will be
+\f[
+N \int_{x_i}^{x_{i+1}}f(x)dx = N \left[F(x_{i+1}) - F(x_i)\right]
+\f]
+where the bin interval is \f$ [x_i,x_{i+1}) \f$ and \f$ f(x) \f$
+is the probability distribution function (PDF) and \f$ F(x) \f$
+is the  cumulative distribution function (CDF).
+
+The bin object also tallies samples below and above the set of bins.
+If you define \e n boundaries then there are \e n + 1 bins.
+The order the boundaries are set is not important.  The method orders
+the boundaries internally.
+
+The following is some example code fragments for defining the bins, tallying
+the samples, and viewing the results.
+
+\code
+#include <stdio.h>
+#include "libran.h"
+...
+int nbin = 10;
+LR_obj *b = LR_bin_new(nbin+2);
+...
+// set the boundaries
+for (int i = 0; i <= nbin; i++) {
+	LR_bin_set(b, 2.0 + .1 * i);
+}
+...
+// tally samples
+for (int i = 0; i < 10000; i++) {
+	LR_bin_add(b, LRd_RAN(o));
+}
+...
+// view results
+fprint("-inf - %f : %f\n", b->bdrs[0], b->bins[0]);
+for (int i = 1; i <= nbin; i++) {
+	fprint("%f - %f : %f\n", b->bdrs[i-1], b->bdrs[i], b->bins[i]);
+}
+fprint("%f - inf : %f\n", b->bdrs[nbin+1], b->bins[nbin+1]);
+...
+LR_bin_rm(&b);
+
+\endcode
 
 */
 #ifdef __cplusplus
@@ -16,9 +65,13 @@ extern "C" {
 /*!
 @brief	LR_bin_new(LR_data_type d, int n) - create new binning object
 
+This routine creates a new `LR_bin` object and allocates the necessary
+memory for the boundaries and tally bins.  Must give at least the the expected
+number of boundaries plus one (or the number of bins plus two).
+
 @param	t	data type
 @param	n	number of bins
-@return	LR_bin object
+@return	LR_bin object if successful, else NULL
 */
 LR_bin *LR_bin_new(int n) {
 	LR_bin *ptr = (void *) NULL;
@@ -49,6 +102,9 @@ bad0:
 /*!
 @brief	LR_bin_rm(LR_bin **b) - remove binning object
 
+Since the `LR_bin` object allocates memory this method needs to be
+called to deallocate the memory to avoid memory leaks.
+
 @param	b	LR_bin object address
 @return	0 if successful, else non-zero if failed
 */
@@ -64,7 +120,10 @@ int LR_bin_rm(LR_bin **b) {
 }
 
 /*!
-@brief	LR_bin_set(LR_bin *b, double x) - add bin boundary (will order internally).
+@brief	LR_bin_set(LR_bin *b, double x) - add bin boundary
+
+Include another bin boundary, which will be ordered internally.
+However, it will not identify or flag repeated boundaries.
 
 @param	b	LR_bin object
 @param	x	bin boundary to add
@@ -103,6 +162,9 @@ int LR_bin_set(LR_bin *b, double x) {
 
 /*!
 @brief	LR_bin_add(LR_bin *b, double x) - collect value to be binned.
+
+This is *the* tallying routine, where the value \e x is compared to the
+boundary values and the appropriate bin tally is incremented.
 
 @param	b	LR_bin object
 @param	x	value to count within the given bin.
