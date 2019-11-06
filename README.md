@@ -134,6 +134,11 @@ int main() {
 		LRperror("Sample Code", o->errno);
 		return 3;
 	}
+	// check the object
+	if (LR_check(o)) {
+		LRperror("Sample Code - check", o->errno);
+		return 4;
+	}
 	// set seed
 	LR_lsetseed(o, 19580512L);
 
@@ -144,7 +149,7 @@ int main() {
 	for (int i = 0; i <= 60; i++) {
 		if (LR_bin_set(b, start + i*incr)) {
 			LRperror("Sample Code - bin", b->errno);
-			return 4;
+			return 5;
 		}
 	}
 	// set up expectation histogram
@@ -152,7 +157,7 @@ int main() {
 	for (int i = 0; i < 61; i++) {
 		if (isnan(thiscdf = LRd_CDF(o, start + i*incr))){
 			LRperror("Sample Code - CDF", o->errno);
-			return 4;
+			return 6;
 		}
 		ehist[i] = nsamples * (thiscdf - prevcdf);
 		prevcdf = thiscdf;
@@ -165,11 +170,11 @@ int main() {
 	for (int i = 0; i < nsamples; i++) {
 		if (isnan(x = LRd_RAN(o))) {
 			LRperror("Sample Code - RAN", o->errno);
-			return 5;
+			return 7;
 		}
 		if (LR_bin_add(b, x)) {
 			LRperror("Sample Code - bin add", b->errno);
-			return 6;
+			return 8;
 		}
 	}
 
