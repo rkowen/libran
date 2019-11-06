@@ -23,22 +23,22 @@ LR_obj *o = LR_new(piece, LR_double);
 LR_set_all(o,"abx", 0., 8., 4.);
 
 // set the number of pieces
-LR_pcs_new(o,6);
+LR_aux_new(o,6);
 
 // now set the probability density height of the subsequent segments
-LR_pcs_set(o, 2.0, 1.0);
-LR_pcs_set(o, 3.0, 3.0);
-LR_pcs_set(o, 4.0, 0.0);
-LR_pcs_set(o, 5.0, 5.0);
-LR_pcs_set(o, 7.0, 2.0);
+LR_aux_set(o, 2.0, 1.0);
+LR_aux_set(o, 3.0, 3.0);
+LR_aux_set(o, 4.0, 0.0);
+LR_aux_set(o, 5.0, 5.0);
+LR_aux_set(o, 7.0, 2.0);
 
 // normalize the segmented probability density (the total integral = 1)
-LR_pcs_norm(o);
+LR_aux_norm(o);
 ...
 // do your typical processing
 ...
 // remove the segment pieces
-LR_pcs_rm(o);
+LR_aux_rm(o);
 // remove the piecewise LR_obj
 LR_rm(&o);
 ...

@@ -31,22 +31,22 @@ LR_obj *o = LR_new(lspline, LR_double);
 LR_set_all(o,"ab", 0., 8.);
 
 // set the number of segments
-LR_lspl_new(o,6);
+LR_aux_new(o,6);
 ...
 // must set at least one intervening value to a non-zero value.
-LR_lspl_set(o, 2.0, 1.0);
-LR_lspl_set(o, 3.0, 3.0);
-LR_lspl_set(o, 4.0, 0.0);
-LR_lspl_set(o, 5.0, 5.0);
-LR_lspl_set(o, 7.0, 2.0);
+LR_aux_set(o, 2.0, 1.0);
+LR_aux_set(o, 3.0, 3.0);
+LR_aux_set(o, 4.0, 0.0);
+LR_aux_set(o, 5.0, 5.0);
+LR_aux_set(o, 7.0, 2.0);
 
 // normalize the segmented probability density (the total integral = 1)
-LR_lspl_norm(o);
+LR_aux_norm(o);
 ...
 // do your typical processing
 ...
 // remove the segment pieces
-LR_lspl_rm(o);
+LR_aux_rm(o);
 // remove the piecewise LR_obj
 LR_rm(&o);
 ...
