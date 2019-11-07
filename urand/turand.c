@@ -24,7 +24,6 @@ executable - "turand" .  Run with "./turand" .
 #include <stdio.h>
 #include <stdlib.h>
 #include "libran.h"
-#include "urand.h"
 #include "config.h"
 
 #ifndef MAXSMP

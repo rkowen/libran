@@ -36,7 +36,7 @@ LR_lsetseed(19580512L);
 // generate random number
 x = LR_RAN(o);
 // get the same random number
-y = LR_igetrand(o);
+y = LR_lgetrand(o);
 ...
 // remove object
 LR_rm(&o);
