@@ -2,11 +2,35 @@
 \file	LRnew.c
 \brief	Create a new LR_obj object and set some parameter values
 
-The LR_obj is created from allocated memory and certain of the parameters
-are set to default values dependent on the random variate type given.
+Use these methods to create the `LR_obj` object by allocating memory,
+and set certain of the parameters
+to default values dependent on the random variate type given.
+Other of the routines set these `LR_obj` object attributes or
+remove the object.
+Lastly there is a check method to correct any of the parameter values
+where possible.  (E.g. the interval boundaries b > a, width s > 0, etc.)
 
-A check function is added to check and correct any of the parameter values
-possible.  (E.g. the interval boundaries b > a, width s > 0, etc.)
+The following code segment sets up a `LR_obj` object to generate
+uniform distributed random variates on the interval (a=1, b=3).
+
+\code
+#include "libran.h"
+...
+LR_obj *o = LR_new(unif, LR_double);
+// set the parameters from the default
+LR_set_all(o, "ab", 1., 3.);
+// check parameters
+LR_check(o);
+// set the seed
+LR_lsetseed(19580512L);
+...
+// generate random number
+x = LR_RAN(o);
+...
+// remove object
+LR_rm(&o);
+...
+\endcode
 
 */
 #ifdef __cplusplus
@@ -22,8 +46,8 @@ extern "C" {
 #include "urand/urand.h"
 
 /*!
-@brief	LR_new(LR_type t, LR_data_type d) - create the LR object and preset
-some default parameter values.
+@brief	LR_new(LR_type t, LR_data_type d) - create the LR object
+and preset some default parameter values.
 
 @param	t	LR_type (e.g. LR_gausbm)
 @param	d	LR_data_type (e.g. LR_double)
@@ -308,7 +332,7 @@ objerr:
 memory.
 
 @param	o	Address of LR_obj pointer
-@return	0	if successful
+@return	0	if successful, non-zero if an error
 */
 int LR_rm(LR_obj **o) {
 	/* check if LR_obj */
@@ -334,6 +358,16 @@ int LR_rm(LR_obj **o) {
 /*!
 @brief	LR_check(LR_obj *o) - check and fix the LR object parameters
 if possible
+
+This method finds and addresses fixable errors.  For example for those
+random variate distributions that use the interval end points (a,b) the
+check method will switch 'a' and 'b' if 'a' > 'b'.  The other example
+is for those distributions that use 's' which generally relates to
+the width of the peak.  This value should be positive and the check will
+take the absolute value of this value if negative.
+
+However, non-fixable errors will raise an error, such as a=b in the first
+case or s=0 for the second case.
 
 @param	o	LR_obj pointer
 @return	0	if successful, non-zero if an error or not possible to fix
