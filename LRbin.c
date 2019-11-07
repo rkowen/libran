@@ -2,7 +2,8 @@
 \file	LRbin.c
 \brief	Set of LibRan binning functions
 
-This set of LibRan functions will set-up or take-down the bins for
+This set of LibRan functions will set-up or take-down the `LR_bin` object
+and the bins for
 counting values into bins based on the bin boundaries.
 Each of the `LR_bin` objects is independent of any other object such as
 the `LR_obj`.
@@ -18,7 +19,7 @@ is the probability distribution function (PDF) and \f$ F(x) \f$
 is the  cumulative distribution function (CDF).
 
 The bin object also tallies samples below and above the set of bins.
-If you define \e n boundaries then there are \e n + 1 bins.
+If you define \e n-1 boundaries then there are \e n bins.
 The order the boundaries are set is not important.  The method orders
 the boundaries internally.
 
@@ -30,7 +31,7 @@ the samples, and viewing the results.
 #include "libran.h"
 ...
 int nbin = 10;
-LR_obj *b = LR_bin_new(nbin+2);
+LR_bin *b = LR_bin_new(nbin+2);
 ...
 // set the boundaries
 for (int i = 0; i <= nbin; i++) {
@@ -66,8 +67,8 @@ extern "C" {
 @brief	LR_bin_new(LR_data_type d, int n) - create new binning object
 
 This routine creates a new `LR_bin` object and allocates the necessary
-memory for the boundaries and tally bins.  Must give at least the the expected
-number of boundaries plus one (or the number of bins plus two).
+memory for the boundaries and tally bins.  Must give at least the expected
+number of bins or the number of boundaries plus one.
 
 @param	t	data type
 @param	n	number of bins
@@ -164,7 +165,7 @@ int LR_bin_set(LR_bin *b, double x) {
 @brief	LR_bin_add(LR_bin *b, double x) - collect value to be binned.
 
 This is *the* tallying routine, where the value \e x is compared to the
-boundary values and the appropriate bin tally is incremented.
+boundary values and the appropriate bin array element tally is incremented.
 
 @param	b	LR_bin object
 @param	x	value to count within the given bin.
