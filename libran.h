@@ -38,48 +38,50 @@ LibRan Error Numbers
 
 /*!
 \enum	LR_type
-\brief	an enum of allowed distribution types
+\brief	an enum of allowed random variate distribution types
 */
 typedef	enum {
 /**< discrete distributions */
-	poiss,		/**< poiss	- Poison */
-	binom,		/**< binom	- Binomial */
+	poiss,		/**< Poison */
+	binom,		/**< Binomial */
 /**< continuum distributions */
-	unif,		/**< unif	- uniform */
-	piece,		/**< piece	- piecewise uniform */
-	lspline,	/**< lspline	- linear spline */
-	gausbm,		/**< gausbm	- Gaussian (Normal)-Box Muller method*/
-	gausmar,	/**< gausmar	- Gaussian (Normal)-Marsaglia method*/
-	gsn2,		/**< gsn2	- Gaussian like - 2 uni (saw tooth) */
-	gsn4,		/**< gsn4	- Gaussian like - 4 uni */
-	gsn12,		/**< gsn12	- Gaussian like - 12 uni */
-	logd,		/**< logd	- logirithmic */
-	nexp,		/**< nexp	- negative exponential */
-	cauchy,		/**< cauchy	- Cauchy */
-	cauchymar	/**< cauchymar	- Cauchy using polar/Marsaglia method*/
+	unif,		/**< uniform */
+	piece,		/**< piecewise uniform */
+	lspline,	/**< linear spline */
+	gausbm,		/**< Gaussian (Normal)-Box Muller method*/
+	gausmar,	/**< Gaussian (Normal)-Marsaglia method*/
+	gsn2,		/**< Gaussian like - 2 uni (saw tooth) */
+	gsn4,		/**< Gaussian like - 4 uni */
+	gsn12,		/**< Gaussian like - 12 uni */
+	logd,		/**< logirithmic */
+	nexp,		/**< negative exponential */
+	cauchy,		/**< Cauchy */
+	cauchymar	/**< Cauchy using polar/Marsaglia method*/
 }	LR_type;
 
 /*!
 \union	LR_val
 \brief	spans the set of allowed value types
 
-This union allows all the various allowed types to be used for a given LibRan
-object attribute conserving memory.  The length of this attribute will the
-longest of the given types used in the union.
+This union allows all the various allowed data types to be used for a
+given LibRan `LR_obj` object attribute conserving memory.  The length of this
+attribute will be the longest of the given types used in the union.
+
 */
 typedef	union {
-	long	l; /*!< long type */
-	int	i; /*!< int type */
-	float	f; /*!< float type */
-	double	d; /*!< double type */
+	long	l; /*!< l - long type */
+	int	i; /*!< i - int type */
+	float	f; /*!< f - float type */
+	double	d; /*!< d - double type */
 }	LR_val;
 
 /*!
 \enum	LR_data_type
 \brief	an enum of allowed value types
 
-This enum value identifies which data type is used within the LibRan object.
-Then the associated type should be used from the given LR_val attribute.
+This enum value identifies which data type is to be
+used within the LibRan object.
+Then the associated type should be used from the given `LR_val` attribute.
 */
 typedef enum {
 	LR_int,		/*!< integer type */
@@ -90,41 +92,59 @@ typedef enum {
 
 /*!
 \typedef	LR_obj
-\brief		the fundamental LibRan distribution object - the LR_obj struct
+\brief		the fundamental LibRan distribution object - the `LR_obj` struct
 */
 /* tag & predefine the fns object */
 typedef struct LR_obj LR_obj;
 
 /*!
 \struct	LR_obj
-\brief	the fundamental LibRan distribution object
+\brief	the fundamental LibRan random variate distribution object
+
+The `LR_obj` object is the fundemental LibRan random variate distribution
+object containing the basic attributes defining the specific distribution
+characteristics.
+
+If the built-in pseudo-random number generator is used then the generator
+values are also stored within the object to allow each object to act
+independently.
+
+Other of the attributes serve the object-oriented aspect of the `LR_obj`
+object by having pointers to the random variate distribution's
+RAN, PDF, and CDF functions. 
+
+Some random variate distributions (e.g. \e piece and \e lspline ) require
+auxiliary methods to define the distribution.
+
+Lastly there is \e errno which contains the last error number encountered.
+Use `LR_perror()` to display the error description.
 */
 struct LR_obj {
 	const char const *	type;	/*!< named distribution type */
 	LR_type		t;	/*!< t - distribution type */
 	LR_data_type	d;	/*!< d - data type */
-	LR_val		a;	/*!< a - lower bound */
-	LR_val		b;	/*!< b - upper bound */
+	LR_val		a;	/*!< a - lower bound of interval */
+	LR_val		b;	/*!< b - upper bound of interval */
 	LR_val		m;	/*!< m - middle value of distribution */
 	LR_val		s;	/*!< s - measure of distribution width */
 	LR_val		x;	/*!< x - auxiliary value */
 	/**< object random values */
-	LR_val		iy;	/*!< iy  - current sequence value */
-	LR_val		iy0;	/*!< iy0 - initial sequence value */
+	LR_val		iy;	/*!< iy  - current random number sequence value */
+	LR_val		iy0;	/*!< iy0 - initial random number sequence value */
 	/**< set of uniform random number generators - one for each data type */
-	int	(*ui)(LR_obj *);	/*!< ui - int */
-	long	(*ul)(LR_obj *);	/*!< ul - long */
-	float	(*uf)(LR_obj *);	/*!< uf - float */
-	double	(*ud)(LR_obj *);	/*!< ud - double */
+	int	(*ui)(LR_obj *);	/*!< ui - int random number fn */
+	long	(*ul)(LR_obj *);	/*!< ul - long random number fn */
+	float	(*uf)(LR_obj *);	/*!< uf - float random number fn */
+	double	(*ud)(LR_obj *);	/*!< ud - double random number fn */
 	/**< set of Random Fns for this distribution type */
-	float	(*rnf)(LR_obj *);		/*!< rnf - float */
-	double	(*rnd)(LR_obj *);		/*!< rnd - double */
+	float	(*rnf)(LR_obj *);		/*!< rnf - float _RAN fn */
+	double	(*rnd)(LR_obj *);		/*!< rnd - double _RAN fn */
 	/**< set of PDFs for this distribution type */
-	float	(*pdff)(LR_obj *, float);	/*!< pdff - float */
-	double	(*pdfd)(LR_obj *, double);	/*!< pdfd - double */
+	float	(*pdff)(LR_obj *, float);	/*!< pdff - float _PDF fn */
+	double	(*pdfd)(LR_obj *, double);	/*!< pdfd - double _PDF fn */
 	/**< set of CDFs for this distribution type  */
-	float	(*cdff)(LR_obj *, float);	/*!< cdff - float */
-	double	(*cdfd)(LR_obj *, double);	/*!< cdfd - double */
+	float	(*cdff)(LR_obj *, float);	/*!< cdff - float _CDF fn */
+	double	(*cdfd)(LR_obj *, double);	/*!< cdfd - double _CDF fn */
 	/**< generic (void) pointer to some other object */
 	void *		aux;	/*!< aux - auxiliary object */
 	int		errno;	/*!< errno - last error encountered */
@@ -133,11 +153,19 @@ struct LR_obj {
 /*!
 \struct	LR_bin
 \brief	the binning object - for tallying results
+
+The `LR_bin` object is a useful tool for tallying and creating a
+histogram of samples.  The array of bins and boundaries are allocated
+when instantiated the number of which may be less than actually used.
+
+The object also has
+\e errno which contains the last error number encountered.
+Use `LR_perror()` to display the error description.
 */
 typedef struct {
 	int		n;	/*!< n - number of bins */
 	int		nn;	/*!< nn - number of bins declared */
-	long		c;	/*!< c - count of values */
+	long		c;	/*!< c - count of sample values */
 	double *	bdrs;	/*!< bdrs - set of bin boundaries (n - 1) */
 	long *		bins;	/*!< bins - set of bins (n) */
 	int		errno;	/*!< errno - last bin error encountered */
@@ -145,25 +173,34 @@ typedef struct {
 
 /*!
 \struct	LR_pcs
-\brief	the special piecewise uniform object (also linear spline)
+\brief	A special object for defining some of the random variate distributions.
+
+The `LR_pcs` object is not referenced directly by the program and is only
+used by the special piecewise uniform and the  linear spline random
+variate distributions, and is referenced through the `LR_obj` \e aux
+attribute.
+
+In this object are attributes concerning the tallying of samples
+and the rest are for \e generic referencing specific methods
+given the random variate.
 */
 typedef struct {
 	int		n;	/*!< n - number of intervals */
 	int		nn;	/*!< nn - number of intervals declared */
 	double *	bdrs;	/*!< bdrs - set of interval boundaries (n-1) */
-	double *	c;	/*!< relative probability for each interval (n) */
-	double *	sc;	/*!< cumulative probability for each interval (n) */
-	double 		norm;	/*!< norm - normalization factor for c */
-	int		flags;	/*!< flags to guarentee certain actions */
+	double *	c;	/*!< c - relative probability for each interval (n) */
+	double *	sc;	/*!< sc - cumulative probability for each interval (n) */
+	double 		norm;	/*!< norm - normalization factor for `c` */
+	int		flags;	/*!< flags to guarantee certain actions */
 
 /**< special auxiliary methods */
-	int (*new)(LR_obj *o, int n);		/*!< aux new */
-	int (*rm)(LR_obj *o);			/*!< aux rm */
-	int (*set)(LR_obj *o, double x, double p);	/*!< aux set points */
-	int (*normalize)(LR_obj *o);		/*!< aux normalize points */
+	int (*new)(LR_obj *o, int n);		/*!< aux new fn */
+	int (*rm)(LR_obj *o);			/*!< aux rm fn */
+	int (*set)(LR_obj *o, double x, double p); /*!< aux set points fn */
+	int (*normalize)(LR_obj *o);		/*!< aux normalize points fn */
 }	LR_pcs;
 
-/**< special auxiliary flags */
+/**< special auxiliary flags for LR_pcs.flags */
 #  define	LR_AUX_NORM		0x01
 #  define	LR_AUX_SET		0x02
 
