@@ -200,3 +200,5 @@ int main() {
 	return 0;
 }
 \endcode
+
+\include EXPAND.md
