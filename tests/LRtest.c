@@ -36,6 +36,7 @@ void test_LR_errors(void) {
 0x05,	"LRerr_BadLRType : LibRan - Bad Random Variate Type given\n",
 0x09,	"LRerr_NoAuxiliaryObject : LibRan - Required Auxiliary Object not found\n",
 0x0B,	"LRerr_NoAuxNormalizeDone : LibRan - Auxiliary Object requires normalization\n",
+0x0D,	"LRerr_BadAuxSetup : LibRan - Auxiliary Object incorrectly set-up\n",
 0x11,	"LRerr_BinGeneric : LibRan - Binning Object Unspecified Error\n",
 0x13,	"LRerr_TooManyValues : LibRan - Too Many Values given\n",
 0x15,	"LRerr_InvalidInputValue : LibRan - Invalid Input Value Error\n",
@@ -563,6 +564,28 @@ void test_##vty ## _##tt ## _##nn(void) {				\
 		tol = max(cdf[i]*vsc,vab);				\
 		CU_ASSERT_DOUBLE_EQUAL(1.0*b->bins[i],cdf[i],tol);	\
 	}								\
+}
+
+/* test bad data type errors */
+/* vty	- LR distribution
+ * nn	- test #
+ * tt	- type letter (f or d)
+ * ttt	- type (float or double)
+ * btt	- bad type letter (d or f)
+ * xx	- value
+ * setup- set-up code
+ */
+#define testBADdt(vty,nn,tt,ttt, btt, xx, setup)			\
+void test_bad_##tt ## _dt_ ##nn(void) {					\
+	LR_obj *o = LR_new(vty, LR_##ttt);				\
+	setup;								\
+	CU_ASSERT(isnan(LR##btt ## _RAN(o)));				\
+	CU_ASSERT(isnan(LR##btt ## _PDF(o,xx)));			\
+	CU_ASSERT(isnan(LR##btt ## _CDF(o,xx)));			\
+	CU_ASSERT_EQUAL(LR_aux_new(o,9),LRerr_NoAuxiliaryObject);	\
+	CU_ASSERT_EQUAL(LR_aux_rm(o),LRerr_NoAuxiliaryObject);		\
+	CU_ASSERT_EQUAL(LR_aux_set(o,1.,1.),LRerr_NoAuxiliaryObject);	\
+	CU_ASSERT_EQUAL(LR_aux_norm(o),LRerr_NoAuxiliaryObject);	\
 }
 
 /* uniform distribution */
@@ -1491,6 +1514,18 @@ testLRcauchymar(3,f,float,3.0,60,
 	LR_set_all(o,"ms", 2., 2.50);
 )
 
+/* data type errors */
+testBADdt(unif,1,d,double, f, .5, )
+testBADdt(unif,2,f,float, d, .5, )
+testBADdt(cauchy,3,d,double, f, .5, )
+testBADdt(cauchy,4,f,float, d, .5, )
+testBADdt(gausbm,5,d,double, f, .5, )
+testBADdt(gausbm,6,f,float, d, .5, )
+testBADdt(nexp,7,d,double, f, .5, )
+testBADdt(nexp,8,f,float, d, .5, )
+testBADdt(gsn12,9,d,double, f, .5, )
+testBADdt(gsn12,10,f,float, d, .5, )
+
 int main(int argc, char* argv[]) {
 	CU_pSuite		pS		= NULL;
 	CU_pSuite		pSint		= NULL;
@@ -1615,6 +1650,16 @@ if ((NULL == CU_add_test(pS,"errors", test_LR_errors))
 ||  (NULL == CU_add_test(pS,"new_bin_add - 2", test_bin_add_2))
 ||  (NULL == CU_add_test(pS,"new_bin_add - 3", test_bin_add_3))
 ||  (NULL == CU_add_test(pS,"new_bin_add - 4", test_bin_add_4))
+||  (NULL == CU_add_test(pS,"bad data type - 1", test_bad_d_dt_1))
+||  (NULL == CU_add_test(pS,"bad data type - 2", test_bad_f_dt_2))
+||  (NULL == CU_add_test(pS,"bad data type - 3", test_bad_d_dt_3))
+||  (NULL == CU_add_test(pS,"bad data type - 4", test_bad_f_dt_4))
+||  (NULL == CU_add_test(pS,"bad data type - 5", test_bad_d_dt_5))
+||  (NULL == CU_add_test(pS,"bad data type - 6", test_bad_f_dt_6))
+||  (NULL == CU_add_test(pS,"bad data type - 7", test_bad_d_dt_7))
+||  (NULL == CU_add_test(pS,"bad data type - 8", test_bad_f_dt_8))
+||  (NULL == CU_add_test(pS,"bad data type - 9", test_bad_d_dt_9))
+||  (NULL == CU_add_test(pS,"bad data type - 10", test_bad_f_dt_10))
 ) {
 		printf("\nTest Suite additions failure.");
 		CU_cleanup_registry();

@@ -78,6 +78,8 @@ char *LRstrerror(int LRerrno) {
 		return	"LibRan - Required Auxiliary Object not found";
 	case	LRerr_NoAuxNormalizeDone:
 		return	"LibRan - Auxiliary Object requires normalization";
+	case	LRerr_BadAuxSetup:
+		return	"LibRan - Auxiliary Object incorrectly set-up";
 	case	LRerr_BinGeneric:
 		return	"LibRan - Binning Object Unspecified Error";
 	case	LRerr_TooManyValues:
@@ -117,6 +119,8 @@ char *LRstrerrno(int LRerrno) {
 		return	"LRerr_NoAuxiliaryObject";
 	case	LRerr_NoAuxNormalizeDone:
 		return	"LRerr_NoAuxNormalizeDone";
+	case	LRerr_BadAuxSetup:
+		return	"LRerr_BadAuxSetup";
 	case	LRerr_BinGeneric:
 		return	"LRerr_BinGeneric";
 	case	LRerr_TooManyValues:

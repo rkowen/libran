@@ -28,6 +28,7 @@ LibRan Error Numbers
 #  define LRerr_BadLRType				0x05
 #  define LRerr_NoAuxiliaryObject			0x09
 #  define LRerr_NoAuxNormalizeDone			0x0B
+#  define LRerr_BadAuxSetup				0x0D
 #  define LRerr_BinGeneric				0x11
 #  define LRerr_TooManyValues				0x13
 #  define LRerr_InvalidInputValue			0x15
