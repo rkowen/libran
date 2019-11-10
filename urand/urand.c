@@ -62,6 +62,8 @@ no longer effective.
  -  LR_dgetrand()	- returns last value returned from drand()
  -  LR_igetval()	- returns URAND int  configuration values
  -  LR_lgetval()	- returns URAND long configuration values
+ -  LR_fgetval()	- returns URAND float  configuration values
+ -  LR_dgetval()	- returns URAND double configuration values
  */
 
 #ifdef __cplusplus
@@ -445,6 +447,44 @@ long LR_lgetval(char *val) {
 		return	LR_IRAND_LMAX;
 	else if (!strcmp(val, "LR_IRAND_LNOT"))
 		return	LR_IRAND_LNOT;
+	return 0;
+}
+
+/*!
+@brief	LR_fgetval(char *val) - return the configure value
+
+Return the value computed from the library configuration step, such as
+\c LR_FEPS , and \c LR_FSQEPS .
+
+\see urand/config.h
+
+@param	val	configuration parameter
+@return float	configuration value
+*/
+float LR_fgetval(char *val) {
+	if (!strcmp(val, "LR_FEPS"))
+		return	LR_FEPS;
+	else if (!strcmp(val, "LR_FSQEPS"))
+		return	LR_FSQEPS;
+	return 0;
+}
+
+/*!
+@brief	LR_dgetval(char *val) - return the configure value
+
+Return the value computed from the library configuration step, such as
+\c LR_DEPS , and \c LR_DSQEPS .
+
+\see urand/config.h
+
+@param	val	configuration parameter
+@return double	configuration value
+*/
+double LR_dgetval(char *val) {
+	if (!strcmp(val, "LR_DEPS"))
+		return	LR_DEPS;
+	else if (!strcmp(val, "LR_DSQEPS"))
+		return	LR_DSQEPS;
 	return 0;
 }
 

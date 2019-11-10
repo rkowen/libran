@@ -1,6 +1,6 @@
 bin_PROGRAMS	= turand
 turand_SOURCES	= turand.c urand.c
-turand_LDADD	= -lran -lm
+turand_LDADD	= -lran
 turand_LDFLAGS	= -L..
 dist_doc_DATA	= README
 AM_CPPFLAGS	= -I..

@@ -22,20 +22,21 @@ extern "C" {
 /*!
 LibRan Error Numbers
 */
-#  define LRerr_OK					0x00
-#  define LRerr_Unspecified				0x01
-#  define LRerr_BadDataType				0x03
-#  define LRerr_BadLRType				0x05
-#  define LRerr_NoAuxiliaryObject			0x09
-#  define LRerr_NoAuxNormalizeDone			0x0B
-#  define LRerr_BadAuxSetup				0x0D
-#  define LRerr_BinGeneric				0x11
-#  define LRerr_TooManyValues				0x13
-#  define LRerr_InvalidInputValue			0x15
-#  define LRerr_InvalidRange				0x17
-#  define LRerr_UnmetPreconditions			0x19
-#  define LRerr_SuspiciousValues			0x1B
-#  define LRerr_AllocFail				0x1D
+#  define LRerr_OK			0x00 /*!< No error */
+#  define LRerr_Unspecified		0x01 /*!< Unknown error */
+#  define LRerr_BadDataType		0x03 /*!< Bad data type */
+#  define LRerr_BadLRType		0x05 /*!< Bad LibRan variate type */
+#  define LRerr_NoAuxiliaryObject	0x09 /*!< No auxiliary object found */
+#  define LRerr_NoAuxNormalizeDone	0x0B /*!< Normalization not done */
+#  define LRerr_BadAuxSetup		0x0D /*!< Incomplete auxiliary object */
+#  define LRerr_BinGeneric		0x11 /*!< Generic binning error */
+#  define LRerr_TooManyValues		0x13 /*!< Too many values given */
+#  define LRerr_InvalidInputValue	0x15 /*!< Invalid input value given */
+#  define LRerr_InvalidRange		0x17 /*!< Invalid range given */
+#  define LRerr_UnmetPreconditions	0x19 /*!< Prerequisites not met */
+#  define LRerr_SuspiciousValues	0x1B /*!< Something suspicious */
+#  define LRerr_AllocFail		0x1D /*!< Memory alloc failure */
+#  define LRerr_InvalidCDF		0x21 /*!< CDF is not monotonic, etc. */
 
 /*!
 \enum	LR_type
@@ -49,6 +50,7 @@ typedef	enum {
 	unif,		/**< uniform */
 	piece,		/**< piecewise uniform */
 	lspline,	/**< linear spline */
+	uinvcdf,	/**< User inverse CDF */
 	gausbm,		/**< Gaussian (Normal)-Box Muller method*/
 	gausmar,	/**< Gaussian (Normal)-Marsaglia method*/
 	gsn2,		/**< Gaussian like - 2 uni (saw tooth) */
@@ -202,8 +204,25 @@ typedef struct {
 }	LR_pcs;
 
 /**< special auxiliary flags for LR_pcs.flags */
-#  define	LR_AUX_NORM		0x01
-#  define	LR_AUX_SET		0x02
+#  define	LR_AUX_NORM		0x01 /*!< Performed normalization */
+#  define	LR_AUX_SET		0x02 /*!< Performed Aux set */
+
+/*!
+\struct	LR_uinvcdf
+\brief	A special object for using a user defined CDF
+
+This is another auxiliary object specialized to the `LR_type` = \e uinvcdf.
+The user will supply their own defined CDF which will be used via the
+inversion method.  The new random variate will be given by
+\f$ X \gets \mbox{CDF}^{-1}(U) \f$ where \e U is a uniformly distributed
+random variate on the interval [0,1).
+
+The user will define any CDF attributes externally of LibRan.
+*/
+typedef struct {
+	double (*dcdf)(double x);	/*<! double version of CDF */
+	float  (*fcdf)(float x);	/*<! float version of CDF */
+}	LR_uinvcdf;
 
 /* LibRan function declarations */
 LR_obj *LR_new(LR_type t, LR_data_type d);
@@ -243,6 +262,8 @@ double	LR_dgetrand(LR_obj *);
 
 int	LR_igetval(char *str);
 long	LR_lgetval(char *str);
+float	LR_fgetval(char *str);
+double	LR_dgetval(char *str);
 
 /* LibRan generic distribution functions */
 /* double */
@@ -296,6 +317,17 @@ double LRd_lspline_CDF(LR_obj *o, double x);
 float LRf_lspline_RAN(LR_obj *o);
 float LRf_lspline_PDF(LR_obj *o, float x);
 float LRf_lspline_CDF(LR_obj *o, float x);
+
+/* double user inverse CDF */
+double LRd_uinvcdf_RAN(LR_obj *o);
+double LRd_uinvcdf_PDF(LR_obj *o, double x);
+double LRd_uinvcdf_CDF(LR_obj *o, double x);
+/* float user inverse CDF spline */
+/*
+float LRf_uinvcdf_RAN(LR_obj *o);
+float LRf_uinvcdf_PDF(LR_obj *o, float x);
+float LRf_uinvcdf_CDF(LR_obj *o, float x);
+*/
 
 /* double negative exponential */
 double LRd_nexp_RAN(LR_obj *o);

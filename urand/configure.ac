@@ -75,6 +75,30 @@ AH_BOTTOM([
 */
 #undef LR_IRAND_INOT
 
+/*!
+\def	LR_FEPS
+\brief	LibRan float machine epsilon
+*/
+#undef LR_FEPS
+
+/*!
+\def	LR_FSQEPS
+\brief	LibRan float sqrt machine epsilon
+*/
+#undef LR_FSQEPS
+
+/*!
+\def	LR_DEPS
+\brief	LibRan double machine epsilon
+*/
+#undef LR_DEPS
+
+/*!
+\def	LR_DSQEPS
+\brief	LibRan double sqrt machine epsilon
+*/
+#undef LR_DSQEPS
+
 /* these macros specialize urand to the fastest operations */
 /* +m2 as fast as ^m */
 #undef LR_IADD
@@ -109,6 +133,7 @@ AC_PROG_CPP
 AM_PROG_CC_C_O
 
 # Checks for libraries.
+AC_SEARCH_LIBS([sqrt], [m])
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h])
@@ -146,11 +171,14 @@ AC_MSG_CHECKING([IRAND half max value])
 AC_RUN_IFELSE([AC_LANG_PROGRAM(
 [
 #include <stdio.h>
+#include <math.h>
 ],[
 	long  mm2 = 0;
 	long  mm = 1;
 	int  imm2 = 0;
 	int  imm = 1;
+	float fone = 1.0, fhalf = 0.5, LR_feps = 1.0;
+	double done = 1.0, dhalf = 0.5, LR_deps = 1.0;
 	FILE *conftest;
 	if (!(conftest = fopen("confdefs.h","a")))
 		return 1;
@@ -163,6 +191,13 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM(
 		imm2 = imm;
 		imm = 2 * imm2;
 	} while (imm > imm2);
+/* COMPUTE MACHINE EPSILON - not rely on float.h */
+	while (fone + fhalf*LR_feps != fone) {
+		LR_feps *= fhalf;
+	}
+	while (done + dhalf*LR_deps != done) {
+		LR_deps *= dhalf;
+	}
 
 	fprintf(conftest,
 "#define LR_IRAND_LMAX2	%ldL\n"
@@ -170,9 +205,15 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM(
 "#define LR_IRAND_LNOT	0x%lxL\n"
 "#define LR_IRAND_IMAX2	%d\n"
 "#define LR_IRAND_IMAX	%d\n"
-"#define LR_IRAND_INOT	0x%x\n",
+"#define LR_IRAND_INOT	0x%x\n"
+"#define LR_FEPS	%e\n"
+"#define LR_DEPS	%g\n"
+"#define LR_FSQEPS	%e\n"
+"#define LR_DSQEPS	%g\n",
 		mm2, (mm2 - 1) + mm2, mm,
-		imm2, (imm2 - 1) + imm2, imm);
+		imm2, (imm2 - 1) + imm2, imm,
+		LR_feps, LR_deps,
+		sqrtf(LR_feps), sqrt(LR_deps));
 ])],[
 AC_MSG_RESULT(found values)
 ],[AC_MSG_FAILURE(Failed to determine LR_IRAND constants)],
