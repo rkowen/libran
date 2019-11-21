@@ -59,6 +59,7 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 		return ptr;
 	ptr->errno = 0;
 	ptr->d = d;
+	ptr->aux = (void *) NULL;
 	/* set all the pseudo-uniform random number generators */
 	ptr->ui = LR_irand;
 	ptr->ul = LR_lrand;
@@ -139,6 +140,36 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->rnf  = LRf_lspline_RAN;
 			ptr->pdff = LRf_lspline_PDF;
 			ptr->cdff = LRf_lspline_CDF;
+		} else {
+			/* error */
+			ptr->errno = LRerr_BadDataType;
+		}
+	}
+		break;
+	case uinvcdf:
+	{
+		ptr->type = "uinvcdf";
+		if (!(ptr->aux = (void *) malloc(sizeof(LR_uinvcdf))))
+			goto objerr;
+		LR_uinvcdf *aux = (LR_uinvcdf *) ptr->aux;
+		if (d == LR_double) {
+			aux->dcdf = NULL;
+			ptr->a.d = NAN;
+			ptr->b.d = NAN;
+			ptr->m.d = NAN;
+			ptr->s.d = NAN;
+			ptr->rnd  = LRd_uinvcdf_RAN;
+			ptr->pdfd = LRd_uinvcdf_PDF;
+			ptr->cdfd = LRd_uinvcdf_CDF;
+		} else if (d == LR_float) {
+			aux->fcdf = NULL;
+			ptr->a.f = NAN;
+			ptr->b.f = NAN;
+			ptr->m.f = NAN;
+			ptr->s.f = NAN;
+			ptr->rnf  = LRf_uinvcdf_RAN;
+			ptr->pdff = LRf_uinvcdf_PDF;
+			ptr->cdff = LRf_uinvcdf_CDF;
 		} else {
 			/* error */
 			ptr->errno = LRerr_BadDataType;
@@ -400,6 +431,58 @@ int LR_check(LR_obj *o) {
 				} else if (o->a.d == o->b.d) {
 					return o->errno = LRerr_InvalidRange;
 				}
+			} else {
+				/* error */
+				return o->errno = LRerr_BadDataType;
+			}
+			return LRerr_OK;
+
+		/* mixed attributes (a,b,m,s) */
+		case uinvcdf:
+			if (o->d == LR_double) {
+			    if ((!isnan(o->a.d)) && (!isnan(o->b.d))) {
+				if (o->a.d > o->b.d) {
+					td = o->a.d;
+					o->a.d = o->b.d;
+					o->b.d = td;
+				} else if (o->a.d == o->b.d) {
+					return o->errno = LRerr_InvalidRange;
+				}
+			    }
+			    if ((!isnan(o->s.d))) {
+				if (o->s.d < dzero) {
+					o->s.d = - o->s.d;
+				} else if (o->s.d == dzero) {
+					return o->errno
+						= LRerr_InvalidInputValue;
+				}
+			    }
+			    if (isnan(o->a.d) && isnan(o->b.d)
+			    &&  isnan(o->m.d) && isnan(o->s.d))
+				return o->errno = LRerr_UnmetPreconditions;
+
+			} else if (o->d == LR_float) {
+			    if ((!isnan(o->a.f)) && (!isnan(o->b.f))) {
+				if (o->a.f > o->b.f) {
+					tf = o->a.f;
+					o->a.f = o->b.f;
+					o->b.f = tf;
+				} else if (o->a.f == o->b.f) {
+					return o->errno = LRerr_InvalidRange;
+				}
+			    }
+			    if ((!isnan(o->s.f))) {
+				if (o->s.f < fzero) {
+					o->s.f = - o->s.f;
+				} else if (o->s.f == fzero) {
+					return o->errno
+						= LRerr_InvalidInputValue;
+				}
+			    }
+			    if (isnan(o->a.f) && isnan(o->b.f)
+			    &&  isnan(o->m.f) && isnan(o->s.f))
+				return o->errno = LRerr_UnmetPreconditions;
+
 			} else {
 				/* error */
 				return o->errno = LRerr_BadDataType;

@@ -322,12 +322,12 @@ float LRf_lspline_CDF(LR_obj *o, float x);
 double LRd_uinvcdf_RAN(LR_obj *o);
 double LRd_uinvcdf_PDF(LR_obj *o, double x);
 double LRd_uinvcdf_CDF(LR_obj *o, double x);
+int LRd_uinvcdf(LR_obj *o, double (*cdf)(double));
 /* float user inverse CDF spline */
-/*
 float LRf_uinvcdf_RAN(LR_obj *o);
 float LRf_uinvcdf_PDF(LR_obj *o, float x);
 float LRf_uinvcdf_CDF(LR_obj *o, float x);
-*/
+int LRf_uinvcdf(LR_obj *o, float (*cdf)(float));
 
 /* double negative exponential */
 double LRd_nexp_RAN(LR_obj *o);
