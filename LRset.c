@@ -52,7 +52,7 @@ The program must execute `va_start()` before calling this function, and call
 Generally there is no need to call this routine.  Call `LR_set_all()` instead.
 
 However, the list of attributes handled is important -
-'d', 'a', 'b', 'm', 's', and 'x'.
+'k','n', 'd', 'a', 'b', 'm', 's', and 'x'.
 Any other characters are ignored except causing a negative value
 to be returned representing the number of such ignored characters.
 A \e real error will result in a positive return value.
@@ -60,38 +60,50 @@ A \e real error will result in a positive return value.
 All other characters in the \e format string are an ignorable error.
 
 The precision of the input values are governed by the \c LR_obj
-\c LR_data_type.
+\c LR_data_type, except for 'k','n' which are \c int only.
 
 @param	o	LR_obj object
 @param	x	controlling format string
 @param	ap	additional arguments context information
-@return	0 if no error else < 0 for non-valid characters in format string or an error if > 0
+@return	0	if no error else < 0 for non-valid characters in format string
+		or an error if > 0
 */
 int LR_vset(LR_obj *o, char *x, va_list ap) {
-	LR_val t;
-	char x1;
-	int ret = 0;
+	LR_val	t;
+	int	i;
+	char	x1;
+	int	ret = 0;
 
 	while (x1 = *x++) {
-		switch (o->d) {
-		case LR_int:
-			t.i = va_arg(ap, int);
+		switch (x1) {
+		case	'k':
+			i = va_arg(ap, int);
+			(void) memcpy(&(o->k), &i, sizeof(int));
 			break;
-		case LR_long:
-			t.l = va_arg(ap, long);
+		case	'n':
+			i = va_arg(ap, int);
+			(void) memcpy(&(o->n), &i, sizeof(int));
 			break;
-		case LR_float:
-			/* floats are promoted to double in ... */
-			t.f = va_arg(ap, double);
-			break;
-		case LR_double:
-			t.d = va_arg(ap, double);
-			break;
-		default:
+		default: /* rest are dependent on LR_type */
+			switch (o->d) {
+			case LR_int:
+				t.i = va_arg(ap, int);
+				break;
+			case LR_long:
+				t.l = va_arg(ap, long);
+				break;
+			case LR_float:
+				/* floats are promoted to double in ... */
+				t.f = va_arg(ap, double);
+				break;
+			case LR_double:
+				t.d = va_arg(ap, double);
+				break;
+			default:
 			/* should not get here unless a new type was added */
-			return o->errno = LRerr_BadDataType;
+				return o->errno = LRerr_BadDataType;
+			}
 		}
-
 		switch (x1) {
 		case	'd':
 			(void) memcpy(&(o->d), &t, sizeof(LR_val));
@@ -110,6 +122,9 @@ int LR_vset(LR_obj *o, char *x, va_list ap) {
 			break;
 		case	'x':
 			(void) memcpy(&(o->x), &t, sizeof(LR_val));
+			break;
+		case	'k':
+		case	'n':
 			break;
 		default:
 			/* it is an error to include non-object attributes */

@@ -14,9 +14,14 @@
 #  define CX_ASSERT_DOUBLE_EQUAL(val,exp,tol)			\
 {	printf("value, expect = % 9.5f,% 9.5f\n",val,exp);	\
 	CU_ASSERT_DOUBLE_EQUAL(val,exp,tol); }
+#  define CX_ASSERT_EQUAL(val, exp);				\
+{	printf("value, expect = % ld,% ld\n",(long) val,(long) exp);	\
+	CU_ASSERT_EQUAL(val,exp); }
 #else
 #  define CX_ASSERT_DOUBLE_EQUAL(val,exp,tol)			\
 	CU_ASSERT_DOUBLE_EQUAL(val,exp,tol);
+#  define CX_ASSERT_EQUAL(val, exp);				\
+	CU_ASSERT_EQUAL(val,exp);
 #endif
 
 int init_suite(void) { return 0; }
@@ -97,12 +102,16 @@ testLRnew(double)
 	CU_ASSERT_EQUAL(LR_set(o, 'm',  2##ptt),0);			\
 	CU_ASSERT_EQUAL(LR_set(o, 's',  1##ptt),0);			\
 	CU_ASSERT_EQUAL(LR_set(o, 'x',  5##ptt),0);			\
+	CU_ASSERT_EQUAL(LR_set(o, 'k',  7),0);				\
+	CU_ASSERT_EQUAL(LR_set(o, 'n',  11),0);				\
 	CU_ASSERT_NOT_EQUAL(LR_set(o, 'z',  9##ptt),0);			\
 	CU_ASSERT_EQUAL(o->a.att, -1##ptt);				\
 	CU_ASSERT_EQUAL(o->b.att,  3##ptt);				\
 	CU_ASSERT_EQUAL(o->m.att,  2##ptt);				\
 	CU_ASSERT_EQUAL(o->s.att,  1##ptt);				\
 	CU_ASSERT_EQUAL(o->x.att,  5##ptt);				\
+	CU_ASSERT_EQUAL(o->k,  7);					\
+	CU_ASSERT_EQUAL(o->n,  11);					\
 	LR_rm(&o);							\
 }
 
@@ -115,12 +124,15 @@ testLRset(double,.,d)
 #define testLRsetall(tt, ptt, att)	void test_set_all_##tt(void) {	\
 	LR_obj *o = LR_new(gausbm, LR_##tt);				\
 	CU_ASSERT_EQUAL(						\
-	  LR_set_all(o,"abmsx",-1##ptt,3##ptt,2##ptt,1##ptt,5##ptt),0);	\
+		LR_set_all(o,"abmsxkn",					\
+		-1##ptt,3##ptt,2##ptt,1##ptt,5##ptt,7,11),0);		\
 	CU_ASSERT_EQUAL(o->a.att, -1##ptt);				\
 	CU_ASSERT_EQUAL(o->b.att,  3##ptt);				\
 	CU_ASSERT_EQUAL(o->m.att,  2##ptt);				\
 	CU_ASSERT_EQUAL(o->s.att,  1##ptt);				\
 	CU_ASSERT_EQUAL(o->x.att,  5##ptt);				\
+	CU_ASSERT_EQUAL(o->k,  7);					\
+	CU_ASSERT_EQUAL(o->n,  11);					\
 	LR_rm(&o);							\
 }
 
@@ -133,12 +145,15 @@ testLRsetall(double,.,d)
 #define testLRsetall2(tt, ptt, att)	void test_set_all2_##tt(void) {	\
 	LR_obj *o = LR_new(gausbm, LR_##tt);				\
 	CU_ASSERT_EQUAL(						\
-	  LR_set_all(o,"maxsb",2##ptt,-1##ptt,5##ptt,1##ptt,3##ptt),0);	\
+	  LR_set_all(o,"mnaxksb",					\
+		2##ptt,11,-1##ptt,5##ptt,7,1##ptt,3##ptt),0);	\
 	CU_ASSERT_EQUAL(o->a.att, -1##ptt);				\
 	CU_ASSERT_EQUAL(o->b.att,  3##ptt);				\
 	CU_ASSERT_EQUAL(o->m.att,  2##ptt);				\
 	CU_ASSERT_EQUAL(o->s.att,  1##ptt);				\
 	CU_ASSERT_EQUAL(o->x.att,  5##ptt);				\
+	CU_ASSERT_EQUAL(o->k,  7);					\
+	CU_ASSERT_EQUAL(o->n,  11);					\
 	LR_rm(&o);							\
 }
 
@@ -151,12 +166,15 @@ testLRsetall2(double,.,d)
 #define testLRsetall3(tt, ptt, att)	void test_set_all3_##tt(void) {	\
 	LR_obj *o = LR_new(gausbm, LR_##tt);				\
 	CU_ASSERT_NOT_EQUAL(						\
-	  LR_set_all(o,"maxzsby",2##ptt,-1##ptt,5##ptt,33##ptt,1##ptt,3##ptt,9##ptt),0);	\
+	  LR_set_all(o,"mnaxzksby",					\
+	2##ptt,11,-1##ptt,5##ptt,33##ptt,7,1##ptt,3##ptt,9##ptt),0);	\
 	CU_ASSERT_EQUAL(o->a.att, -1##ptt);				\
 	CU_ASSERT_EQUAL(o->b.att,  3##ptt);				\
 	CU_ASSERT_EQUAL(o->m.att,  2##ptt);				\
 	CU_ASSERT_EQUAL(o->s.att,  1##ptt);				\
 	CU_ASSERT_EQUAL(o->x.att,  5##ptt);				\
+	CU_ASSERT_EQUAL(o->k,  7);					\
+	CU_ASSERT_EQUAL(o->n,  11);					\
 	LR_rm(&o);							\
 }
 

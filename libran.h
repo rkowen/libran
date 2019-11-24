@@ -131,9 +131,11 @@ struct LR_obj {
 	LR_val		m;	/*!< m - middle value of distribution */
 	LR_val		s;	/*!< s - measure of distribution width */
 	LR_val		x;	/*!< x - auxiliary value */
+	int		k;	/*!< k - integer attribute */
+	int		n;	/*!< n - integer attribute */
 	/**< object random values */
-	LR_val		iy;	/*!< iy  - current random number sequence value */
-	LR_val		iy0;	/*!< iy0 - initial random number sequence value */
+	LR_val		iy;	/*!< iy - current random number sequence value*/
+	LR_val		iy0;	/*!< iy0- initial random number sequence value*/
 	/**< set of uniform random number generators - one for each data type */
 	int	(*ui)(LR_obj *);	/*!< ui - int random number fn */
 	long	(*ul)(LR_obj *);	/*!< ul - long random number fn */
