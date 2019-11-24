@@ -51,10 +51,13 @@ Default values: peak m = 1.
 @return double
 */
 double LRd_nexp_RAN(LR_obj *o) {
-	double one = 1.0;
+	double u, zero = 0.0, one = 1.0;
 
-	/* avoid overflow with 1-U */
-	return - o->m.d*log(one - o->ud(o));
+	do {
+		u = o->ud(o);
+	} while (u == zero);
+
+	return - o->m.d*log(u);
 }
 
 /*!
@@ -103,10 +106,13 @@ Default values: peak m = 1.
 @return float
 */
 float LRf_nexp_RAN(LR_obj *o) {
-	float one = 1.0;
+	float u, zero = 0.0, one = 1.0;
 
-	/* avoid overflow with 1-U */
-	return - o->m.f*logf(one - o->uf(o));
+	do {
+		u = o->uf(o);
+	} while (u == zero);
+
+	return - o->m.f*log(u);
 }
 
 /*!
