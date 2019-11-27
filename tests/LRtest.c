@@ -1429,9 +1429,9 @@ void test_cdf_pdf_##tt ## _##dist ## _##nn(void) {			\
  * tol	- tolerance
  * mean	- mean value
  */
-#define testCdfPdf0nexp(nn,tt,ttt,tol,mean)				\
-void test_cdf_pdf_##tt ## _nexp ## _##nn(void) {			\
-	LR_obj *o = LR_new(nexp, LR_##ttt);				\
+#define testCdfPdf0nexp(dist,nn,tt,ttt,tol,mean)			\
+void test_cdf_pdf_##tt ## _ ## dist ## _##nn(void) {			\
+	LR_obj *o = LR_new(dist, LR_##ttt);				\
 	LR_set_all(o,"m", mean);					\
 	ttt cc = 1.0/M_E;						\
 	ttt cc2 = sqrt(cc);						\
@@ -1443,9 +1443,9 @@ CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mean*2.0),1.0-cc*cc,tol)	\
 CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mean*2.0),cc*cc/mean,tol)	\
 }
 
-testCdfPdf0nexp(0,d,double,.0001,1.0)
-testCdfPdf0nexp(1,d,double,.0001,.3)
-testCdfPdf0nexp(2,d,double,.0001,3.0)
+testCdfPdf0nexp(nexp,0,d,double,.0001,1.0)
+testCdfPdf0nexp(nexp,1,d,double,.0001,.3)
+testCdfPdf0nexp(nexp,2,d,double,.0001,3.0)
 
 testCdfPdfHR(3,d,double,nexp,3.,60,.0001,)
 testCdfPdfHR(4,d,double,nexp,3.,60,.0005,
@@ -1455,9 +1455,9 @@ testCdfPdfHR(5,d,double,nexp,4.,80,.0001,
 	LR_set_all(o,"m", 2.);
 )
 
-testCdfPdf0nexp(0,f,float,.001,1.0)
-testCdfPdf0nexp(1,f,float,.001,.3)
-testCdfPdf0nexp(2,f,float,.001,3.0)
+testCdfPdf0nexp(nexp,0,f,float,.001,1.0)
+testCdfPdf0nexp(nexp,1,f,float,.001,.3)
+testCdfPdf0nexp(nexp,2,f,float,.001,3.0)
 
 testCdfPdfHR(3,f,float,nexp,3.,60,.001,)
 testCdfPdfHR(4,f,float,nexp,3.,60,.005,
@@ -1484,6 +1484,184 @@ testLRnexp(2,f,float,2.0,60,
 )
 testLRnexp(3,f,float,4.0,80,
 	LR_set_all(o,"m", 2.0);
+)
+
+/* erlang */
+#define testLRerlang(nn,tt,ttt,end,bn,setup)				\
+	testLRhalf(erlang,nn,tt,ttt,end,bn,50*10007,.1,100,setup)
+
+/* default k=1 => nexp */
+testCdfPdf0nexp(erlang,0,d,double,.0001,1.0)
+testCdfPdf0nexp(erlang,1,d,double,.0001,.3)
+testCdfPdf0nexp(erlang,2,d,double,.0001,3.0)
+
+testCdfPdfHR(3,d,double,erlang,3.,60,.0001,)
+testCdfPdfHR(4,d,double,erlang,3.,60,.0005,
+	LR_set_all(o,"m", .5);
+)
+testCdfPdfHR(5,d,double,erlang,4.,80,.0001,
+	LR_set_all(o,"m", 2.);
+)
+
+testLRerlang(1,d,double,3.0,60, )
+testLRerlang(2,d,double,2.0,60,
+	LR_set_all(o,"m", .5);
+)
+testLRerlang(3,d,double,4.0,80,
+	LR_set_all(o,"m", 2.0);
+)
+
+/* k=2 */
+#define testCdfPdf0erlang2(nn,tt,ttt,tol,mn)				\
+void test_cdf_pdf_##tt ## _ ## erlang2 ## _##nn(void) {			\
+	LR_obj *o = LR_new(erlang, LR_##ttt);				\
+	LR_set_all(o,"mk", mn, 2);					\
+	ttt cc = 1.0/M_E;						\
+	ttt cc2 = sqrt(cc);						\
+	ttt xm = 1.0/mn;						\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,-.1),0.,tol)			\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,-.1),0.,tol)			\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mn*0.5),1.0-cc2*1.5,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mn*0.5),.5*cc2*xm,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mn),1.0-cc*2.0,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mn),cc*xm,tol)			\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mn*2.0),1.0-cc*cc*3.0,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mn*2.0),2.0*cc*cc*xm,tol)	\
+}
+
+testCdfPdf0erlang2(0,d,double,.0001,1.0)
+testCdfPdf0erlang2(1,d,double,.0001,.3)
+testCdfPdf0erlang2(2,d,double,.0001,3.0)
+testLRerlang(4,d,double,3.0,60,
+	LR_set_all(o,"k", 2);
+)
+testLRerlang(5,d,double,2.0,60,
+	LR_set_all(o,"km", 2, .5);
+)
+testLRerlang(6,d,double,4.0,80,
+	LR_set_all(o,"km", 2, 2.0);
+)
+
+/* k=3 */
+#define testCdfPdf0erlang3(nn,tt,ttt,tol,mn)				\
+void test_cdf_pdf_##tt ## _ ## erlang3 ## _##nn(void) {			\
+	LR_obj *o = LR_new(erlang, LR_##ttt);				\
+	LR_set_all(o,"mk", mn, 3);					\
+	ttt cc = 1.0/M_E;						\
+	ttt cc2 = sqrt(cc);						\
+	ttt xm = 1.0/mn;						\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,-.1),0.,tol)			\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,-.1),0.,tol)			\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mn*0.5),1.0-cc2*1.625,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mn*0.5),.125*cc2*xm,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mn),1.0-cc*2.5,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mn),.5*cc*xm,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mn*2.0),1.0-cc*cc*5.0,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mn*2.0),2.0*cc*cc*xm,tol)	\
+}
+
+testCdfPdf0erlang3(0,d,double,.0001,1.0)
+testCdfPdf0erlang3(1,d,double,.0001,.3)
+testCdfPdf0erlang3(2,d,double,.0001,3.0)
+testLRerlang(7,d,double,3.0,60,
+	LR_set_all(o,"k", 3);
+)
+testLRerlang(8,d,double,2.0,60,
+	LR_set_all(o,"km", 3, .5);
+)
+testLRerlang(9,d,double,4.0,80,
+	LR_set_all(o,"km", 3, 2.0);
+)
+
+/* k=4 */
+#define testCdfPdf0erlang4(nn,tt,ttt,tol,mn)				\
+void test_cdf_pdf_##tt ## _ ## erlang4 ## _##nn(void) {			\
+	LR_obj *o = LR_new(erlang, LR_##ttt);				\
+	LR_set_all(o,"mk", mn, 4);					\
+	ttt cc = 1.0/M_E;						\
+	ttt cc2 = sqrt(cc);						\
+	ttt xm = 1.0/mn;						\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,-.1),0.,tol)			\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,-.1),0.,tol)			\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mn*0.5),1.0-cc2*1.645833,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mn*0.5),.02083333*cc2*xm,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mn),1.0-cc*2.666667,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mn),.1666667*cc*xm,tol)		\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _CDF(o,mn*2.0),1.0-cc*cc*6.333333,tol)	\
+CU_ASSERT_DOUBLE_EQUAL(LR##tt ## _PDF(o,mn*2.0),1.3333333*cc*cc*xm,tol)	\
+}
+
+testCdfPdf0erlang4(0,d,double,.0001,1.0)
+testCdfPdf0erlang4(1,d,double,.0001,.3)
+testCdfPdf0erlang4(2,d,double,.0001,3.0)
+testLRerlang(10,d,double,3.0,60,
+	LR_set_all(o,"k", 4);
+)
+testLRerlang(11,d,double,2.0,60,
+	LR_set_all(o,"km", 4, .5);
+)
+testLRerlang(12,d,double,4.0,80,
+	LR_set_all(o,"km", 4, 2.0);
+)
+
+/* float erlang */
+testCdfPdf0nexp(erlang,0,f,float,.0001,1.0)
+testCdfPdf0nexp(erlang,1,f,float,.0001,.3)
+testCdfPdf0nexp(erlang,2,f,float,.0001,3.0)
+
+testCdfPdfHR(3,f,float,erlang,3.,60,.001,)
+testCdfPdfHR(4,f,float,erlang,3.,60,.005,
+	LR_set_all(o,"m", .5);
+)
+testCdfPdfHR(5,f,float,erlang,4.,80,.001,
+	LR_set_all(o,"m", 2.);
+)
+
+testLRerlang(1,f,float,3.0,60, )
+testLRerlang(2,f,float,2.0,60,
+	LR_set_all(o,"m", .5);
+)
+testLRerlang(3,f,float,4.0,80,
+	LR_set_all(o,"m", 2.0);
+)
+
+testCdfPdf0erlang2(0,f,float,.001,1.0)
+testCdfPdf0erlang2(1,f,float,.001,.3)
+testCdfPdf0erlang2(2,f,float,.001,3.0)
+testLRerlang(4,f,float,3.0,60,
+	LR_set_all(o,"k", 2);
+)
+testLRerlang(5,f,float,2.0,60,
+	LR_set_all(o,"km", 2, .5);
+)
+testLRerlang(6,f,float,4.0,80,
+	LR_set_all(o,"km", 2, 2.0);
+)
+
+testCdfPdf0erlang3(0,f,float,.001,1.0)
+testCdfPdf0erlang3(1,f,float,.001,.3)
+testCdfPdf0erlang3(2,f,float,.001,3.0)
+testLRerlang(7,f,float,3.0,60,
+	LR_set_all(o,"k", 3);
+)
+testLRerlang(8,f,float,2.0,60,
+	LR_set_all(o,"km", 3, .5);
+)
+testLRerlang(9,f,float,4.0,80,
+	LR_set_all(o,"km", 3, 2.0);
+)
+
+testCdfPdf0erlang4(0,f,float,.001,1.0)
+testCdfPdf0erlang4(1,f,float,.001,.3)
+testCdfPdf0erlang4(2,f,float,.001,3.0)
+testLRerlang(10,f,float,3.0,60,
+	LR_set_all(o,"k", 4);
+)
+testLRerlang(11,f,float,2.0,60,
+	LR_set_all(o,"km", 4, .5);
+)
+testLRerlang(12,f,float,4.0,80,
+	LR_set_all(o,"km", 4, 2.0);
 )
 
 /* CDF/PDF tests for full range */
@@ -2075,18 +2253,72 @@ if ((NULL == CU_add_test(pShalf,"Nexp-P/CDF-d-0", test_cdf_pdf_d_nexp_0))
 ||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-d-3", test_cdf_pdf_d_nexp_3))
 ||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-d-4", test_cdf_pdf_d_nexp_4))
 ||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-d-5", test_cdf_pdf_d_nexp_5))
-||  (NULL == CU_add_test(pSfull,"Nexp-Ran-d-1", test_nexp_d_1))
-||  (NULL == CU_add_test(pSfull,"Nexp-Ran-d-2", test_nexp_d_2))
-||  (NULL == CU_add_test(pSfull,"Nexp-Ran-d-3", test_nexp_d_3))
+||  (NULL == CU_add_test(pShalf,"Nexp-Ran-d-1", test_nexp_d_1))
+||  (NULL == CU_add_test(pShalf,"Nexp-Ran-d-2", test_nexp_d_2))
+||  (NULL == CU_add_test(pShalf,"Nexp-Ran-d-3", test_nexp_d_3))
 ||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-0", test_cdf_pdf_f_nexp_0))
 ||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-1", test_cdf_pdf_f_nexp_1))
 ||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-2", test_cdf_pdf_f_nexp_2))
 ||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-3", test_cdf_pdf_f_nexp_3))
 ||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-4", test_cdf_pdf_f_nexp_4))
 ||  (NULL == CU_add_test(pShalf,"Nexp-P/CDF-f-5", test_cdf_pdf_f_nexp_5))
-||  (NULL == CU_add_test(pSfull,"Nexp-Ran-f-1", test_nexp_f_1))
-||  (NULL == CU_add_test(pSfull,"Nexp-Ran-f-2", test_nexp_f_2))
-||  (NULL == CU_add_test(pSfull,"Nexp-Ran-f-3", test_nexp_f_3))
+||  (NULL == CU_add_test(pShalf,"Nexp-Ran-f-1", test_nexp_f_1))
+||  (NULL == CU_add_test(pShalf,"Nexp-Ran-f-2", test_nexp_f_2))
+||  (NULL == CU_add_test(pShalf,"Nexp-Ran-f-3", test_nexp_f_3))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-d-0", test_cdf_pdf_d_erlang_0))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-d-1", test_cdf_pdf_d_erlang_1))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-d-2", test_cdf_pdf_d_erlang_2))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-d-3", test_cdf_pdf_d_erlang_3))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-d-4", test_cdf_pdf_d_erlang_4))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-d-5", test_cdf_pdf_d_erlang_5))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-Ran-d-1", test_erlang_d_1))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-Ran-d-2", test_erlang_d_2))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-Ran-d-3", test_erlang_d_3))
+||  (NULL == CU_add_test(pShalf,"Erlang2-P/CDF-d-0", test_cdf_pdf_d_erlang2_0))
+||  (NULL == CU_add_test(pShalf,"Erlang2-P/CDF-d-1", test_cdf_pdf_d_erlang2_1))
+||  (NULL == CU_add_test(pShalf,"Erlang2-P/CDF-d-2", test_cdf_pdf_d_erlang2_2))
+||  (NULL == CU_add_test(pShalf,"Erlang2-Ran-d-4", test_erlang_d_4))
+||  (NULL == CU_add_test(pShalf,"Erlang2-Ran-d-5", test_erlang_d_5))
+||  (NULL == CU_add_test(pShalf,"Erlang2-Ran-d-6", test_erlang_d_6))
+||  (NULL == CU_add_test(pShalf,"Erlang3-P/CDF-d-0", test_cdf_pdf_d_erlang3_0))
+||  (NULL == CU_add_test(pShalf,"Erlang3-P/CDF-d-1", test_cdf_pdf_d_erlang3_1))
+||  (NULL == CU_add_test(pShalf,"Erlang3-P/CDF-d-2", test_cdf_pdf_d_erlang3_2))
+||  (NULL == CU_add_test(pShalf,"Erlang3-Ran-d-7", test_erlang_d_7))
+||  (NULL == CU_add_test(pShalf,"Erlang3-Ran-d-8", test_erlang_d_8))
+||  (NULL == CU_add_test(pShalf,"Erlang3-Ran-d-9", test_erlang_d_9))
+||  (NULL == CU_add_test(pShalf,"Erlang4-P/CDF-d-0", test_cdf_pdf_d_erlang4_0))
+||  (NULL == CU_add_test(pShalf,"Erlang4-P/CDF-d-1", test_cdf_pdf_d_erlang4_1))
+||  (NULL == CU_add_test(pShalf,"Erlang4-P/CDF-d-2", test_cdf_pdf_d_erlang4_2))
+||  (NULL == CU_add_test(pShalf,"Erlang4-Ran-d-10", test_erlang_d_10))
+||  (NULL == CU_add_test(pShalf,"Erlang4-Ran-d-11", test_erlang_d_11))
+||  (NULL == CU_add_test(pShalf,"Erlang4-Ran-d-12", test_erlang_d_12))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-f-0", test_cdf_pdf_f_erlang_0))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-f-1", test_cdf_pdf_f_erlang_1))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-f-2", test_cdf_pdf_f_erlang_2))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-f-3", test_cdf_pdf_f_erlang_3))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-f-4", test_cdf_pdf_f_erlang_4))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-P/CDF-f-5", test_cdf_pdf_f_erlang_5))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-Ran-f-1", test_erlang_f_1))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-Ran-f-2", test_erlang_f_2))
+||  (NULL == CU_add_test(pShalf,"Erlang/Nexp-Ran-f-3", test_erlang_f_3))
+||  (NULL == CU_add_test(pShalf,"Erlang2-P/CDF-f-0", test_cdf_pdf_f_erlang2_0))
+||  (NULL == CU_add_test(pShalf,"Erlang2-P/CDF-f-1", test_cdf_pdf_f_erlang2_1))
+||  (NULL == CU_add_test(pShalf,"Erlang2-P/CDF-f-2", test_cdf_pdf_f_erlang2_2))
+||  (NULL == CU_add_test(pShalf,"Erlang2-Ran-f-4", test_erlang_f_4))
+||  (NULL == CU_add_test(pShalf,"Erlang2-Ran-f-5", test_erlang_f_5))
+||  (NULL == CU_add_test(pShalf,"Erlang2-Ran-f-6", test_erlang_f_6))
+||  (NULL == CU_add_test(pShalf,"Erlang3-P/CDF-f-0", test_cdf_pdf_f_erlang3_0))
+||  (NULL == CU_add_test(pShalf,"Erlang3-P/CDF-f-1", test_cdf_pdf_f_erlang3_1))
+||  (NULL == CU_add_test(pShalf,"Erlang3-P/CDF-f-2", test_cdf_pdf_f_erlang3_2))
+||  (NULL == CU_add_test(pShalf,"Erlang3-Ran-f-7", test_erlang_f_7))
+||  (NULL == CU_add_test(pShalf,"Erlang3-Ran-f-8", test_erlang_f_8))
+||  (NULL == CU_add_test(pShalf,"Erlang3-Ran-f-9", test_erlang_f_9))
+||  (NULL == CU_add_test(pShalf,"Erlang4-P/CDF-f-0", test_cdf_pdf_f_erlang4_0))
+||  (NULL == CU_add_test(pShalf,"Erlang4-P/CDF-f-1", test_cdf_pdf_f_erlang4_1))
+||  (NULL == CU_add_test(pShalf,"Erlang4-P/CDF-f-2", test_cdf_pdf_f_erlang4_2))
+||  (NULL == CU_add_test(pShalf,"Erlang4-Ran-f-10", test_erlang_f_10))
+||  (NULL == CU_add_test(pShalf,"Erlang4-Ran-f-11", test_erlang_f_11))
+||  (NULL == CU_add_test(pShalf,"Erlang4-Ran-f-12", test_erlang_f_12))
 ) {
 		printf("\nTest Suite interval additions failure.");
 		CU_cleanup_registry();

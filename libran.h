@@ -58,6 +58,7 @@ typedef	enum {
 	gsn12,		/**< Gaussian like - 12 uni */
 	logd,		/**< logirithmic */
 	nexp,		/**< negative exponential */
+	erlang,		/**< Erlang */
 	cauchy,		/**< Cauchy */
 	cauchymar	/**< Cauchy using polar/Marsaglia method*/
 }	LR_type;
@@ -339,6 +340,15 @@ double LRd_nexp_CDF(LR_obj *o, double x);
 float LRf_nexp_RAN(LR_obj *o);
 float LRf_nexp_PDF(LR_obj *o, float x);
 float LRf_nexp_CDF(LR_obj *o, float x);
+
+/* double Erlang */
+double LRd_erlang_RAN(LR_obj *o);
+double LRd_erlang_PDF(LR_obj *o, double x);
+double LRd_erlang_CDF(LR_obj *o, double x);
+/* float Erlang */
+float LRf_erlang_RAN(LR_obj *o);
+float LRf_erlang_PDF(LR_obj *o, float x);
+float LRf_erlang_CDF(LR_obj *o, float x);
 
 /* double gaussian */
 double LRd_gausbm_RAN(LR_obj *o);

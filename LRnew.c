@@ -195,6 +195,26 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->errno = LRerr_BadDataType;
 		}
 		break;
+	case erlang:
+		ptr->type = "erlang";
+		ptr->k = 1;
+		if (d == LR_double) {
+			ptr->m.d = (double) 1.0;
+			ptr->s.d = NAN;
+			ptr->rnd  = LRd_erlang_RAN;
+			ptr->pdfd = LRd_erlang_PDF;
+			ptr->cdfd = LRd_erlang_CDF;
+		} else if (d == LR_float) {
+			ptr->m.f = (float) 1.0;
+			ptr->s.f = NAN;
+			ptr->rnf  = LRf_erlang_RAN;
+			ptr->pdff = LRf_erlang_PDF;
+			ptr->cdff = LRf_erlang_CDF;
+		} else {
+			/* error */
+			ptr->errno = LRerr_BadDataType;
+		}
+		break;
 	case gausbm:
 		ptr->type = "gausbm";
 		if (d == LR_double) {
@@ -516,6 +536,32 @@ int LR_check(LR_obj *o) {
 			return LRerr_OK;
 		/* semi-infinite (m)*/
 		case nexp:
+			if (o->d == LR_double) {
+				if (o->m.d < dzero) {
+					o->m.d = - o->m.d;
+				} else if (o->m.d == dzero) {
+					return o->errno
+						= LRerr_InvalidInputValue;
+				}
+			} else if (o->d == LR_float) {
+				if (o->m.f < fzero) {
+					o->m.f = - o->m.f;
+				} else if (o->m.f == fzero) {
+					return o->errno
+						= LRerr_InvalidInputValue;
+				}
+			} else {
+				/* error */
+				return o->errno = LRerr_BadDataType;
+			}
+			return LRerr_OK;
+
+		case erlang:
+			if (o->k < 0) {
+				o->k = - o->k;
+			} else if (o->k == 0) {
+				return o->errno = LRerr_InvalidInputValue;
+			}
 			if (o->d == LR_double) {
 				if (o->m.d < dzero) {
 					o->m.d = - o->m.d;
