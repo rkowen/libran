@@ -1,6 +1,10 @@
 /*!	\file libran.h
  *	\brief The LibRan common header file
  */
+/*
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 
 #ifndef 	_LIBRAN_H_
 #  define	_LIBRAN_H_

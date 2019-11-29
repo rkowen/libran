@@ -106,7 +106,10 @@ CDF	U(u) =	{ 0			if x < 0
 \image latex UserDefinedCDF.eps "User defined CDF"
 
 */
-
+/*
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 #ifdef __cplusplus
 extern "C" {
 #endif

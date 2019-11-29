@@ -37,8 +37,16 @@ The default is \f$ m = 1 \f$ and \em s will be set to \f$ 1/m \f$
 for calculation efficiency.
 Do not set \e s when declaring this distribution.
 The default for \e k = 1 , which is also the \e nexp distribution.
+
+\see LRnexp.c
  
+\image html ErlangDistribution.png
+\image latex ErlangDistribution.eps "Erlang Distribution"
 */
+/*
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 #ifdef __cplusplus
 extern "C" {
 #endif

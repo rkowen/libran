@@ -48,6 +48,10 @@ This simplicity may result in a faster generator despite the time to
 calculate rejected samples.
 
 */
+/*
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 #ifdef __cplusplus
 extern "C" {
 #endif

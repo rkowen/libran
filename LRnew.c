@@ -33,6 +33,10 @@ LR_rm(&o);
 \endcode
 
 */
+/*
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -35,6 +35,10 @@ an error which can be ignored if the value returned is equal to
 `LRerr_NoAuxiliaryObject`.
 
 */
+/*
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -201,4 +201,6 @@ int main() {
 }
 \endcode
 
+\include lgpl.md
+
 \include EXPAND.md

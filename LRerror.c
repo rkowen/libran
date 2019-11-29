@@ -50,6 +50,10 @@ if (!LR_bin_set(b,2.0)) {
 Use these routines to identify the specific LibRan error.
 
 */
+/*
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -23,6 +23,9 @@ CDF(z) = 1/pi*arctan((x-m)/s) + 1/2
 
 The default is m = 0, s = 1; which is called the <b>standard Cauchy
 distribution</b>.
+
+\image html CauchyLorentzDistribution.png
+\image latex CauchyLorentzDistribution.eps	"Cauchy/Lorentz"
  
 The Cauchy-Lorentz distributed random variates can be generated in a couple of
 ways.  The first and most direct way comes using the inverse of the
@@ -45,6 +48,10 @@ competative in comparison to the first method.
 Default values: peak m = 0, half width s = 1
 
 */
+/*
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -34,6 +34,10 @@ for calculation efficiency.
 Do not set \e s when declaring this distribution.
  
 */
+/*
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 #ifdef __cplusplus
 extern "C" {
 #endif
