@@ -1,9 +1,9 @@
 static const char AUTHOR[]="@(#)urand 06/02/94 1.3 R.K.Owen,PhD";
 static const char RCSID[]="$Id: urand.c 106 2002-02-10 08:02:39Z rk $";
 /*
- Copyright 2019 by R.K. Owen, Ph.D.
- See LICENSE.LGPL, which must be provided, for details.
-*/
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 /*!
 \file	urand.c
 \brief	Specialized sequential congruential uniform pseudo-random number generator

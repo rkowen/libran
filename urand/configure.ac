@@ -24,11 +24,10 @@ and converted from Fortran 77 to C with f2c.
 This \c config.h has the typical autoconf macros, but also some
 specialized macros with magic values.
 */
-
 /*
- Copyright 2018 by R.K. Owen, Ph.D.
- See LICENSE.LGPL, which must be provided, for details.
-*/
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 
 #ifndef		_URAND_CONFIG_H_
 #  define	_URAND_CONFIG_H_

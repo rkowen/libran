@@ -12,11 +12,12 @@ static const char RCSID[]="$Id: urand.c 106 2002-02-10 08:02:39Z rk $";
 	Modified to fit into the LibRan package, and to isolate each
 	pseudo-random sequence to each LibRan object.
 
- Copyright 2018 by R.K. Owen, Ph.D.
- See LICENSE.LGPL, which must be provided, for details.
-
  ******************************************************************************
  *****/
+/*
+ * Copyright	2019	R.K. Owen, Ph.D.
+ * License	see lgpl.md (Gnu Lesser General Public License)
+ */
 
 /*
  *  LR_irand()		- returns int       in range [0,LR_IRAND_IMAX]
