@@ -1,12 +1,15 @@
+\image html LRlogo.png
+\image latex LRlogo.eps "LibRan library"
+
 LibRan pseudo-random number generator library
 =============================================
 
 The LibRan package is a library of various pseudo-random number
-generators along with their \e exact probability or cumulative
+generators along with their \e exact probability and cumulative
 probability density functions.  The libary contains its own
 optimized sequential congruential uniform pseudo-random number
 generator on the interval \f$ x \in [0,1) \f$; along with useful
-tools such as methods for collecting statistics in \e bins.
+tools such as methods for collecting statistics into \e bins.
 
 Each of the random variate distributions rely on a number of internal
 attributes to \e customize the distribution.  The library is written
@@ -18,9 +21,9 @@ routines for the given random variate distribution.
 Required Library Methods
 ========================
 
-Each random variate include here has at least three provided methods,
+Each random variate included here has at least three provided methods,
 and for two numeric precisions - (`f` = `float` and `d` = `double`).
-The data or numeric precision is given by \e enum `LR_data_type`
+The data or numeric precision is given by the \e enum `LR_data_type`
 in `libran.h`.
 
 Routine     | Generic Fn | Description
@@ -30,7 +33,7 @@ LR?_*_PDF    | LR?_PDF    | Random variate probability distribution function
 LR?_*_CDF    | LR?_CDF    | Random variate cumulative distribution function
 
 Where \f$ \mbox{PDF}(x) = \frac{d}{dx} \mbox{CDF}(x) \f$, and
-\f$ \mbox{CDF}(x) \f$ is \e monotonically non-decreasing such that
+\f$ \mbox{CDF}(x) \f$ is a \e monotonically non-decreasing function such that
 \f[ \mbox{CDF}(x_1) \le \mbox{CDF}(x_2) \mbox{ where } x_1 < x_2 \f]
 and
 \f[ 0 \le \mbox{CDF}(x) \le 1 \mbox{ for all } x \f]
@@ -107,7 +110,7 @@ The median is at \f$ x = 3 \f$ with a width of 2.  This code can be used
 \e as-is by just changing the `LR_type` from \e gausbm to either
 \e gausmar, \e gsn12, \e cauchy, or \e cauchymar.
 The code can be simply changed for those random variate distributions
-with definite endpoints \e a and \b.
+with definite endpoints \e a and \e b.
 
 \code
 /* example LibRan code */

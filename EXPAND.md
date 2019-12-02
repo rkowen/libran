@@ -2,7 +2,7 @@ How To Expand LibRan
 ====================
 
 This document will help the developer to add another random variate
-distribution.  First you need to have developed the algorithms to
+distribution.  First you need to have developed an algorithm to
 generate the random variate, the probability distribution function,
 and the cumulative distribution function.  Once these are ready then
 do the following (suppose we call the distribution \e xxx as an example):
@@ -23,12 +23,14 @@ such as 'xxx' for example.
 LRnew.c
 -------
 * Add the `case xxx` block to 'LR_new()' and set the \e default `LR_obj`
-attributes for random variate distribution.
+attributes for the random variate distribution.
 Look at the other ones for examples, but you'll need to
-have code to set the attributes for either `double` or `float`.
+have code to set the attributes for either `double` and `float` or
+`int` and `long`.
 
 * Add the `case xxx` block to `LR_check()` and code to adjust "fixable"
-attributes.
+attributes.  (Usually, for examplt,
+setting \e s non-negative and raising an error if given as \e zero.)
 
 LRxxx.c
 -------
