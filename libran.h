@@ -17,11 +17,14 @@ extern "C" {
 /*!	\def	LR_VERSION
  *	\brief	LibRan Library Version (X.Y.Z)
  */
-#  define LR_VERSION	"LibRan_VERSION=0.1.0";
+#  define LR_VER_MAJOR	0
+#  define LR_VER_MINOR	5
+#  define LR_VER_PATCH	1
+#  define LR_VERSION	LR_VER_MAJOR.LR_VER_MINOR.LR_VER_PATCH
 /*!	\def	LR_DATE
  *	\brief	LibRan Library date (YYYYMMDD)
  */
-#  define LR_DATE	"LibRan_DATE=20190512";
+#  define LR_DATE	20191201
 
 /*!
 LibRan Error Numbers
@@ -249,10 +252,11 @@ int LR_bin_rm(LR_bin **b);
 int LR_bin_set(LR_bin *b, double x);
 int LR_bin_add(LR_bin *b, double x);
 
-/* LibRan error routines */
+/* LibRan error and info routines */
 char *LRstrerror(int LRerrno);
 char *LRstrerrno(int LRerrno);
 void LRperror(char *str, int LRerrno);
+char *LRversion(char *str);
 
 /* urand routines */
 int	LR_irand(LR_obj *);
