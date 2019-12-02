@@ -43,7 +43,7 @@ extern "C" {
 
 #include <stdio.h>
 #include <stdarg.h>
-#include <stdlib.h>	/* malloc,free */
+#include <stdlib.h>	/* calloc,free */
 #include <string.h>	/* memcpy */
 #include <math.h>	/* NAN */
 #include "libran.h"
@@ -59,7 +59,7 @@ and preset some default parameter values.
 */
 LR_obj *LR_new(LR_type t, LR_data_type d) {
 	LR_obj *ptr = (void *) NULL;
-	if (!(ptr = (LR_obj *) malloc(sizeof(LR_obj))))
+	if (!(ptr = (LR_obj *) calloc(sizeof(LR_obj),1)))
 		return ptr;
 	ptr->errno = 0;
 	ptr->d = d;
@@ -95,7 +95,7 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 	case piece:
 	{
 		ptr->type = "piece";
-		if (!(ptr->aux = (void *) malloc(sizeof(LR_pcs))))
+		if (!(ptr->aux = (void *) calloc(sizeof(LR_pcs),1)))
 			goto objerr;
 		LR_pcs *aux = (LR_pcs *) ptr->aux;
 		aux->new = LR_pcs_new;
@@ -125,7 +125,7 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 	case lspline:
 	{
 		ptr->type = "lspline";
-		if (!(ptr->aux = (void *) malloc(sizeof(LR_pcs))))
+		if (!(ptr->aux = (void *) calloc(sizeof(LR_pcs),1)))
 			goto objerr;
 		LR_pcs *aux = (LR_pcs *) ptr->aux;
 		aux->new = LR_lspl_new;
@@ -153,7 +153,7 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 	case uinvcdf:
 	{
 		ptr->type = "uinvcdf";
-		if (!(ptr->aux = (void *) malloc(sizeof(LR_uinvcdf))))
+		if (!(ptr->aux = (void *) calloc(sizeof(LR_uinvcdf),1)))
 			goto objerr;
 		LR_uinvcdf *aux = (LR_uinvcdf *) ptr->aux;
 		if (d == LR_double) {

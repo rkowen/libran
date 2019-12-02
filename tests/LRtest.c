@@ -124,8 +124,8 @@ testLRset(double,.,d)
 #define testLRsetall(tt, ptt, att)	void test_set_all_##tt(void) {	\
 	LR_obj *o = LR_new(gausbm, LR_##tt);				\
 	CU_ASSERT_EQUAL(						\
-		LR_set_all(o,"abmsxkn",					\
-		-1##ptt,3##ptt,2##ptt,1##ptt,5##ptt,7,11),0);		\
+		LR_set_all(o,"abmsxknpq",				\
+		-1##ptt,3##ptt,2##ptt,1##ptt,5##ptt,7,11,4.,16.),0);	\
 	CU_ASSERT_EQUAL(o->a.att, -1##ptt);				\
 	CU_ASSERT_EQUAL(o->b.att,  3##ptt);				\
 	CU_ASSERT_EQUAL(o->m.att,  2##ptt);				\
@@ -133,6 +133,8 @@ testLRset(double,.,d)
 	CU_ASSERT_EQUAL(o->x.att,  5##ptt);				\
 	CU_ASSERT_EQUAL(o->k,  7);					\
 	CU_ASSERT_EQUAL(o->n,  11);					\
+	CU_ASSERT_EQUAL(o->p,  4.);					\
+	CU_ASSERT_EQUAL(o->q,  16.);					\
 	LR_rm(&o);							\
 }
 
@@ -145,8 +147,8 @@ testLRsetall(double,.,d)
 #define testLRsetall2(tt, ptt, att)	void test_set_all2_##tt(void) {	\
 	LR_obj *o = LR_new(gausbm, LR_##tt);				\
 	CU_ASSERT_EQUAL(						\
-	  LR_set_all(o,"mnaxksb",					\
-		2##ptt,11,-1##ptt,5##ptt,7,1##ptt,3##ptt),0);	\
+	  LR_set_all(o,"mpnaxksqb",					\
+		2##ptt,4.,11,-1##ptt,5##ptt,7,1##ptt,16.,3##ptt),0);	\
 	CU_ASSERT_EQUAL(o->a.att, -1##ptt);				\
 	CU_ASSERT_EQUAL(o->b.att,  3##ptt);				\
 	CU_ASSERT_EQUAL(o->m.att,  2##ptt);				\
@@ -154,6 +156,8 @@ testLRsetall(double,.,d)
 	CU_ASSERT_EQUAL(o->x.att,  5##ptt);				\
 	CU_ASSERT_EQUAL(o->k,  7);					\
 	CU_ASSERT_EQUAL(o->n,  11);					\
+	CU_ASSERT_EQUAL(o->p,  4.);					\
+	CU_ASSERT_EQUAL(o->q,  16.);					\
 	LR_rm(&o);							\
 }
 
@@ -166,8 +170,8 @@ testLRsetall2(double,.,d)
 #define testLRsetall3(tt, ptt, att)	void test_set_all3_##tt(void) {	\
 	LR_obj *o = LR_new(gausbm, LR_##tt);				\
 	CU_ASSERT_NOT_EQUAL(						\
-	  LR_set_all(o,"mnaxzksby",					\
-	2##ptt,11,-1##ptt,5##ptt,33##ptt,7,1##ptt,3##ptt,9##ptt),0);	\
+	  LR_set_all(o,"mpnaxzksqby",					\
+  2##ptt,4.,11,-1##ptt,5##ptt,33##ptt,7,1##ptt,16.,3##ptt,9##ptt),0);	\
 	CU_ASSERT_EQUAL(o->a.att, -1##ptt);				\
 	CU_ASSERT_EQUAL(o->b.att,  3##ptt);				\
 	CU_ASSERT_EQUAL(o->m.att,  2##ptt);				\
@@ -175,6 +179,8 @@ testLRsetall2(double,.,d)
 	CU_ASSERT_EQUAL(o->x.att,  5##ptt);				\
 	CU_ASSERT_EQUAL(o->k,  7);					\
 	CU_ASSERT_EQUAL(o->n,  11);					\
+	CU_ASSERT_EQUAL(o->p,  4.);					\
+	CU_ASSERT_EQUAL(o->q,  16.);					\
 	LR_rm(&o);							\
 }
 
@@ -280,7 +286,7 @@ testLRcheck(8, uinvcdf, f, float,
 
 /* independent pseudo-random sequences */
 #define testLRindep(dist, nn, num, incr, setup)				\
-void test_indep_seq_##nn(void) {	\
+void test_indep_seq_##nn(void) {					\
 	LR_obj *o1 = LR_new(dist, LR_double);				\
 	LR_obj *o2 = LR_new(dist, LR_double);				\
 	double y1, y2;							\
@@ -289,7 +295,7 @@ void test_indep_seq_##nn(void) {	\
 		for (int j = 0; j < incr; j++) {			\
 			y1 = LRd_RAN(o1); y2 = LRd_RAN(o2);		\
 		}							\
-		CU_ASSERT_EQUAL(y1, y2);				\
+		CU_ASSERT_DOUBLE_EQUAL(y1, y2,.0000001);		\
 	}								\
 	LR_rm(&o1); LR_rm(&o2);						\
 }

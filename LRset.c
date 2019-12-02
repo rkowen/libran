@@ -55,7 +55,7 @@ The program must execute `va_start()` before calling this function, and call
 Generally there is no need to call this routine.  Call `LR_set_all()` instead.
 
 However, the list of attributes handled is important -
-'k','n', 'd', 'a', 'b', 'm', 's', and 'x'.
+'k','n', 'p', 'q', 'd', 'a', 'b', 'm', 's', and 'x'.
 Any other characters are ignored except causing a negative value
 to be returned representing the number of such ignored characters.
 A \e real error will result in a positive return value.
@@ -63,7 +63,8 @@ A \e real error will result in a positive return value.
 All other characters in the \e format string are an ignorable error.
 
 The precision of the input values are governed by the \c LR_obj
-\c LR_data_type, except for 'k','n' which are \c int only.
+\c LR_data_type, except for 'k','n' which are \c int only, and
+except for 'p','q' which are \c float only.
 
 @param	o	LR_obj object
 @param	x	controlling format string
@@ -74,6 +75,7 @@ The precision of the input values are governed by the \c LR_obj
 int LR_vset(LR_obj *o, char *x, va_list ap) {
 	LR_val	t;
 	int	i;
+	float	f;
 	char	x1;
 	int	ret = 0;
 
@@ -86,6 +88,14 @@ int LR_vset(LR_obj *o, char *x, va_list ap) {
 		case	'n':
 			i = va_arg(ap, int);
 			(void) memcpy(&(o->n), &i, sizeof(int));
+			break;
+		case	'p':
+			f = va_arg(ap, double);
+			(void) memcpy(&(o->p), &f, sizeof(double));
+			break;
+		case	'q':
+			f = va_arg(ap, double);
+			(void) memcpy(&(o->q), &f, sizeof(double));
 			break;
 		default: /* rest are dependent on LR_type */
 			switch (o->d) {
@@ -128,6 +138,8 @@ int LR_vset(LR_obj *o, char *x, va_list ap) {
 			break;
 		case	'k':
 		case	'n':
+		case	'p':
+		case	'q':
 			break;
 		default:
 			/* it is an error to include non-object attributes */

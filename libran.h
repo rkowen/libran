@@ -138,6 +138,8 @@ struct LR_obj {
 	LR_val		x;	/*!< x - auxiliary value */
 	int		k;	/*!< k - integer attribute */
 	int		n;	/*!< n - integer attribute */
+	float		p;	/*!< p - float attribute */
+	float		q;	/*!< q - float attribute */
 	/**< object random values */
 	LR_val		iy;	/*!< iy - current random number sequence value*/
 	LR_val		iy0;	/*!< iy0- initial random number sequence value*/
