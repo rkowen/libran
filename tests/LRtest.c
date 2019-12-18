@@ -76,6 +76,29 @@ fprintf(stderr, ">>> %x,%d\n:%s:%s\n",es[i].err,
 	stderr = oldstderr;
 }
 
+/* LibRan version */
+#define STRINGIFY(arg)		#arg
+#define STRVAL(arg)		STRINGIFY(arg)
+void test_LR_version(void) {
+	CU_ASSERT_STRING_EQUAL(LRversion("vers"), STRVAL(LR_VERSION));
+	CU_ASSERT_STRING_EQUAL(LRversion("version"), STRVAL(LR_VERSION));
+	CU_ASSERT_STRING_EQUAL(LRversion("major"), STRVAL(LR_VER_MAJOR));
+	CU_ASSERT_STRING_EQUAL(LRversion("MAJOR"), STRVAL(LR_VER_MAJOR));
+	CU_ASSERT_STRING_EQUAL(LRversion("minor"), STRVAL(LR_VER_MINOR));
+	CU_ASSERT_STRING_EQUAL(LRversion("mInOr"), STRVAL(LR_VER_MINOR));
+	CU_ASSERT_STRING_EQUAL(LRversion("patch"), STRVAL(LR_VER_PATCH));
+	CU_ASSERT_STRING_EQUAL(LRversion("PaTcH"), STRVAL(LR_VER_PATCH));
+	CU_ASSERT_STRING_EQUAL(LRversion("date"), STRVAL(LR_DATE));
+	CU_ASSERT_STRING_EQUAL(LRversion("Date"), STRVAL(LR_DATE));
+/* make sure major.minor.patch are right */
+	CU_ASSERT_STRING_EQUAL(
+		LRversion("vers"),
+		STRVAL(LR_VER_MAJOR) "."
+		STRVAL(LR_VER_MINOR) "."
+		STRVAL(LR_VER_PATCH));
+	CU_ASSERT_STRING_EQUAL(LRversion("foobar"), "");
+}
+
 #define testLRnew(tt)			void test_new_##tt(void) {	\
 	LR_obj *o = LR_new(gausbm, LR_##tt);				\
 	CU_ASSERT_PTR_NOT_NULL(o);					\
@@ -2125,6 +2148,7 @@ int main(int argc, char* argv[]) {
 	}
 	/* add tests to the suite */
 if ((NULL == CU_add_test(pS,"errors", test_LR_errors))
+||  (NULL == CU_add_test(pS,"version", test_LR_version))
 ||  (NULL == CU_add_test(pS,"new - int", test_new_int))
 ||  (NULL == CU_add_test(pS,"new - float", test_new_float))
 ||  (NULL == CU_add_test(pS,"new - long", test_new_long))
