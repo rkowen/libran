@@ -125,7 +125,7 @@ float LRf_RAN(LR_obj *o) {
 }
 
 /*!
-@brief	LRd_PDF(LR_obj *o, float x) - probability distribution function
+@brief	LRf_PDF(LR_obj *o, float x) - probability distribution function
 
 This method will call the specific random variate
 probability distribution function
@@ -146,7 +146,7 @@ float LRf_PDF(LR_obj *o, float x) {
 }
 
 /*!
-@brief	LRd_CDF(LR_obj *o, float x) - cumulative distribution function
+@brief	LRf_CDF(LR_obj *o, float x) - cumulative distribution function
 
 This method will call the specific random variate
 cumulative distribution function
@@ -164,6 +164,66 @@ float LRf_CDF(LR_obj *o, float x) {
 		return NAN;
 	}
 	return o->cdff(o,x);
+}
+
+/*!
+@brief	LRi_RAN(LR_obj *o) - random variate generator
+
+This method will call the specific random variate generator as determined
+by the object's `LR_type` and `LR_data_type`.  Note that using the wrong
+data type will return a NAN and raise an error.
+
+@param	o	LR_obj object
+@return	int random variate
+*/
+int LRi_RAN(LR_obj *o) {
+	if (o->d != LR_int) {
+		o->errno = LRerr_BadDataType;
+		return NAN;
+	}
+	return o->rni(o);
+}
+
+/*!
+@brief	LRi_PDF(LR_obj *o, int x) - probability distribution function
+
+This method will call the specific random variate
+probability distribution function
+as determined
+by the object's `LR_type` and `LR_data_type`.  Note that using the wrong
+data type will return a NAN and raise an error.
+
+@param	o	LR_obj object
+@param	x	value
+@return float PDF at x
+*/
+float LRi_PDF(LR_obj *o, int x) {
+	if (o->d != LR_int) {
+		o->errno = LRerr_BadDataType;
+		return NAN;
+	}
+	return o->pdfi(o,x);
+}
+
+/*!
+@brief	LRi_CDF(LR_obj *o, int x) - cumulative distribution function
+
+This method will call the specific random variate
+cumulative distribution function
+as determined
+by the object's `LR_type` and `LR_data_type`.  Note that using the wrong
+data type will return a NAN and raise an error.
+
+@param	o	LR_obj object
+@param	x	value
+@return float CDF at x
+*/
+float LRi_CDF(LR_obj *o, int x) {
+	if (o->d != LR_int) {
+		o->errno = LRerr_BadDataType;
+		return NAN;
+	}
+	return o->cdfi(o,x);
 }
 
 /*!

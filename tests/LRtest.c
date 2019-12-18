@@ -282,7 +282,6 @@ testLRcheck(8, uinvcdf, f, float,
 	LR_set_all(o, "ab", 2.0,2.0);
 	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidRange);
 )
-/* uinvcdf f 9 */
 
 /* independent pseudo-random sequences */
 #define testLRindep(dist, nn, num, incr, setup)				\
@@ -1944,12 +1943,111 @@ testBADdt(nexp,7,d,double, f, .5, )
 testBADdt(nexp,8,f,float, d, .5, )
 testBADdt(gsn12,9,d,double, f, .5, )
 testBADdt(gsn12,10,f,float, d, .5, )
+testBADdt(poisson,11,i,int, d, .5, )
+
+/* Poisson */
+#define tryPdfCdf(kk,pdf,cdf)						\
+CU_ASSERT_DOUBLE_EQUAL(LRi_CDF(o,kk),cdf,.000001)			\
+CU_ASSERT_DOUBLE_EQUAL(LRi_PDF(o,kk),pdf,.000001)
+
+#define testCdfPdf0pois(nn,xp,setup)					\
+void test_cdf_pdf_##xp ## _poisson ## _##nn(void) {			\
+	LR_obj *o = LR_new(poisson, LR_int);				\
+	LR_set_all(o,"p", xp ## .);					\
+	setup;								\
+}
+
+testCdfPdf0pois(1,1,
+  tryPdfCdf(0,.3678794,.3678794)
+  tryPdfCdf(1,.3678794,.7357589)
+  tryPdfCdf(2,.1839397,.9196986)
+  tryPdfCdf(4,.0153283,.9963402)
+  tryPdfCdf(8,.0000091,.9999989)
+)
+testCdfPdf0pois(2,2,
+  tryPdfCdf(0,.1353353,.1353353)
+  tryPdfCdf(1,.2706706,.4060058)
+  tryPdfCdf(2,.2706706,.6766764)
+  tryPdfCdf(4,.0902235,.9473470)
+  tryPdfCdf(8,.0008593,.9997626)
+)
+testCdfPdf0pois(3,4,
+  tryPdfCdf(0,.0183156,.0183156)
+  tryPdfCdf(1,.0732626,.0915782)
+  tryPdfCdf(3,.1953668,.4334701)
+  tryPdfCdf(4,.1953668,.6288369)
+  tryPdfCdf(8,.0297702,.9786366)
+  tryPdfCdf(12,.0006415,.9997263)
+)
+testCdfPdf0pois(4,8,
+  tryPdfCdf(0,.0003355,.0003355)
+  tryPdfCdf(1,.0026837,.0030192)
+  tryPdfCdf(4,.0572523,.0996324)
+  tryPdfCdf(7,.1395865,.4529608)
+  tryPdfCdf(8,.1395865,.5925473)
+  tryPdfCdf(12,.0481268,.9362028)
+  tryPdfCdf(15,.0090260,.9917690)
+)
+
+/* more complicated random variates do not have "uniform" coverage */
+/* also the limited test t*rand functions do not adequately span space */
+/* make tolerance adjustable */
+/* vty	- LR distribution
+ * nn	- test #
+ * bn	- bin number
+ * xtot	- total number of samples (should be large)
+ * vsc	- % error tolerance (.1 = 10%)
+ * vab	- absolute error tolerance
+ * setup- set-up code
+ */
+#define testLRdisc(vty,nn,bn,xtot,vsc,vab,setup)			\
+void test_##vty ## _i ## _##nn(void) {					\
+	LR_obj *o = LR_new(vty, LR_int);				\
+	LR_bin *b = LR_bin_new(bn+1);					\
+	double	x, cdf[bn+1], tol;					\
+	setup;								\
+	double	begin = 0.5,						\
+		incr = 1.0;						\
+	for (int i = 0; i < bn; i++) {					\
+		x = begin + i;						\
+		LR_bin_set(b,x);					\
+		cdf[i] = xtot*(LRi_PDF(o,x));				\
+	}								\
+	cdf[bn] = xtot * (1.0 - LRi_CDF(o,bn-1));			\
+	for (int i = 0; i < xtot; i++) {				\
+		LR_bin_add(b,LRi_RAN(o));				\
+	}								\
+	for (int i = 0; i <= bn; i++) {					\
+		tol = max(cdf[i]*vsc,vab);				\
+		CU_ASSERT_DOUBLE_EQUAL(1.0*b->bins[i],cdf[i],tol);	\
+	}								\
+	LR_rm(&o); LR_bin_rm(&b);					\
+}
+
+#define testLRpoisson(nn,bn,setup)					\
+	testLRdisc(poisson,nn,bn,50*10007,.1,100,setup)
+
+testLRpoisson(1,20, LR_set_all(o,"p", 1.); )
+testLRpoisson(2,20, LR_set_all(o,"p", 2.); )
+testLRpoisson(3,20, LR_set_all(o,"p", 4.); )
+testLRpoisson(4,20, LR_set_all(o,"p", 8.); )
+testLRpoisson(5,20, LR_set_all(o,"p", 5.5); )
+
+testLRcheck(1, poisson, i, int, 
+	LR_set_all(o, "p", -1.0);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_OK);
+)
+testLRcheck(2, poisson, i, int, 
+	LR_set_all(o, "p", 0.0);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidInputValue);
+)
 
 int main(int argc, char* argv[]) {
 	CU_pSuite		pS		= NULL;
 	CU_pSuite		pSint		= NULL;
 	CU_pSuite		pShalf		= NULL;
 	CU_pSuite		pSfull		= NULL;
+	CU_pSuite		pSdisc		= NULL;
 	CU_BasicRunMode		mode		= CU_BRM_VERBOSE;
 	CU_ErrorAction		error_action	= CUEA_IGNORE;
 	int i;
@@ -2015,6 +2113,13 @@ int main(int argc, char* argv[]) {
 		init_suite, clean_suite);
 	if (pSfull == NULL) {
 		printf("\nTest Registry Suite Full Range failure.");
+		CU_cleanup_registry();
+		return CU_get_error();
+	}
+	pSdisc = CU_add_suite("LR_test_suite_discrete",
+		init_suite, clean_suite);
+	if (pSdisc == NULL) {
+		printf("\nTest Registry Suite Discrete failure.");
 		CU_cleanup_registry();
 		return CU_get_error();
 	}
@@ -2091,6 +2196,7 @@ if ((NULL == CU_add_test(pS,"errors", test_LR_errors))
 ||  (NULL == CU_add_test(pS,"bad data type - 8", test_bad_f_dt_8))
 ||  (NULL == CU_add_test(pS,"bad data type - 9", test_bad_d_dt_9))
 ||  (NULL == CU_add_test(pS,"bad data type - 10", test_bad_f_dt_10))
+||  (NULL == CU_add_test(pS,"bad data type - 11", test_bad_i_dt_11))
 ) {
 		printf("\nTest Suite additions failure.");
 		CU_cleanup_registry();
@@ -2419,6 +2525,22 @@ if ((NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-0", test_cdf_pdf_d_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Cauchy/Uinvcdf-Ran-f-11", test_uinvcdf_f_11))
 ) {
 		printf("\nTest Suite full range  additions failure.");
+		CU_cleanup_registry();
+		return CU_get_error();
+	}
+if ((NULL == CU_add_test(pSdisc,"Poisson-P/CDF-1-1", test_cdf_pdf_1_poisson_1))
+||  (NULL == CU_add_test(pSdisc,"Poisson-P/CDF-2-2", test_cdf_pdf_2_poisson_2))
+||  (NULL == CU_add_test(pSdisc,"Poisson-P/CDF-4-3", test_cdf_pdf_4_poisson_3))
+||  (NULL == CU_add_test(pSdisc,"Poisson-P/CDF-8-4", test_cdf_pdf_8_poisson_4))
+||  (NULL == CU_add_test(pSdisc,"Poisson-Ran-1-1", test_poisson_i_1))
+||  (NULL == CU_add_test(pSdisc,"Poisson-Ran-2-2", test_poisson_i_2))
+||  (NULL == CU_add_test(pSdisc,"Poisson-Ran-4-3", test_poisson_i_3))
+||  (NULL == CU_add_test(pSdisc,"Poisson-Ran-8-4", test_poisson_i_4))
+||  (NULL == CU_add_test(pSdisc,"Poisson-Ran-55-5", test_poisson_i_5))
+||  (NULL == CU_add_test(pSdisc,"check - Poisson - 1",test_check_i_1))
+||  (NULL == CU_add_test(pSdisc,"check - Poisson - 2",test_check_i_2))
+) {
+		printf("\nTest Suite discrete  additions failure.");
 		CU_cleanup_registry();
 		return CU_get_error();
 	}
