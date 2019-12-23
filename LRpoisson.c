@@ -87,8 +87,6 @@ probablity (or mass) distribution function
 @param o	LR_obj object
 @param x	value
 @return float PDF at x
-   PDF(k) = p^k * exp(-p) / k!
-   CDF(k) = exp(-p) * sum_(n=0)^(k) p^n / n!
 */
 float LRi_poisson_PDF(LR_obj *o, int x) {
 	float zero = 0.0, one = 1.0, p = one;
