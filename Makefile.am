@@ -29,7 +29,7 @@ LR_srcs	=								\
 	LRunif.c LRpiece.c LRlspline.c LRuinvcdf.c			\
 	LRnexp.c LRerlang.c						\
 	LRgaus.c LRgsn.c LRcauchy.c					\
-	LRpoisson.c
+	LRpoisson.c LRgeom.c
 
 URAND_srcs = 								\
 	urand/urand.c

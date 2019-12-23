@@ -52,6 +52,7 @@ LibRan Error Numbers
 typedef	enum {
 /**< discrete distributions */
 	poisson = 1,	/**< Poisson */
+	geometric,	/**< Geometric */
 	binomial,	/**< Binomial */
 /**< continuum distributions */
 	unif,		/**< uniform */
@@ -422,6 +423,11 @@ float LRf_cauchy_CDF(LR_obj *o, float x);
 int LRi_poisson_RAN(LR_obj *o);
 float LRi_poisson_PDF(LR_obj *o, int x);
 float LRi_poisson_CDF(LR_obj *o, int x);
+
+/* Geometric */
+int LRi_geometric_RAN(LR_obj *o);
+float LRi_geometric_PDF(LR_obj *o, int x);
+float LRi_geometric_CDF(LR_obj *o, int x);
 
 #  ifdef __cplusplus
 }
