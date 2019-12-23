@@ -7,7 +7,7 @@ Return the LibRan version info as a string.
 The allowed set of input parameters are:
 
 Parameter  | Description
------------ --------------------------
+---------- | -------------------------
 version    | Full string (X.Y.Z)
 major      | Major level (X)
 minor      | Minor level (Y)
