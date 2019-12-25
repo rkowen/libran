@@ -1,6 +1,6 @@
 /*!
 \file	LRgeom.c
-\brief 	The Geometric distribution with rate \e p > 0.
+\brief 	The Geometric distribution with a probability of success 0 < \e p < 1.
 
 The pseudo-random numbers are distributed from the Geometric distribution,
 which is a discrete distribution describing the number of Bernoulli
@@ -13,8 +13,8 @@ represents the probability of a successful trial.
 Therefore, \e 1/p is the mean number of trials until success.
 
 \manonly
-   PDF(k) = p^k * exp(-p) / k!
-   CDF(k) = exp(-p) * sum_(n=0)^(k) p^n / n!
+   PDF(k) = p*(1-p)^{k-1}, 0<k
+   CDF(k) = 1 - (1-p)^k, 0<k
 \endmanonly
 
 \f{eqnarray*}{
