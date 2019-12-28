@@ -429,6 +429,11 @@ int LRi_geometric_RAN(LR_obj *o);
 float LRi_geometric_PDF(LR_obj *o, int x);
 float LRi_geometric_CDF(LR_obj *o, int x);
 
+/* Binomial */
+int LRi_binomial_RAN(LR_obj *o);
+float LRi_binomial_PDF(LR_obj *o, int x);
+float LRi_binomial_CDF(LR_obj *o, int x);
+
 #  ifdef __cplusplus
 }
 #  endif
