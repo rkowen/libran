@@ -214,7 +214,7 @@ testLRsetall3(double,.,d)
 
 /* test the check method */
 #define testLRcheck(nn, dist, tt, ttt, setup)				\
-void test_check_ ## tt ## _##nn(void) {					\
+void test_check_ ## dist ## _##tt ## _##nn(void) {			\
 	LR_obj *o = LR_new(dist, LR_ ##ttt);				\
 	setup;								\
 	LR_rm(&o);							\
@@ -305,7 +305,6 @@ testLRcheck(8, uinvcdf, f, float,
 	LR_set_all(o, "ab", 2.0,2.0);
 	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidRange);
 )
-/* uinvcdf f 9 */
 
 /* independent pseudo-random sequences */
 #define testLRindep(dist, nn, num, incr, setup)				\
@@ -1967,12 +1966,228 @@ testBADdt(nexp,7,d,double, f, .5, )
 testBADdt(nexp,8,f,float, d, .5, )
 testBADdt(gsn12,9,d,double, f, .5, )
 testBADdt(gsn12,10,f,float, d, .5, )
+testBADdt(poisson,11,i,int, d, 2, )
+testBADdt(geometric,12,i,int, d, 2, )
+testBADdt(binomial,13,i,int, d, 2, )
+
+/* Poisson */
+#define tryPdfCdf(kk,pdf,cdf)						\
+CU_ASSERT_DOUBLE_EQUAL(LRi_CDF(o,kk),cdf,.000001)			\
+CU_ASSERT_DOUBLE_EQUAL(LRi_PDF(o,kk),pdf,.000001)
+
+#define testCdfPdf0pois(nn,xp,setup)					\
+void test_cdf_pdf_##xp ## _poisson ## _##nn(void) {			\
+	LR_obj *o = LR_new(poisson, LR_int);				\
+	LR_set_all(o,"p", xp ## .);					\
+	setup;								\
+}
+
+testCdfPdf0pois(1,1,
+  tryPdfCdf(0,.3678794,.3678794)
+  tryPdfCdf(1,.3678794,.7357589)
+  tryPdfCdf(2,.1839397,.9196986)
+  tryPdfCdf(4,.0153283,.9963402)
+  tryPdfCdf(8,.0000091,.9999989)
+)
+testCdfPdf0pois(2,2,
+  tryPdfCdf(0,.1353353,.1353353)
+  tryPdfCdf(1,.2706706,.4060058)
+  tryPdfCdf(2,.2706706,.6766764)
+  tryPdfCdf(4,.0902235,.9473470)
+  tryPdfCdf(8,.0008593,.9997626)
+)
+testCdfPdf0pois(3,4,
+  tryPdfCdf(0,.0183156,.0183156)
+  tryPdfCdf(1,.0732626,.0915782)
+  tryPdfCdf(3,.1953668,.4334701)
+  tryPdfCdf(4,.1953668,.6288369)
+  tryPdfCdf(8,.0297702,.9786366)
+  tryPdfCdf(12,.0006415,.9997263)
+)
+testCdfPdf0pois(4,8,
+  tryPdfCdf(0,.0003355,.0003355)
+  tryPdfCdf(1,.0026837,.0030192)
+  tryPdfCdf(4,.0572523,.0996324)
+  tryPdfCdf(7,.1395865,.4529608)
+  tryPdfCdf(8,.1395865,.5925473)
+  tryPdfCdf(12,.0481268,.9362028)
+  tryPdfCdf(15,.0090260,.9917690)
+)
+
+/* more complicated random variates do not have "uniform" coverage */
+/* also the limited test t*rand functions do not adequately span space */
+/* make tolerance adjustable */
+/* vty	- LR distribution
+ * nn	- test #
+ * bn	- bin number
+ * xtot	- total number of samples (should be large)
+ * vsc	- % error tolerance (.1 = 10%)
+ * vab	- absolute error tolerance
+ * setup- set-up code
+ */
+#define testLRdisc(vty,nn,bn,xtot,vsc,vab,setup)			\
+void test_##vty ## _i ## _##nn(void) {					\
+	LR_obj *o = LR_new(vty, LR_int);				\
+	LR_bin *b = LR_bin_new(bn+1);					\
+	double	x, cdf[bn+1], tol;					\
+	setup;								\
+	double	begin = 0.5,						\
+		incr = 1.0;						\
+	for (int i = 0; i < bn; i++) {					\
+		x = begin + i;						\
+		LR_bin_set(b,x);					\
+		cdf[i] = xtot*(LRi_PDF(o,x));				\
+	}								\
+	cdf[bn] = xtot * (1.0 - LRi_CDF(o,bn-1));			\
+	for (int i = 0; i < xtot; i++) {				\
+		LR_bin_add(b,LRi_RAN(o));				\
+	}								\
+	for (int i = 0; i <= bn; i++) {					\
+		tol = max(cdf[i]*vsc,vab);				\
+		CU_ASSERT_DOUBLE_EQUAL(1.0*b->bins[i],cdf[i],tol);	\
+	}								\
+	LR_rm(&o); LR_bin_rm(&b);					\
+}
+
+#define testLRpoisson(nn,bn,setup)					\
+	testLRdisc(poisson,nn,bn,50*10007,.1,100,setup)
+
+testLRpoisson(1,20, LR_set_all(o,"p", 1.); )
+testLRpoisson(2,20, LR_set_all(o,"p", 2.); )
+testLRpoisson(3,20, LR_set_all(o,"p", 4.); )
+testLRpoisson(4,20, LR_set_all(o,"p", 8.); )
+testLRpoisson(5,20, LR_set_all(o,"p", 5.5); )
+
+testLRcheck(1, poisson, i, int, 
+	LR_set_all(o, "p", -1.0);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_OK);
+)
+testLRcheck(2, poisson, i, int, 
+	LR_set_all(o, "p", 0.0);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidInputValue);
+)
+
+/* Geometric */
+#define testCdfPdf0geom(nn,xp,setup)					\
+void test_cdf_pdf_##xp ## _geometric ## _##nn(void) {			\
+	LR_obj *o = LR_new(geometric, LR_int);				\
+	LR_set_all(o,"p", . ## xp);					\
+	setup;								\
+}
+
+testCdfPdf0geom(1,25,
+  tryPdfCdf(1,.250000,.250000)
+  tryPdfCdf(2,.187500,.437500)
+  tryPdfCdf(3,.140625,.578125)
+  tryPdfCdf(4,.105469,.683594)
+  tryPdfCdf(8,.033371,.899887)
+)
+testCdfPdf0geom(2,50,
+  tryPdfCdf(1,.500000,.500000)
+  tryPdfCdf(2,.250000,.750000)
+  tryPdfCdf(3,.125000,.875000)
+  tryPdfCdf(4,.062500,.937500)
+  tryPdfCdf(8,.003906,.996094)
+)
+testCdfPdf0geom(3,75,
+  tryPdfCdf(1,.750000,.750000)
+  tryPdfCdf(2,.187500,.937500)
+  tryPdfCdf(3,.046875,.984375)
+  tryPdfCdf(4,.011719,.996094)
+  tryPdfCdf(5,.002930,.999023)
+)
+
+#define testLRgeom(nn,bn,setup)					\
+	testLRdisc(geometric,nn,bn,50*10007,.1,100,setup)
+
+testLRgeom(1,10, )
+testLRgeom(2,10, LR_set_all(o,"p", .5); )
+testLRgeom(3,10, LR_set_all(o,"p", .2); )
+testLRgeom(4,15, LR_set_all(o,"p", .35); )
+testLRgeom(5,20, LR_set_all(o,"p", .65); )
+testLRgeom(6,25, LR_set_all(o,"p", .8); )
+
+testLRcheck(1, geometric, i, int, 
+	LR_set_all(o, "p", -.5);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_OK);
+)
+testLRcheck(2, geometric, i, int, 
+	LR_set_all(o, "p", 0.0);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidInputValue);
+)
+testLRcheck(3, geometric, i, int, 
+	LR_set_all(o, "p", -2.0);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidInputValue);
+)
+
+/* Binomial */
+#define testCdfPdf0binom(nn,xp,mm,setup)				\
+void test_cdf_pdf_##xp ## _binomial ## _##nn(void) {			\
+	LR_obj *o = LR_new(binomial, LR_int);				\
+	LR_set_all(o,"pn", . ## xp, mm);				\
+	setup;								\
+}
+testCdfPdf0binom(1,25, 10,
+  tryPdfCdf(0,.056314,.056314)
+  tryPdfCdf(2,.281568,.525593)
+  tryPdfCdf(5,.058399,.980272)
+  tryPdfCdf(7,.003090,.999584)
+  tryPdfCdf(8,.000386,.999970)
+)
+testCdfPdf0binom(2,50, 10,
+  tryPdfCdf(0,.000977,.000977)
+  tryPdfCdf(2,.043945,.054688)
+  tryPdfCdf(5,.246094,.623047)
+  tryPdfCdf(7,.117188,.945313)
+  tryPdfCdf(8,.043945,.989258)
+)
+testCdfPdf0binom(3,80, 10,
+  tryPdfCdf(0,.000000,.000000)
+  tryPdfCdf(2,.000074,.000078)
+  tryPdfCdf(5,.026424,.032793)
+  tryPdfCdf(7,.201327,.322200)
+  tryPdfCdf(8,.301990,.624190)
+  tryPdfCdf(10,.107374,1.000000)
+)
+
+#define testLRbinom(nn,bn,setup)					\
+	testLRdisc(binomial,nn,bn,50*10007,.1,100,			\
+	LR_set_all(o,"n", bn);						\
+	setup)
+
+testLRbinom(1,10, )
+testLRbinom(2,10, LR_set_all(o,"p", .5); )
+testLRbinom(3,10, LR_set_all(o,"p", .2); )
+testLRbinom(4,15, LR_set_all(o,"p", .35); )
+testLRbinom(5,20, LR_set_all(o,"p", .65); )
+testLRbinom(6,25, LR_set_all(o,"p", .8); )
+
+testLRcheck(1, binomial, i, int, 
+	LR_set_all(o, "np", 10, -.5);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_OK);
+)
+testLRcheck(2, binomial, i, int, 
+	LR_set_all(o, "np", 10, 0.0);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidInputValue);
+)
+testLRcheck(3, binomial, i, int, 
+	LR_set_all(o, "np", 10, -2.0);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidInputValue);
+)
+testLRcheck(4, binomial, i, int, 
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_InvalidInputValue);
+)
+testLRcheck(5, binomial, i, int, 
+	LR_set_all(o, "np", -10, -.5);
+	CU_ASSERT_EQUAL(LR_check(o), LRerr_OK);
+)
 
 int main(int argc, char* argv[]) {
 	CU_pSuite		pS		= NULL;
 	CU_pSuite		pSint		= NULL;
 	CU_pSuite		pShalf		= NULL;
 	CU_pSuite		pSfull		= NULL;
+	CU_pSuite		pSdisc		= NULL;
 	CU_BasicRunMode		mode		= CU_BRM_VERBOSE;
 	CU_ErrorAction		error_action	= CUEA_IGNORE;
 	int i;
@@ -2041,6 +2256,13 @@ int main(int argc, char* argv[]) {
 		CU_cleanup_registry();
 		return CU_get_error();
 	}
+	pSdisc = CU_add_suite("LR_test_suite_discrete",
+		init_suite, clean_suite);
+	if (pSdisc == NULL) {
+		printf("\nTest Registry Suite Discrete failure.");
+		CU_cleanup_registry();
+		return CU_get_error();
+	}
 	/* add tests to the suite */
 if ((NULL == CU_add_test(pS,"errors", test_LR_errors))
 ||  (NULL == CU_add_test(pS,"version", test_LR_version))
@@ -2065,26 +2287,26 @@ if ((NULL == CU_add_test(pS,"errors", test_LR_errors))
 ||  (NULL == CU_add_test(pS,"set_all3 - long", test_set_all3_long))
 ||  (NULL == CU_add_test(pS,"set_all3 - double",test_set_all3_double))
 ||  (NULL == CU_add_test(pS,"check - bad",test_check_bad_0))
-||  (NULL == CU_add_test(pS,"check - d - 0",test_check_d_0))
-||  (NULL == CU_add_test(pS,"check - d - 1",test_check_d_1))
-||  (NULL == CU_add_test(pS,"check - d - 2",test_check_d_2))
-||  (NULL == CU_add_test(pS,"check - d - 3",test_check_d_3))
-||  (NULL == CU_add_test(pS,"check - d - 4",test_check_d_4))
-||  (NULL == CU_add_test(pS,"check - d - 5",test_check_d_5))
-||  (NULL == CU_add_test(pS,"check - d - 6",test_check_d_6))
-||  (NULL == CU_add_test(pS,"check - d - 7",test_check_d_7))
-||  (NULL == CU_add_test(pS,"check - d - 8",test_check_d_8))
-||  (NULL == CU_add_test(pS,"check - d - 9",test_check_d_9))
-||  (NULL == CU_add_test(pS,"check - f - 0",test_check_f_0))
-||  (NULL == CU_add_test(pS,"check - f - 1",test_check_f_1))
-||  (NULL == CU_add_test(pS,"check - f - 2",test_check_f_2))
-||  (NULL == CU_add_test(pS,"check - f - 3",test_check_f_3))
-||  (NULL == CU_add_test(pS,"check - f - 4",test_check_f_4))
-||  (NULL == CU_add_test(pS,"check - f - 5",test_check_f_5))
-||  (NULL == CU_add_test(pS,"check - f - 6",test_check_f_6))
-||  (NULL == CU_add_test(pS,"check - f - 7",test_check_f_7))
-||  (NULL == CU_add_test(pS,"check - f - 8",test_check_f_8))
-||  (NULL == CU_add_test(pS,"check - f - 9",test_check_f_9))
+||  (NULL == CU_add_test(pS,"check - d - 0",test_check_unif_d_0))
+||  (NULL == CU_add_test(pS,"check - d - 1",test_check_unif_d_1))
+||  (NULL == CU_add_test(pS,"check - d - 2",test_check_gausbm_d_2))
+||  (NULL == CU_add_test(pS,"check - d - 3",test_check_gausbm_d_3))
+||  (NULL == CU_add_test(pS,"check - d - 4",test_check_uinvcdf_d_4))
+||  (NULL == CU_add_test(pS,"check - d - 5",test_check_uinvcdf_d_5))
+||  (NULL == CU_add_test(pS,"check - d - 6",test_check_uinvcdf_d_6))
+||  (NULL == CU_add_test(pS,"check - d - 7",test_check_uinvcdf_d_7))
+||  (NULL == CU_add_test(pS,"check - d - 8",test_check_uinvcdf_d_8))
+||  (NULL == CU_add_test(pS,"check - d - 9",test_check_uinvcdf_d_9))
+||  (NULL == CU_add_test(pS,"check - f - 0",test_check_unif_f_0))
+||  (NULL == CU_add_test(pS,"check - f - 1",test_check_unif_f_1))
+||  (NULL == CU_add_test(pS,"check - f - 2",test_check_gausbm_f_2))
+||  (NULL == CU_add_test(pS,"check - f - 3",test_check_gausbm_f_3))
+||  (NULL == CU_add_test(pS,"check - f - 4",test_check_uinvcdf_f_4))
+||  (NULL == CU_add_test(pS,"check - f - 5",test_check_uinvcdf_f_5))
+||  (NULL == CU_add_test(pS,"check - f - 6",test_check_uinvcdf_f_6))
+||  (NULL == CU_add_test(pS,"check - f - 7",test_check_uinvcdf_f_7))
+||  (NULL == CU_add_test(pS,"check - f - 8",test_check_uinvcdf_f_8))
+||  (NULL == CU_add_test(pS,"check - f - 9",test_check_uinvcdf_f_9))
 ||  (NULL == CU_add_test(pS,"indep seq - 1",test_indep_seq_1))
 ||  (NULL == CU_add_test(pS,"indep seq - 2",test_indep_seq_2))
 ||  (NULL == CU_add_test(pS,"indep seq - 3",test_indep_seq_3))
@@ -2115,6 +2337,9 @@ if ((NULL == CU_add_test(pS,"errors", test_LR_errors))
 ||  (NULL == CU_add_test(pS,"bad data type - 8", test_bad_f_dt_8))
 ||  (NULL == CU_add_test(pS,"bad data type - 9", test_bad_d_dt_9))
 ||  (NULL == CU_add_test(pS,"bad data type - 10", test_bad_f_dt_10))
+||  (NULL == CU_add_test(pS,"bad data type - 11", test_bad_i_dt_11))
+||  (NULL == CU_add_test(pS,"bad data type - 12", test_bad_i_dt_12))
+||  (NULL == CU_add_test(pS,"bad data type - 13", test_bad_i_dt_13))
 ) {
 		printf("\nTest Suite additions failure.");
 		CU_cleanup_registry();
@@ -2443,6 +2668,48 @@ if ((NULL == CU_add_test(pSfull,"Gausbm-P/CDF-d-0", test_cdf_pdf_d_gausbm_0))
 ||  (NULL == CU_add_test(pSfull,"Cauchy/Uinvcdf-Ran-f-11", test_uinvcdf_f_11))
 ) {
 		printf("\nTest Suite full range  additions failure.");
+		CU_cleanup_registry();
+		return CU_get_error();
+	}
+if ((NULL == CU_add_test(pSdisc,"Poisson-P/CDF-1-1", test_cdf_pdf_1_poisson_1))
+||  (NULL == CU_add_test(pSdisc,"Poisson-P/CDF-2-2", test_cdf_pdf_2_poisson_2))
+||  (NULL == CU_add_test(pSdisc,"Poisson-P/CDF-4-3", test_cdf_pdf_4_poisson_3))
+||  (NULL == CU_add_test(pSdisc,"Poisson-P/CDF-8-4", test_cdf_pdf_8_poisson_4))
+||  (NULL == CU_add_test(pSdisc,"Poisson-Ran-1-1", test_poisson_i_1))
+||  (NULL == CU_add_test(pSdisc,"Poisson-Ran-2-2", test_poisson_i_2))
+||  (NULL == CU_add_test(pSdisc,"Poisson-Ran-4-3", test_poisson_i_3))
+||  (NULL == CU_add_test(pSdisc,"Poisson-Ran-8-4", test_poisson_i_4))
+||  (NULL == CU_add_test(pSdisc,"Poisson-Ran-55-5", test_poisson_i_5))
+||  (NULL == CU_add_test(pSdisc,"check - Poisson - 1",test_check_poisson_i_1))
+||  (NULL == CU_add_test(pSdisc,"check - Poisson - 2",test_check_poisson_i_2))
+||  (NULL == CU_add_test(pSdisc,"Geom-P/CDF-25-1", test_cdf_pdf_25_geometric_1))
+||  (NULL == CU_add_test(pSdisc,"Geom-P/CDF-50-2", test_cdf_pdf_50_geometric_2))
+||  (NULL == CU_add_test(pSdisc,"Geom-P/CDF-75-3", test_cdf_pdf_75_geometric_3))
+||  (NULL == CU_add_test(pSdisc,"Geometric-Ran-def-1", test_geometric_i_1))
+||  (NULL == CU_add_test(pSdisc,"Geometric-Ran-50-2", test_geometric_i_2))
+||  (NULL == CU_add_test(pSdisc,"Geometric-Ran-20-3", test_geometric_i_3))
+||  (NULL == CU_add_test(pSdisc,"Geometric-Ran-35-4", test_geometric_i_4))
+||  (NULL == CU_add_test(pSdisc,"Geometric-Ran-65-5", test_geometric_i_5))
+||  (NULL == CU_add_test(pSdisc,"Geometric-Ran-80-6", test_geometric_i_6))
+||  (NULL == CU_add_test(pSdisc,"check - Geom - 1",test_check_geometric_i_1))
+||  (NULL == CU_add_test(pSdisc,"check - Geom - 2",test_check_geometric_i_2))
+||  (NULL == CU_add_test(pSdisc,"check - Geom - 3",test_check_geometric_i_3))
+||  (NULL == CU_add_test(pSdisc,"Binom-P/CDF-25-1", test_cdf_pdf_25_binomial_1))
+||  (NULL == CU_add_test(pSdisc,"Binom-P/CDF-50-2", test_cdf_pdf_50_binomial_2))
+||  (NULL == CU_add_test(pSdisc,"Binom-P/CDF-75-3", test_cdf_pdf_80_binomial_3))
+||  (NULL == CU_add_test(pSdisc,"Binomial-Ran-def-1", test_binomial_i_1))
+||  (NULL == CU_add_test(pSdisc,"Binomial-Ran-50-1", test_binomial_i_2))
+||  (NULL == CU_add_test(pSdisc,"Binomial-Ran-20-1", test_binomial_i_3))
+||  (NULL == CU_add_test(pSdisc,"Binomial-Ran-35-1", test_binomial_i_4))
+||  (NULL == CU_add_test(pSdisc,"Binomial-Ran-65-1", test_binomial_i_5))
+||  (NULL == CU_add_test(pSdisc,"Binomial-Ran-80-1", test_binomial_i_6))
+||  (NULL == CU_add_test(pSdisc,"check - Binomial - 1",test_check_binomial_i_1))
+||  (NULL == CU_add_test(pSdisc,"check - Binomial - 2",test_check_binomial_i_2))
+||  (NULL == CU_add_test(pSdisc,"check - Binomial - 3",test_check_binomial_i_3))
+||  (NULL == CU_add_test(pSdisc,"check - Binomial - 4",test_check_binomial_i_4))
+||  (NULL == CU_add_test(pSdisc,"check - Binomial - 5",test_check_binomial_i_5))
+) {
+		printf("\nTest Suite discrete  additions failure.");
 		CU_cleanup_registry();
 		return CU_get_error();
 	}

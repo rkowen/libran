@@ -9,8 +9,8 @@ Poisson point process, \e i.e. a process in which events occur continuously
 and independently at a constant average rate.
 
 \manonly
-   PDF(z) = 1/m * exp(-x/m)
-   CDF(z) = 1 - exp(-x/m)
+   PDF(x) = 1/m * exp(-x/m)
+   CDF(x) = 1 - exp(-x/m)
 \endmanonly
 
 \f{eqnarray*}{

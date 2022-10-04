@@ -20,6 +20,11 @@ such as 'xxx' for example.
   - LRf_xxx_PDF(LR_obj *o, float x) - probability density function (float)
   - LRf_xxx_CDF(LR_obj *o, float x) - cumulative density function (float)
 
+* Or for discrete variate distributions then
+  - LRi_xxx_RAN(LR_obj *o)	- random variate generator (int)
+  - LRi_xxx_PDF(LR_obj *o, int x) - probability (or mass) density function (float)
+  - LRi_xxx_CDF(LR_obj *o, int x) - cumulative density function (float)
+
 LRnew.c
 -------
 * Add the `case xxx` block to 'LR_new()' and set the \e default `LR_obj`

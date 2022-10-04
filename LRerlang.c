@@ -12,8 +12,8 @@ The attributes \e k is an integer greater than zero, and the scale \e m
 is greater than zero.
 
 \manonly
-   PDF(z) = x^(k-1) * exp(-x/m) / (m^k * (k-1)!)
-   CDF(z) = 1 - exp(-x/m) * sum_(n=0)^(k-1) (x/m)^n
+   PDF(x) = x^(k-1) * exp(-x/m) / (m^k * (k-1)!)
+   CDF(x) = 1 - exp(-x/m) * sum_(n=0)^(k-1) (x/m)^n
 \endmanonly
 
 \f{eqnarray*}{

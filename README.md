@@ -40,6 +40,9 @@ and
 
 The \e generic functions are found in `LRdf.c`.
 
+[For discrete distributions the probability mass function (PMF) is
+taken here as synonymous with the probability distribtuion function (PDF).]
+
 Random Variate Distributions
 ============================
 
@@ -98,6 +101,16 @@ lspline    | LRlspline.c       | Linear spline PDF on [a,b]
 piece      | LRpiece.c         | Histogram-like PDF on [a,b]
 inverse    | LRinv.c           | User defined CDF
 
+Discrete
+--------
+
+These distributions return discrete (integer values) which are
+distributed according to the probability mass function (PMF), but
+denoted here as the probability density function (PDF).
+
+Type       | Source            | Distribution Description
+---------- | ----------------- | ------------------------
+poisson    | LRpoisson.c       | Events in a fixed interval
 
 Example Code
 ============

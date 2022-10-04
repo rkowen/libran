@@ -51,8 +51,9 @@ LibRan Error Numbers
 */
 typedef	enum {
 /**< discrete distributions */
-	poiss,		/**< Poison */
-	binom,		/**< Binomial */
+	poisson = 1,	/**< Poisson */
+	geometric,	/**< Geometric */
+	binomial,	/**< Binomial */
 /**< continuum distributions */
 	unif,		/**< uniform */
 	piece,		/**< piecewise uniform */
@@ -95,7 +96,7 @@ used within the LibRan object.
 Then the associated type should be used from the given `LR_val` attribute.
 */
 typedef enum {
-	LR_int,		/*!< integer type */
+	LR_int = 1,	/*!< integer type */
 	LR_long,	/*!< long integer type */
 	LR_float,	/*!< single precision floating point type */
 	LR_double	/*!< double precision floating type */
@@ -154,12 +155,15 @@ struct LR_obj {
 	/**< set of Random Fns for this distribution type */
 	float	(*rnf)(LR_obj *);		/*!< rnf - float _RAN fn */
 	double	(*rnd)(LR_obj *);		/*!< rnd - double _RAN fn */
+	int	(*rni)(LR_obj *);		/*!< rni - int _RAN fn */
 	/**< set of PDFs for this distribution type */
 	float	(*pdff)(LR_obj *, float);	/*!< pdff - float _PDF fn */
 	double	(*pdfd)(LR_obj *, double);	/*!< pdfd - double _PDF fn */
+	float	(*pdfi)(LR_obj *, int);		/*!< pdfi - float _PDF fn */
 	/**< set of CDFs for this distribution type  */
 	float	(*cdff)(LR_obj *, float);	/*!< cdff - float _CDF fn */
 	double	(*cdfd)(LR_obj *, double);	/*!< cdfd - double _CDF fn */
+	float	(*cdfi)(LR_obj *, int);		/*!< cdfi - float _PDF fn */
 	/**< generic (void) pointer to some other object */
 	void *		aux;	/*!< aux - auxiliary object */
 	int		errno;	/*!< errno - last error encountered */
@@ -287,6 +291,10 @@ double LRd_CDF(LR_obj *o, double x);
 float LRf_RAN(LR_obj *o);
 float LRf_PDF(LR_obj *o, float x);
 float LRf_CDF(LR_obj *o, float x);
+/* int */
+int   LRi_RAN(LR_obj *o);
+float LRi_PDF(LR_obj *o, int x);
+float LRi_CDF(LR_obj *o, int x);
 /* LibRan generic auxiliary functions */
 int LR_aux_new(LR_obj *o, int n);
 int LR_aux_rm(LR_obj *o);
@@ -410,6 +418,21 @@ float LRf_cauchy_RAN(LR_obj *o);
 float LRf_cauchymar_RAN(LR_obj *o);
 float LRf_cauchy_PDF(LR_obj *o, float x);
 float LRf_cauchy_CDF(LR_obj *o, float x);
+
+/* Poisson */
+int LRi_poisson_RAN(LR_obj *o);
+float LRi_poisson_PDF(LR_obj *o, int x);
+float LRi_poisson_CDF(LR_obj *o, int x);
+
+/* Geometric */
+int LRi_geometric_RAN(LR_obj *o);
+float LRi_geometric_PDF(LR_obj *o, int x);
+float LRi_geometric_CDF(LR_obj *o, int x);
+
+/* Binomial */
+int LRi_binomial_RAN(LR_obj *o);
+float LRi_binomial_PDF(LR_obj *o, int x);
+float LRi_binomial_CDF(LR_obj *o, int x);
 
 #  ifdef __cplusplus
 }

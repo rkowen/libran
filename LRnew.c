@@ -368,6 +368,46 @@ LR_obj *LR_new(LR_type t, LR_data_type d) {
 			ptr->errno = LRerr_BadDataType;
 		}
 		break;
+	case poisson:
+		ptr->type = "poisson";
+		if (d == LR_int) {
+			ptr->p = (float) 1.0;
+			ptr->q = NAN;
+			ptr->rni  = LRi_poisson_RAN;
+			ptr->pdfi = LRi_poisson_PDF;
+			ptr->cdfi = LRi_poisson_CDF;
+		} else {
+			/* error */
+			ptr->errno = LRerr_BadDataType;
+		}
+		break;
+	case geometric:
+		ptr->type = "geometric";
+		if (d == LR_int) {
+			ptr->p = (float) 0.5;
+			ptr->q = NAN;
+			ptr->rni  = LRi_geometric_RAN;
+			ptr->pdfi = LRi_geometric_PDF;
+			ptr->cdfi = LRi_geometric_CDF;
+		} else {
+			/* error */
+			ptr->errno = LRerr_BadDataType;
+		}
+		break;
+	case binomial:
+		ptr->type = "binomial";
+		if (d == LR_int) {
+			ptr->p = (float) 0.5;
+			ptr->q = NAN;
+			ptr->n = 0;
+			ptr->rni  = LRi_binomial_RAN;
+			ptr->pdfi = LRi_binomial_PDF;
+			ptr->cdfi = LRi_binomial_CDF;
+		} else {
+			/* error */
+			ptr->errno = LRerr_BadDataType;
+		}
+		break;
 	default:
 		/* error */
 		ptr->errno = LRerr_BadLRType;
@@ -583,6 +623,35 @@ int LR_check(LR_obj *o) {
 			} else {
 				/* error */
 				return o->errno = LRerr_BadDataType;
+			}
+			return LRerr_OK;
+
+		case poisson:
+			if (o->p < 0) {
+				o->p = - o->p;
+			} else if (o->p == 0) {
+				return o->errno = LRerr_InvalidInputValue;
+			}
+			return LRerr_OK;
+
+		case geometric:
+			if (o->p < 0) {
+				o->p = - o->p;
+			}
+			if (o->p == 0 || o->p > 1) {
+				return o->errno = LRerr_InvalidInputValue;
+			}
+			return LRerr_OK;
+
+		case binomial:
+			if (o->p < 0) {
+				o->p = - o->p;
+			}
+			if (o->n < 0) {
+				o->n = - o->n;
+			}
+			if (o->n < 1 || o->p == 0 || o->p > 1) {
+				return o->errno = LRerr_InvalidInputValue;
 			}
 			return LRerr_OK;
 

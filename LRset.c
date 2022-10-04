@@ -91,11 +91,11 @@ int LR_vset(LR_obj *o, char *x, va_list ap) {
 			break;
 		case	'p':
 			f = va_arg(ap, double);
-			(void) memcpy(&(o->p), &f, sizeof(double));
+			(void) memcpy(&(o->p), &f, sizeof(float));
 			break;
 		case	'q':
 			f = va_arg(ap, double);
-			(void) memcpy(&(o->q), &f, sizeof(double));
+			(void) memcpy(&(o->q), &f, sizeof(float));
 			break;
 		default: /* rest are dependent on LR_type */
 			switch (o->d) {

@@ -9,8 +9,7 @@
 ## run  automake to generate a Makefile.in
 ##	Makefile.am \
 ##	configure.ac >  Makefile.in
-##	aclocal.m4  /
-##
+##	aclocal.m4  / ##
 
 AUTOMAKE_OPTIONS=foreign subdir-objects no-installinfo
 
@@ -29,7 +28,8 @@ LR_srcs	=								\
 	LRnew.c LRset.c LRbin.c LRdf.c LRerror.c LRversion.c		\
 	LRunif.c LRpiece.c LRlspline.c LRuinvcdf.c			\
 	LRnexp.c LRerlang.c						\
-	LRgaus.c LRgsn.c LRcauchy.c
+	LRgaus.c LRgsn.c LRcauchy.c					\
+	LRpoisson.c LRgeom.c LRbinom.c
 
 URAND_srcs = 								\
 	urand/urand.c
