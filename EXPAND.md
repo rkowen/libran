@@ -29,7 +29,7 @@ have code to set the attributes for either `double` and `float` or
 `int` and `long`.
 
 * Add the `case xxx` block to `LR_check()` and code to adjust "fixable"
-attributes.  (Usually, for examplt,
+attributes.  (Usually, for example,
 setting \e s non-negative and raising an error if given as \e zero.)
 
 LRxxx.c
