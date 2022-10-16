@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([LibRan], [0.1], [rk@owen.sj.ca.us])
+AC_INIT([LibRan], [0.2], [dr.rk.owen@gmail.com])
 AM_INIT_AUTOMAKE(foreign -Wportability)
 #
 # Doxygen

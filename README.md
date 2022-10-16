@@ -99,7 +99,7 @@ Type       | Source            | Distribution Description
 ---------- | ----------------- | ------------------------
 lspline    | LRlspline.c       | Linear spline PDF on [a,b]
 piece      | LRpiece.c         | Histogram-like PDF on [a,b]
-inverse    | LRinv.c           | User defined CDF
+inverse    | LRuinvcdf.c       | User defined CDF
 
 Discrete
 --------
@@ -112,7 +112,7 @@ Type       | Source            | Distribution Description
 ---------- | ----------------- | ------------------------
 poisson    | LRpoisson.c       | Events in a fixed interval
 
-Example Code
+Example Code			{#examplecode}
 ============
 
 Here is an example code showing how to use the `LR_obj` and `LR_bin`
@@ -132,11 +132,13 @@ with definite endpoints \e a and \e b.
 #include <math.h>
 #include "libran.h"
 
+#define MAXBIN	60
+
 int main() {
 	int nsamples = 50000;
 	// create LR object and binning object
 	LR_obj *o = LR_new(gausbm, LR_double);
-	LR_bin *b = LR_bin_new(62);
+	LR_bin *b = LR_bin_new(MAXBIN + 2);
 	if (!o) {
 		fprintf(stderr, "Error in creating LR object\n");
 		return 1;
@@ -161,16 +163,16 @@ int main() {
 	// set up bins (use attributes)
 	double	start	= o->m.d - 3.0*o->s.d,
 		finish	= o->m.d + 3.0*o->s.d,
-		incr	= 6.0*o->s.d / 60;
-	for (int i = 0; i <= 60; i++) {
+		incr	= 6.0*o->s.d / MAXBIN;
+	for (int i = 0; i <= MAXBIN; i++) {
 		if (LR_bin_set(b, start + i*incr)) {
 			LRperror("Sample Code - bin", b->errno);
 			return 5;
 		}
 	}
 	// set up expectation histogram
-	double	prevcdf = 0.0, thiscdf, ehist[62];
-	for (int i = 0; i < 61; i++) {
+	double	prevcdf = 0.0, thiscdf, ehist[MAXBIN+2];
+	for (int i = 0; i < MAXBIN+1; i++) {
 		if (isnan(thiscdf = LRd_CDF(o, start + i*incr))){
 			LRperror("Sample Code - CDF", o->errno);
 			return 6;
@@ -179,7 +181,7 @@ int main() {
 		prevcdf = thiscdf;
 	}
 	// last bin
-	ehist[61] = nsamples * (1.0 - prevcdf);
+	ehist[MAXBIN+1] = nsamples * (1.0 - prevcdf);
 
 	// run samples
 	double x;
@@ -199,7 +201,7 @@ int main() {
 	printf("\n"
 " n >  lo   -   hi   :    sample ,  expected\n"
 "--- ------- -------- ----------   ---------\n");
-	for (int i = 0; i < 61; i++) {
+	for (int i = 0; i < MAXBIN+1; i++) {
 		thisbdr = b->bdrs[i];
 		printf("% 3d>% 6.1f - % 6.1f : % 9ld , % 9.2f\n",
 			i, prevbdr, thisbdr, b->bins[i], ehist[i]);
@@ -207,7 +209,7 @@ int main() {
 	}
 	// last bin
 	printf("% 3d>% 6.1f - % 6.1f : % 9ld , % 9.2f\n",
-		61, prevbdr, 99., b->bins[61], ehist[61]);
+		MAXBIN+1, prevbdr, 99., b->bins[MAXBIN+1], ehist[MAXBIN+1]);
 
 	// clean up
 	LR_bin_rm(&b);

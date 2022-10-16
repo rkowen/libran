@@ -25,10 +25,11 @@ and \e float respectively:
 where \c UserCDF is some function name and any attributes are tracked
 internally or externally (but not passed through the function argument list).
 
-In addition when the user *must* supply some of the following:
-   * Zero, one, or two `LR_obj` end point attributes (\e a and \e b).
-   * The `LR_obj` \e middle and \e width (\e m and \e s) if either \e a or
-\b are not given.
+In addition, the user *must* supply some of the following:
+- Zero, one, or two `LR_obj` end point attributes (\e a and \e b).
+- The `LR_obj` \e middle and \e width (\e m and \e s) if either \e a
+  or \e b are not given.
+.
 
 These attributes are for the Zeroin method to start with some reasonable
 guesses of where to bracket the solution.  If your CDF has a well defined
@@ -105,6 +106,36 @@ CDF	U(u) =	{ 0			if x < 0
 \image html UserDefinedCDF.png
 \image latex UserDefinedCDF.eps "User defined CDF"
 
+Using the [example code](index.html#examplecode) as a template the output
+may look something like:
+\code
+
+ n >  lo   -   hi   :    sample ,  expected
+--- ------- -------- ----------   ---------
+  0> -99.0 -    0.0 :         0 ,      0.00
+  1>   0.0 -    0.1 :       307 ,    307.79
+  2>   0.1 -    0.2 :       891 ,    915.80
+  3>   0.2 -    0.3 :      1543 ,   1501.25
+  4>   0.3 -    0.4 :      2030 ,   2049.74
+  5>   0.4 -    0.5 :      2639 ,   2547.76
+  6>   0.5 -    0.6 :      2999 ,   2983.04
+  7>   0.6 -    0.7 :      3389 ,   3344.87
+  8>   0.7 -    0.8 :      3624 ,   3624.34
+  9>   0.8 -    0.9 :      3748 ,   3814.56
+ 10>   0.9 -    1.0 :      3848 ,   3910.86
+ 11>   1.0 -    1.1 :      3789 ,   3910.86
+ 12>   1.1 -    1.2 :      3729 ,   3814.56
+ 13>   1.2 -    1.3 :      3644 ,   3624.34
+ 14>   1.3 -    1.4 :      3357 ,   3344.87
+ 15>   1.4 -    1.5 :      3139 ,   2983.04
+ 16>   1.5 -    1.6 :      2478 ,   2547.76
+ 17>   1.6 -    1.7 :      2040 ,   2049.74
+ 18>   1.7 -    1.8 :      1548 ,   1501.25
+ 19>   1.8 -    1.9 :       953 ,    915.80
+ 20>   1.9 -    2.0 :       305 ,    307.79
+ 41>   2.0 -   99.0 :         0 ,      0.00
+
+\endcode
 */
 /*
  * Copyright	2019	R.K. Owen, Ph.D.

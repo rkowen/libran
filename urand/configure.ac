@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([LibRan],[0.1],[rk@owen.sj.ca.us])
+AC_INIT([LibRan],[0.2],[dr.rk.owen@gmail.com])
 AM_INIT_AUTOMAKE(foreign -Wportability)
 AC_CONFIG_SRCDIR([urand.c])
 AC_CONFIG_HEADERS([config.h])
@@ -41,42 +41,49 @@ AH_BOTTOM([
 /*!
 \def	LR_IRAND_LMAX2
 \brief	LibRan IRAND half max long value
+	(Should be (LONG_MAX+1)/2)
 */
 #undef LR_IRAND_LMAX2
 
 /*!
 \def	LR_IRAND_LMAX
 \brief	LibRan IRAND max long value
+	(Should be LONG_MAX)
 */
 #undef LR_IRAND_LMAX
 
 /*!
 \def	LR_IRAND_LNOT
 \brief	LibRan IRAND long NOT max (in hex)
+	(Should be LONG_MIN in hex)
 */
 #undef LR_IRAND_LNOT
 
 /*!
 \def	LR_IRAND_IMAX2
 \brief	LibRan IRAND half max int value
+	(Should be (INT_MAX+1)/2)
 */
 #undef LR_IRAND_IMAX2
 
 /*!
 \def	LR_IRAND_IMAX
 \brief	LibRan IRAND max int value
+	(Should be INT_MAX)
 */
 #undef LR_IRAND_IMAX
 
 /*!
 \def	LR_IRAND_INOT
 \brief	LibRan IRAND int NOT max (in hex)
+	(Should be INT_MIN in hex)
 */
 #undef LR_IRAND_INOT
 
 /*!
 \def	LR_FEPS
 \brief	LibRan float machine epsilon
+	(Should be FLT_EPSILON)
 */
 #undef LR_FEPS
 
@@ -89,6 +96,7 @@ AH_BOTTOM([
 /*!
 \def	LR_DEPS
 \brief	LibRan double machine epsilon
+	(Should be DBL_EPSILON)
 */
 #undef LR_DEPS
 
