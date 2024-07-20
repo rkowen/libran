@@ -21,6 +21,9 @@ executable - "turand" .  Run with "./turand" .
 #define ABS(a)	((a) < 0 ? -(a) : (a))
 
 #include <time.h>
+#ifdef HAVE_SYS_TIME_H
+#  include <sys/time.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include "libran.h"

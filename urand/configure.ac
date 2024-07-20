@@ -1,12 +1,12 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.71])
 AC_INIT([LibRan],[0.2],[dr.rk.owen@gmail.com])
 AM_INIT_AUTOMAKE(foreign -Wportability)
 AC_CONFIG_SRCDIR([urand.c])
 AC_CONFIG_HEADERS([config.h])
-AC_AIX
+AC_USE_SYSTEM_EXTENSIONS
 AC_PROG_MAKE_SET
 
 dnl ---------------------------------------------------------------------------
@@ -145,7 +145,7 @@ AC_SEARCH_LIBS([sqrt], [m])
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h])
 # this is mostly for the configure time checks
-AC_HEADER_TIME
+AC_CHECK_HEADERS([sys/time.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
